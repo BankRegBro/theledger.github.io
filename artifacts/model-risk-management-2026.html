@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>What Changed: 2026 Model Risk Management Guidance — The Ledger</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --navy:    #07111f;
+      --navy2:   #0c1d35;
+      --navy3:   #112540;
+      --gold:    #c8a84a;
+      --gold2:   #e0c870;
+      --gold3:   #7a6030;
+      --cream:   #f2ece0;
+      --parch:   #e8e0d0;
+      --mist:    #8fa8c0;
+      --dim:     #405870;
+      --rule:    rgba(200,168,74,0.18);
+      --new:     #4a9870;
+      --new-bg:  rgba(74,152,112,0.08);
+      --mod:     #c07030;
+      --mod-bg:  rgba(192,112,48,0.08);
+      --del:     #c04050;
+      --del-bg:  rgba(192,64,80,0.08);
+      --same:    #405878;
+      --same-bg: rgba(64,88,120,0.06);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--navy);
+      color: var(--cream);
+      font-family: 'Source Serif 4', Georgia, serif;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--navy2);
+      border-bottom: 1px solid var(--gold);
+      padding: 1.2rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .back-link {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      color: var(--gold3);
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+    .back-link:hover { color: var(--gold); }
+
+    .header-meta {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      color: var(--dim);
+      letter-spacing: 0.1em;
+    }
+
+    /* ── MASTHEAD ── */
+    .masthead {
+      background: var(--navy2);
+      border-bottom: 1px solid var(--rule);
+      padding: 4rem 3rem 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .masthead::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+
+    .masthead-inner { max-width: 800px; }
+
+    .eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 2rem;
+      height: 1px;
+      background: var(--gold);
+    }
+
+    .masthead h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 900;
+      line-height: 1.1;
+      color: var(--cream);
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.01em;
+    }
+
+    .masthead h1 em {
+      color: var(--gold2);
+      font-style: italic;
+    }
+
+    .masthead-sub {
+      font-size: 1.15rem;
+      color: var(--mist);
+      font-weight: 300;
+      line-height: 1.6;
+      max-width: 620px;
+      margin: 1rem 0 1.5rem;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem;
+      padding: 0.25rem 0.6rem;
+      letter-spacing: 0.08em;
+      border: 1px solid;
+    }
+
+    .tag.auth { color: var(--gold); border-color: var(--gold3); }
+    .tag.date { color: var(--mist); border-color: var(--dim); }
+
+    /* ── LEGEND ── */
+    .legend-bar {
+      background: var(--navy3);
+      border-bottom: 1px solid var(--rule);
+      padding: 0.75rem 3rem;
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .legend-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.5rem;
+      color: var(--dim);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-right: 0.5rem;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.5rem;
+      letter-spacing: 0.08em;
+    }
+
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 1px;
+    }
+
+    /* ── LAYOUT ── */
+    .page-body {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 3rem 5rem;
+    }
+
+    /* ── INTRO ── */
+    .intro-block {
+      max-width: 720px;
+      margin-bottom: 3rem;
+      padding-bottom: 2.5rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .intro-block p {
+      font-size: 1.15rem;
+      line-height: 1.75;
+      color: var(--mist);
+      font-weight: 300;
+      margin-bottom: 1rem;
+    }
+
+    .intro-block p:last-child { margin-bottom: 0; }
+
+    .inline-gold { color: var(--gold2); font-style: italic; }
+
+    /* ── SECTION ── */
+    .section {
+      margin-bottom: 3.5rem;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .section-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem;
+      color: var(--gold3);
+      letter-spacing: 0.15em;
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--cream);
+      line-height: 1.2;
+    }
+
+    /* ── CHANGE CARDS ── */
+    .changes-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .change-card {
+      border: 1px solid;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .change-card.new  { border-color: rgba(74,152,112,0.3); }
+    .change-card.mod  { border-color: rgba(192,112,48,0.3); }
+    .change-card.same { border-color: rgba(64,88,120,0.2);  }
+
+    .change-header {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      cursor: pointer;
+      padding: 1rem 1.2rem;
+    }
+
+    .change-card.new  .change-header { background: var(--new-bg); }
+    .change-card.mod  .change-header { background: var(--mod-bg); }
+    .change-card.same .change-header { background: var(--same-bg); }
+
+    .change-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.48rem;
+      letter-spacing: 0.12em;
+      padding: 0.2rem 0.55rem;
+      border-radius: 2px;
+      margin-right: 1rem;
+      flex-shrink: 0;
+      text-transform: uppercase;
+    }
+
+    .change-card.new  .change-badge { background: var(--new); color: #fff; }
+    .change-card.mod  .change-badge { background: var(--mod); color: #fff; }
+    .change-card.same .change-badge { background: var(--same); color: #fff; }
+
+    .change-title {
+      font-family: 'Source Serif 4', serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--cream);
+      flex: 1;
+      line-height: 1.3;
+    }
+
+    .change-toggle {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--dim);
+      margin-left: 1rem;
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+
+    .change-card.open .change-toggle { transform: rotate(180deg); }
+
+    .change-body {
+      display: none;
+      padding: 1.2rem 1.5rem 1.5rem;
+      border-top: 1px solid;
+    }
+
+    .change-card.new  .change-body { border-color: rgba(74,152,112,0.15); }
+    .change-card.mod  .change-body { border-color: rgba(192,112,48,0.15); }
+    .change-card.same .change-body { border-color: rgba(64,88,120,0.1); }
+
+    .change-card.open .change-body { display: block; }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 600px) { .compare-grid { grid-template-columns: 1fr; } }
+
+    .compare-col h5 {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.48rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+      padding-bottom: 0.35rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .compare-col.before h5 { color: var(--dim); }
+    .compare-col.after  h5 { color: var(--gold2); }
+
+    .compare-col p {
+      font-size: 0.95rem;
+      color: var(--mist);
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    .change-implication {
+      background: rgba(200,168,74,0.05);
+      border-left: 2px solid var(--gold3);
+      padding: 0.75rem 1rem;
+      margin-top: 1rem;
+    }
+
+    .change-implication h5 {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.46rem;
+      letter-spacing: 0.15em;
+      color: var(--gold3);
+      text-transform: uppercase;
+      margin-bottom: 0.35rem;
+    }
+
+    .change-implication p {
+      font-size: 0.92rem;
+      color: var(--mist);
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    /* ── SUMMARY TABLE ── */
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.5rem;
+    }
+
+    .summary-table th {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.5rem;
+      letter-spacing: 0.12em;
+      color: var(--gold3);
+      text-transform: uppercase;
+      text-align: left;
+      padding: 0.6rem 1rem;
+      background: var(--navy3);
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .summary-table td {
+      font-size: 0.9rem;
+      padding: 0.75rem 1rem;
+      vertical-align: top;
+      border-bottom: 1px solid rgba(64,88,120,0.15);
+      line-height: 1.5;
+      color: var(--mist);
+      font-weight: 300;
+    }
+
+    .summary-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .tbl-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.42rem;
+      padding: 0.15rem 0.4rem;
+      border-radius: 2px;
+      letter-spacing: 0.08em;
+    }
+
+    /* ── PULLQUOTE ── */
+    .pullquote {
+      border-left: 3px solid var(--gold);
+      padding: 1.5rem 2rem;
+      margin: 2.5rem 0;
+      background: rgba(200,168,74,0.04);
+    }
+
+    .pullquote p {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-style: italic;
+      color: var(--cream);
+      line-height: 1.55;
+    }
+
+    .pullquote cite {
+      display: block;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.52rem;
+      letter-spacing: 0.12em;
+      color: var(--gold3);
+      margin-top: 0.75rem;
+      font-style: normal;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--rule);
+      padding: 1.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    footer span {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.52rem;
+      color: var(--dim);
+      letter-spacing: 0.08em;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a class="back-link" href="../index.html">◄ The Ledger</a>
+  <span class="header-meta">POLICY ANALYSIS · MODEL RISK MANAGEMENT</span>
+</header>
+
+<!-- MASTHEAD -->
+<div class="masthead">
+  <div class="masthead-inner">
+    <div class="eyebrow">Policy Analysis · Interagency Guidance</div>
+    <h1>What Changed:<br><em>The 2026 Revised Model<br>Risk Management Guidance</em></h1>
+    <p class="masthead-sub">A structured breakdown of the 2026 interagency revisions to model risk management — tracking every material shift from SR 11-7, what the agencies added, modified, and left intact, and what it means for AI, machine learning, and algorithmic model governance.</p>
+    <div class="tag-row">
+      <span class="tag auth">Federal Reserve · OCC · FDIC</span>
+      <span class="tag date">2026 Revised Guidance</span>
+      <span class="tag date">Supersedes SR 11-7 (2011)</span>
+    </div>
+  </div>
+</div>
+
+<!-- LEGEND -->
+<div class="legend-bar">
+  <span class="legend-label">Change Key:</span>
+  <div class="legend-item"><span class="legend-dot" style="background:#4a9870"></span><span style="color:#4a9870">NEW — Added in 2026</span></div>
+  <div class="legend-item"><span class="legend-dot" style="background:#c07030"></span><span style="color:#c07030">MODIFIED — Updated from SR 11-7</span></div>
+  <div class="legend-item"><span class="legend-dot" style="background:#405878"></span><span style="color:#8fa8c0">RETAINED — Core principle unchanged</span></div>
+</div>
+
+<div class="page-body">
+
+  <!-- INTRO -->
+  <div class="intro-block">
+    <p>SR 11-7 has governed model risk management at supervised institutions for over a decade. Issued in 2011, its three-pillar framework — model development and implementation, model validation, and governance — remains the conceptual backbone of the 2026 revision. But the world has changed dramatically.</p>
+    <p>The proliferation of <span class="inline-gold">AI and machine learning models</span>, the rise of third-party and vendor-supplied models, the embedding of models into real-time decisioning systems, and increasing supervisory focus on algorithmic fairness have all strained the original guidance's applicability. The 2026 revision responds — sometimes boldly, sometimes cautiously — to each of these pressures.</p>
+    <p>This analysis traces every material change, explains what prompted it, and draws out the implications for model risk officers, validators, and the boards and senior leaders who sign off on model risk appetite.</p>
+  </div>
+
+  <div class="pullquote">
+    <p>"The definition of a model has not changed. The universe of things that qualify as models — and the risks they carry — has transformed entirely."</p>
+    <cite>— Synthesis of 2026 Guidance Preamble</cite>
+  </div>
+
+  <!-- SECTION 1: SCOPE & DEFINITIONS -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">01</span>
+      <h2 class="section-title">Scope &amp; Definitions</h2>
+    </div>
+    <div class="changes-stack">
+
+      <div class="change-card new" onclick="toggleCard(this)">
+        <div class="change-header">
+          <span class="change-badge">NEW</span>
+          <span class="change-title">Explicit inclusion of AI/ML models within the model definition</span>
+          <span class="change-toggle">▾</span>
+        </div>
+        <div class="change-body">
+          <div class="compare-grid">
+            <div class="compare-col before">
+              <h5>SR 11-7 (2011)</h5>
+              <p>Defined a model as a quantitative method, system, or approach that applies statistical, economic, financial, or mathematical theories to transform inputs into quantitative estimates. AI/ML not addressed; guidance predates widespread ML adoption in banking.</p>
+            </div>
+            <div class="compare-col after">
+              <h5>2026 Revision</h5>
+              <p>Explicitly extends the definition to cover AI/ML systems, including large language models used in decisioning, gradient boosting and neural network credit scoring models, and generative AI tools embedded in customer-facing or internal processes. Addresses model complexity, opacity ("black box" risk), and the challenge of validating models that evolve post-deployment.</p>
+            </div>
+          </div>
+          <div class="change-implication">
+            <h5>Implication</h5>
+            <p>Any AI/ML system that influences a consequential business decision — credit, fraud, pricing, compliance — is now unambiguously within scope. Institutions that have treated ML models as tools rather than models will need to bring them into the formal model inventory, validation program, and governance framework.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="change-card new" onclick="toggleCard(this)">
+        <div class="change-header">
+          <span class="change-badge">NEW</span>
+          <span class="change-title">Tiered model risk classification framework</span>
+          <span class="change-toggle">▾</span>
+        </div>
+        <div class="change-body">
+          <div class="compare-grid">
+            <div class="compare-col before">
+              <h5>SR 11-7 (2011)</h5>
+              <p>Required proportional oversight — more scrutiny for higher-risk models — but provided no standard taxonomy for risk tiering. Classification was left entirely to institution discretion, creating significant variation in practice.</p>
+            </div>
+            <div class="compare-col after">
+              <h5>2026 Revision</h5>
+              <p>Introduces a structured three-tier classification: (1) High — models with significant financial, consumer, or regulatory impact; (2) Moderate — standard production models; (3) Low — simple, well-understood, limited-impact tools. Each tier carries defined validation frequency, documentation, and governance requirements.</p>
+            </div>
+          </div>
+          <div class="change-implication">
+            <h5>Implication</h5>
+            <p>Tiering reduces ambiguity and will be a primary examination focus. Examiners will assess whether institutions have applied tiering consistently and whether high-tier designations are capturing the right models — particularly AI/ML systems that may have been under-classified.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="change-card mod" onclick="toggleCard(this)">
+        <div class="change-header">
+          <span class="change-badge">MODIFIED</span>
+          <span class="change-title">Expanded model inventory requirements</span>
+          <span class="change-toggle">▾</span>
+        </div>
+        <div class="change-body">
+          <div class="compare-grid">
+            <div class="compare-col before">
+              <h5>SR 11-7 (2011)</h5>
+              <p>Required institutions to maintain a model inventory, but did not specify content requirements. In practice, inventories varied widely — some comprehensive, others little more than a list of names.</p>
+            </div>
+            <div class="compare-col after">
+              <h5>2026 Revision</h5>
+              <p>Mandates specific inventory data fields: model name and purpose, risk tier, business owner, model developer, last validation date, next scheduled validation, key assumptions, known limitations, performance monitoring status, and — critically — whether the model is vendor-supplied or developed in-house.</p>
+            </div>
+          </div>
+          <div class="change-implication">
+            <h5>Implication</h5>
+            <p>Institutions with informal or spreadsheet-based inventories will face pressure to formalize. The explicit requirement to flag vendor models is significant — it sets the stage for heightened scrutiny of third-party model governance and vendor concentration risk.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION 2: MODEL DEVELOPMENT -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">02</span>
+      <h2 class="section-title">Model Development &amp; Implementation</h2>
+    </div>
+    <div class="changes-stack">
+
+      <div class="change-card new" onclick="toggleCard(this)">
+        <div class="change-header">
+          <span class="change-badge">NEW</span>
+          <span class="change-title">Algorithmic fairness and bias testing requirements</span>
+          <span class="change-toggle">▾</span>
+        </div>
+        <div class="change-body">
+          <div class="compare-grid">
+            <div class="compare-col before">
+              <h5>SR 11-7 (2011)</h5>
+              <p>No explicit fairness or bias requirements. Fair lending compliance existed in parallel regulatory frameworks but was not integrated into MRM guidance.</p>
+            </div>
+            <div class="compare-col after">
+              <h5>2026 Revision</h5>
+              <p>Requires bias testing and disparity analysis for models used in consumer credit, pricing, or other decisions with fair lending implications. Mandates documentation of data sourcing decisions — particularly where proxy variables for protected characteristics may be present. Requires adverse impact analysis as part of model development for in-scope models.</p>
+            </div>
+          </div>
+          <div class="change-implication">
+            <h5>Implication</h5>
+            <p>This provision bridges MRM and fair lending compliance, historically managed in separate silos. Model risk officers will need closer coordination with fair lending counsel and compliance teams. AI/ML credit scoring models face the highest scrutiny given their opacity and potential to encode historical disparities.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="change-card mod" onclick="toggleCard(this)">
+        <div class="change-header">
+          <span class="change-badge">MODIFIED</span>
+          <span class="change-title">Data quality and lineage documentation — substantially expanded</span>
+          <span class="change-toggle">▾</span>
+        </div>
+        <div class="change-body">
+          <div class="compare-grid">
+            <div class="compare-col before">
+              <h5>SR 11-7 (2011)</h5>
+              <p>Required developers to document data inputs and verify data quality. Relatively high-level — focused on ensuring inputs were appropriate and representative.</p>
+            </div>
+            <div class="compare-col after">
+              <h5>2026 Revision</h5>
+              <p>Mandates full data lineage documentation — source, transformation steps, cleaning decisions, and known data gaps. Requires explicit assessment of training data representativeness for ML models, including vintage and coverage considerations. Addresses concept drift — the risk that a model trained on historical data becomes less predictive as the environment changes — and requires monitoring plans to detect it.</p>
+            </div>
+          </div>
+          <div class="change-implication">
+            <h5>Implication</h5>
+            <p>Concept drift monitoring will be a new operational requirement for most institutions. Models trained pre-pandemic and not revalidated post-pandemic are a primary examiner target — the economic discontinuity exposed the fragility of historically-trained models.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="change-card same" onclick="toggleCard(this)">
+        <div class="change-header">
+          <span class="change-badge">RETAINED</span>
+          <span class="change-title">Core requirement: document purpose, assumptions, and limitations</span>
+          <span class="change-toggle">▾</span>
+        </div>
+        <div class="change-body">
+          <div class="compare-grid">
+            <div class="compare-col before">
+              <h5>SR 11-7 (2011)</h5>
+              <p>Required documentation of model purpose, design rationale, key assumptions, data inputs, and known limitations. Emphasized that developers must understand their own model's mechanics.</p>
+            </div>
+            <div class="compare-col after">
+              <h5>2026 Revision</h5>
+              <p>Retains all core documentation requirements. Extended to explicitly cover AI/ML architectures — requiring that even complex models be documented at a level sufficient for a knowledgeable validator to assess design choices independently.</p>
+            </div>
+          </div>
+          <div class="change-implication">
+            <h5>Implication</h5>
+            <p>The "black box" defense is gone. Institutions cannot claim a vendor model is too complex to document. If a model cannot be adequately documented, it may not be appropriate for the intended use.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION 3: VALIDATION -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">03</span>
+      <h2 class="section-title">Model Validation</h2>
+    </div>
+    <div class="changes-stack">
+
+      <div class="change-card mod" onclick="toggleCard(this)">
+        <div class="change-header">
+          <span class="change-badge">MODIFIED</span>
+          <span class="change-title">Validation independence standards — strengthened and clarified</span>
+          <span class="change-toggle">▾</span>
+        </div>
+        <div class="change-body">
+          <div class="compare-grid">
+            <div class="compare-col before">
+              <h5>SR 11-7 (2011)</h5>
+              <p>Required effective challenge and independence — validators must be separate from model developers. The standard was qualitative; "effective challenge" was principles-based.</p>
+            </div>
+            <div class="compare-col after">
+              <h5>2026 Revision</h5>
+              <p>Clarifies that independence means organizational separation with independent reporting lines, not merely different individuals. Explicitly prohibits validators from validating models they had material input in developing. Introduces the concept of "shadow validation" for high-tier models — parallel validation by a second independent team for models with systemic importance.</p>
+            </div>
+          </div>
+          <div class="change-implication">
+            <h5>Implication</h5>
+            <p>Community banks and smaller institutions that rely on the same small team for development and validation face the sharpest compliance challenge. The guidance acknowledges resource constraints and allows compensating controls — but these must be explicit and documented, not assumed.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="change-card new" onclick="toggleCard(this)">
+        <div class="change-header">
+          <span class="change-badge">NEW</span>
+          <span class="change-title">Vendor model validation — explicit and enforceable obligations</span>
+          <span class="change-toggle">▾</span>
+        </div>
+        <div class="change-body">
+          <div class="compare-grid">
+            <div class="compare-col before">
+              <h5>SR 11-7 (2011)</h5>
+              <p>Addressed vendor models only briefly, noting that institutions remain responsible. In practice, many institutions accepted vendor validation documentation as a substitute for independent review — a practice examiners tolerated inconsistently.</p>
+            </div>
+            <div class="compare-col after">
+              <h5>2026 Revision</h5>
+              <p>Makes clear that vendor-supplied models must be independently validated by the institution, commensurate with risk tier. Vendor documentation may inform — but does not replace — independent validation. Institutions must have contractual rights to access model documentation, and validation findings must be shared with vendors for remediation where applicable.</p>
+            </div>
+          </div>
+          <div class="change-implication">
+            <h5>Implication</h5>
+            <p>This is the provision most likely to drive immediate operational change. Institutions that have accepted SOC reports and vendor white papers as validation substitutes will need to build independent validation capacity for their vendor model portfolio — or accept that high-tier vendor models carry elevated, documented residual risk.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="change-card new" onclick="toggleCard(this)">
+        <div class="change-header">
+          <span class="change-badge">NEW</span>
+          <span class="change-title">Continuous monitoring as a validation component for high-tier models</span>
+          <span class="change-toggle">▾</span>
+        </div>
+        <div class="change-body">
+          <div class="compare-grid">
+            <div class="compare-col before">
+              <h5>SR 11-7 (2011)</h5>
+              <p>Required periodic validation on a defined cycle, supplemented by ongoing performance monitoring. Monitoring was a separate function from validation — periodic revalidation was the primary control.</p>
+            </div>
+            <div class="compare-col after">
+              <h5>2026 Revision</h5>
+              <p>For high-tier models — particularly AI/ML models in production — requires continuous or near-continuous performance monitoring as an integral component of the validation function. Monitoring metrics must be pre-specified, with defined thresholds that trigger escalation to full revalidation. Addresses model drift, performance degradation, and population shift.</p>
+            </div>
+          </div>
+          <div class="change-implication">
+            <h5>Implication</h5>
+            <p>The line between validation and monitoring has effectively blurred for high-tier models. Model validation functions will need technology infrastructure — dashboards, automated alerts, statistical process controls — not just periodic review workflows. This is a meaningful resource investment for most institutions.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION 4: GOVERNANCE -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">04</span>
+      <h2 class="section-title">Governance, Oversight &amp; Culture</h2>
+    </div>
+    <div class="changes-stack">
+
+      <div class="change-card mod" onclick="toggleCard(this)">
+        <div class="change-header">
+          <span class="change-badge">MODIFIED</span>
+          <span class="change-title">Board and senior management responsibilities — materially elevated</span>
+          <span class="change-toggle">▾</span>
+        </div>
+        <div class="change-body">
+          <div class="compare-grid">
+            <div class="compare-col before">
+              <h5>SR 11-7 (2011)</h5>
+              <p>Required board and senior management to establish and maintain a model risk management framework, approve risk appetite, and receive periodic reporting on model risk. Responsibilities were framed at the governance structure level.</p>
+            </div>
+            <div class="compare-col after">
+              <h5>2026 Revision</h5>
+              <p>Significantly elevates board-level expectations: boards must understand the institution's AI/ML model landscape, not just receive summary reporting. Senior management is responsible for ensuring that model risk expertise exists — not just that policies are in place. Introduces the concept of a Model Risk Committee at the management level as a governance expectation for larger institutions.</p>
+            </div>
+          </div>
+          <div class="change-implication">
+            <h5>Implication</h5>
+            <p>Board directors who lack technical literacy around AI/ML face increased scrutiny. Institutions should assess whether board composition and training programs are adequate — and whether board reporting has evolved beyond dashboard summaries to substantive model risk discussion.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="change-card new" onclick="toggleCard(this)">
+        <div class="change-header">
+          <span class="change-badge">NEW</span>
+          <span class="change-title">Model risk culture as an explicit supervisory dimension</span>
+          <span class="change-toggle">▾</span>
+        </div>
+        <div class="change-body">
+          <div class="compare-grid">
+            <div class="compare-col before">
+              <h5>SR 11-7 (2011)</h5>
+              <p>Did not address organizational culture explicitly. Governance was assessed structurally — committees, policies, reporting — not behaviorally.</p>
+            </div>
+            <div class="compare-col after">
+              <h5>2026 Revision</h5>
+              <p>Introduces model risk culture as an explicit governance dimension. Examiners will assess: whether model limitations are openly communicated or suppressed; whether business lines push back on validation findings; whether the institution rewards model development velocity over model risk discipline; and whether model risk concerns reach senior management without distortion.</p>
+            </div>
+          </div>
+          <div class="change-implication">
+            <h5>Implication</h5>
+            <p>Culture is notoriously difficult to examine — but examiners have tools: interview patterns, escalation logs, instances where model limitations were disclosed to users, and cases where model findings conflicted with business preferences. This provision gives examiners latitude to raise concerns that structural governance metrics alone might miss.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="change-card same" onclick="toggleCard(this)">
+        <div class="change-header">
+          <span class="change-badge">RETAINED</span>
+          <span class="change-title">Three lines of defense model risk framework</span>
+          <span class="change-toggle">▾</span>
+        </div>
+        <div class="change-body">
+          <div class="compare-grid">
+            <div class="compare-col before">
+              <h5>SR 11-7 (2011)</h5>
+              <p>Implicitly supported a three-lines structure: business line model owners (first line), independent model validation (second line), and internal audit (third line). Did not use "three lines" terminology explicitly.</p>
+            </div>
+            <div class="compare-col after">
+              <h5>2026 Revision</h5>
+              <p>Explicitly adopts three-lines-of-defense framing. Clarifies that internal audit should independently assess the MRM framework — not just review model inventories — and should have sufficient AI/ML expertise to do so meaningfully. Internal audit that lacks technical capacity to evaluate AI governance is itself a governance finding.</p>
+            </div>
+          </div>
+          <div class="change-implication">
+            <h5>Implication</h5>
+            <p>The audit finding implication is significant. Many internal audit functions have not invested in data science or ML expertise, relying on control framework reviews rather than technical model assessment. The 2026 guidance signals that this gap is itself a supervisory concern.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- QUICK REFERENCE TABLE -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">05</span>
+      <h2 class="section-title">Quick Reference: What Changed at a Glance</h2>
+    </div>
+    <table class="summary-table">
+      <thead>
+        <tr>
+          <th>Topic</th>
+          <th>Status</th>
+          <th>Key Change</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>AI/ML model inclusion</td>
+          <td><span class="tbl-badge" style="background:var(--new);color:#fff">NEW</span></td>
+          <td>Explicitly within scope; opacity addressed</td>
+        </tr>
+        <tr>
+          <td>Risk tiering framework</td>
+          <td><span class="tbl-badge" style="background:var(--new);color:#fff">NEW</span></td>
+          <td>Three-tier structure with defined requirements per tier</td>
+        </tr>
+        <tr>
+          <td>Algorithmic fairness testing</td>
+          <td><span class="tbl-badge" style="background:var(--new);color:#fff">NEW</span></td>
+          <td>Bias and disparity analysis required for consumer models</td>
+        </tr>
+        <tr>
+          <td>Continuous monitoring (high-tier)</td>
+          <td><span class="tbl-badge" style="background:var(--new);color:#fff">NEW</span></td>
+          <td>Required as validation component, not separate function</td>
+        </tr>
+        <tr>
+          <td>Vendor model validation</td>
+          <td><span class="tbl-badge" style="background:var(--new);color:#fff">NEW</span></td>
+          <td>Independent validation explicitly required; vendor docs insufficient</td>
+        </tr>
+        <tr>
+          <td>Model risk culture</td>
+          <td><span class="tbl-badge" style="background:var(--new);color:#fff">NEW</span></td>
+          <td>Explicit supervisory dimension; behavioral assessment</td>
+        </tr>
+        <tr>
+          <td>Model inventory content</td>
+          <td><span class="tbl-badge" style="background:var(--mod);color:#fff">MOD</span></td>
+          <td>Specific required fields defined; vendor flag mandatory</td>
+        </tr>
+        <tr>
+          <td>Data quality & lineage</td>
+          <td><span class="tbl-badge" style="background:var(--mod);color:#fff">MOD</span></td>
+          <td>Full lineage + concept drift monitoring required</td>
+        </tr>
+        <tr>
+          <td>Validation independence</td>
+          <td><span class="tbl-badge" style="background:var(--mod);color:#fff">MOD</span></td>
+          <td>Org separation required; shadow validation for systemic models</td>
+        </tr>
+        <tr>
+          <td>Board/senior mgmt oversight</td>
+          <td><span class="tbl-badge" style="background:var(--mod);color:#fff">MOD</span></td>
+          <td>Substantive AI literacy expected; Model Risk Committee guidance</td>
+        </tr>
+        <tr>
+          <td>Core model definition</td>
+          <td><span class="tbl-badge" style="background:var(--same);color:#fff">RETAINED</span></td>
+          <td>Unchanged; extended to encompass AI/ML explicitly</td>
+        </tr>
+        <tr>
+          <td>Three lines of defense</td>
+          <td><span class="tbl-badge" style="background:var(--same);color:#fff">RETAINED</span></td>
+          <td>Formalized with explicit internal audit expectations</td>
+        </tr>
+        <tr>
+          <td>Document purpose/assumptions/limits</td>
+          <td><span class="tbl-badge" style="background:var(--same);color:#fff">RETAINED</span></td>
+          <td>Core requirement; black-box defense explicitly rejected</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+</div>
+
+<footer>
+  <span>THE LEDGER · FINANCIAL SERVICES POLICY</span>
+  <span>ANALYSIS BASED ON 2026 INTERAGENCY REVISED GUIDANCE · SR 11-7 SUPERSEDED</span>
+</footer>
+
+<script>
+function toggleCard(card) {
+  card.classList.toggle('open');
+}
+</script>
+</body>
+</html>

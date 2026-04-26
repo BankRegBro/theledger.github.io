@@ -1,0 +1,2861 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Press start to pay — The Ledger</title>
+<meta name="description" content="Sony's application for a national trust charter is under active review at the OCC. The implications stretch well beyond gaming." />
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,700&family=Inconsolata:wght@400;600;700&display=swap" rel="stylesheet" />
+
+<!-- React + Recharts + Babel load via the robust loader at the end of this document.
+     The article source itself is the <script type="text/babel-template" id="article-jsx">
+     block further down; the loader compiles and mounts it once all deps are available. -->
+
+<style>
+  :root {
+    --navy: #0F2A44;
+    --navy-deep: #081A2D;
+    --navy-soft: #1F3D5C;
+    --gold: #C8A44D;
+    --gold-deep: #A88534;
+    --gold-soft: #E5C87A;
+    --cream: #F5EFE1;
+    --cream-deep: #EBE2CE;
+    --ink: #1A1814;
+    --rule: #D9CFB8;
+    --muted: #6B6354;
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: Georgia, "EB Garamond", serif;
+  }
+  ::selection { background: var(--gold); color: var(--navy); }
+
+  /* range sliders */
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    width: 100%;
+  }
+  input[type="range"]::-webkit-slider-runnable-track { height: 2px; background: var(--rule); }
+  input[type="range"]::-moz-range-track { height: 2px; background: var(--rule); }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--gold-deep);
+    margin-top: -8px;
+    border: 2px solid var(--cream);
+    box-shadow: 0 2px 6px rgba(15,42,68,0.3);
+    cursor: pointer;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--gold-deep);
+    border: 2px solid var(--cream);
+    box-shadow: 0 2px 6px rgba(15,42,68,0.3);
+    cursor: pointer;
+  }
+
+  /* loading spinner */
+  #root-loading {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 20px;
+    color: var(--navy);
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+  #root-loading .brand {
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+  }
+  #root-loading .tag {
+    font-family: 'Inconsolata', monospace;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+  }
+  @keyframes pulse { 0%,100% { opacity: 0.3; } 50% { opacity: 1; } }
+  #root-loading .dots::after {
+    content: '●●●';
+    letter-spacing: 4px;
+    animation: pulse 1.4s infinite;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulseIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+</style>
+</head>
+<body>
+<div id="root">
+  <div id="root-loading">
+    <div class="brand">The Ledger</div>
+    <div class="tag">Loading interactive edition</div>
+    <div class="dots"></div>
+  </div>
+</div>
+
+<script type="text/babel-template" id="article-jsx">
+const { useState, useMemo, useEffect, useRef } = React;
+const {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ReferenceLine,
+  Cell,
+} = Recharts;
+
+// ————————————————————————————————————————————————————————————————
+// THE LEDGER — "Press start to pay"
+// Navy & Gold · Interactive Edition
+// ————————————————————————————————————————————————————————————————
+
+const NAVY = "#0F2A44";
+const NAVY_DEEP = "#081A2D";
+const NAVY_SOFT = "#1F3D5C";
+const GOLD = "#C8A44D";
+const GOLD_DEEP = "#A88534";
+const GOLD_SOFT = "#E5C87A";
+const CREAM = "#F5EFE1";
+const CREAM_DEEP = "#EBE2CE";
+const INK = "#1A1814";
+const RULE = "#D9CFB8";
+const MUTED = "#6B6354";
+const CRIMSON = "#9A2A2A";
+
+// ————————————————————————————————————————————————————————————————
+// Reveal on scroll
+// ————————————————————————————————————————————————————————————————
+function useReveal() {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    if (!ref.current) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.15 }
+    );
+    obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, []);
+  return [ref, visible];
+}
+
+function Reveal({ children, delay = 0, className = "" }) {
+  const [ref, visible] = useReveal();
+  return (
+    <div
+      ref={ref}
+      className={className}
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(24px)",
+        transition: `opacity 900ms cubic-bezier(.2,.8,.2,1) ${delay}ms, transform 900ms cubic-bezier(.2,.8,.2,1) ${delay}ms`,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function CountUp({ value, prefix = "", suffix = "", decimals = 0, duration = 1400 }) {
+  const [ref, visible] = useReveal();
+  const [n, setN] = useState(0);
+  useEffect(() => {
+    if (!visible) return;
+    const start = performance.now();
+    let raf;
+    const tick = (t) => {
+      const p = Math.min(1, (t - start) / duration);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setN(value * eased);
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [visible, value, duration]);
+  return (
+    <span ref={ref}>
+      {prefix}
+      {n.toLocaleString(undefined, {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+      })}
+      {suffix}
+    </span>
+  );
+}
+
+// ————————————————————————————————————————————————————————————————
+// The Ledger masthead
+// ————————————————————————————————————————————————————————————————
+function Masthead() {
+  return (
+    <header
+      style={{
+        background: NAVY,
+        color: CREAM,
+        borderBottom: `3px solid ${GOLD}`,
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage: `repeating-linear-gradient(90deg, transparent, transparent 80px, rgba(200,164,77,0.04) 80px, rgba(200,164,77,0.04) 81px)`,
+          pointerEvents: "none",
+        }}
+      />
+      <div style={{ maxWidth: 1180, margin: "0 auto", padding: "18px 28px 14px", position: "relative" }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
+          <div
+            style={{
+              fontFamily: '"Playfair Display", Georgia, serif',
+              fontWeight: 900,
+              fontSize: 40,
+              letterSpacing: "-0.02em",
+              lineHeight: 1,
+              color: CREAM,
+            }}
+          >
+            The Ledger
+          </div>
+          <div
+            style={{
+              fontFamily: '"Inconsolata", monospace',
+              fontSize: 11,
+              letterSpacing: "0.3em",
+              textTransform: "uppercase",
+              color: GOLD,
+              borderLeft: `1px solid ${GOLD}`,
+              paddingLeft: 14,
+              paddingBottom: 4,
+            }}
+          >
+            Est. 2026 · Interactive Edition
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function SectionStrip() {
+  return (
+    <div
+      style={{
+        background: NAVY_DEEP,
+        color: CREAM,
+        padding: "9px 0",
+        fontFamily: '"Inconsolata", monospace',
+        fontSize: 11,
+        letterSpacing: "0.25em",
+        textTransform: "uppercase",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: 1180,
+          margin: "0 auto",
+          padding: "0 28px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <span style={{ color: GOLD_SOFT }}>Technology, media and finance</span>
+        <span style={{ opacity: 0.6 }}>Vol. VI · № 02 · February 2027</span>
+      </div>
+    </div>
+  );
+}
+
+// ————————————————————————————————————————————————————————————————
+// Pull quote
+// ————————————————————————————————————————————————————————————————
+function PullQuote({ children, attribution }) {
+  return (
+    <Reveal>
+      <figure
+        style={{
+          margin: "56px 0",
+          padding: "36px 0 32px",
+          borderTop: `2px solid ${NAVY}`,
+          borderBottom: `1px solid ${RULE}`,
+          position: "relative",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            top: -22,
+            left: 0,
+            background: CREAM,
+            padding: "0 14px 0 0",
+            fontFamily: '"Playfair Display", Georgia, serif',
+            fontSize: 60,
+            lineHeight: 1,
+            color: GOLD,
+            fontWeight: 900,
+          }}
+        >
+          “
+        </div>
+        <blockquote
+          style={{
+            margin: 0,
+            fontFamily: '"Playfair Display", "EB Garamond", Georgia, serif',
+            fontSize: 28,
+            lineHeight: 1.35,
+            color: NAVY,
+            fontStyle: "italic",
+            fontWeight: 500,
+            letterSpacing: "-0.005em",
+          }}
+        >
+          {children}
+        </blockquote>
+        {attribution && (
+          <figcaption
+            style={{
+              marginTop: 18,
+              fontFamily: '"Inconsolata", monospace',
+              fontSize: 12,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: MUTED,
+            }}
+          >
+            — {attribution}
+          </figcaption>
+        )}
+      </figure>
+    </Reveal>
+  );
+}
+
+// ————————————————————————————————————————————————————————————————
+// Chart frame (Ledger-style)
+// ————————————————————————————————————————————————————————————————
+function ChartFrame({ eyebrow, title, subtitle, source, children, tall = false }) {
+  return (
+    <Reveal>
+      <figure
+        style={{
+          margin: "48px 0",
+          padding: "26px 26px 22px",
+          background: "white",
+          border: `1px solid ${RULE}`,
+          position: "relative",
+          boxShadow: "0 10px 30px -18px rgba(15,42,68,0.18)",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: 60,
+            height: 5,
+            background: GOLD,
+          }}
+        />
+        <div
+          style={{
+            fontFamily: '"Inconsolata", monospace',
+            fontSize: 11,
+            letterSpacing: "0.25em",
+            textTransform: "uppercase",
+            color: GOLD_DEEP,
+            fontWeight: 700,
+            marginTop: 6,
+            marginBottom: 10,
+          }}
+        >
+          {eyebrow}
+        </div>
+        <h3
+          style={{
+            fontFamily: '"Playfair Display", Georgia, serif',
+            fontSize: 24,
+            lineHeight: 1.2,
+            margin: "0 0 4px",
+            color: NAVY,
+            fontWeight: 700,
+            letterSpacing: "-0.01em",
+          }}
+        >
+          {title}
+        </h3>
+        {subtitle && (
+          <div
+            style={{
+              fontFamily: 'Georgia, "EB Garamond", serif',
+              fontSize: 15,
+              color: MUTED,
+              marginBottom: 18,
+              fontStyle: "italic",
+            }}
+          >
+            {subtitle}
+          </div>
+        )}
+        <div style={{ height: tall ? 360 : 300, marginTop: 12 }}>{children}</div>
+        {source && (
+          <div
+            style={{
+              marginTop: 14,
+              paddingTop: 12,
+              borderTop: `1px solid ${RULE}`,
+              fontFamily: '"Inconsolata", monospace',
+              fontSize: 11,
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+              color: MUTED,
+            }}
+          >
+            Source: {source}
+          </div>
+        )}
+      </figure>
+    </Reveal>
+  );
+}
+
+// ————————————————————————————————————————————————————————————————
+// FIGURE 1 — Float Calculator
+// ————————————————————————————————————————————————————————————————
+function FloatCalculator() {
+  const [circulation, setCirculation] = useState(5);
+  const [yieldPct, setYieldPct] = useState(4.3);
+  const [rewardShare, setRewardShare] = useState(15);
+
+  const reserveIncome = circulation * 1000 * (yieldPct / 100);
+  const rewardsPaid = reserveIncome * (rewardShare / 100);
+  const sonyRetains = reserveIncome - rewardsPaid;
+  const interchangeSavings = Math.min(circulation * 104, 520 + (circulation - 5) * 40);
+
+  const curve = useMemo(() => {
+    const points = [];
+    for (let c = 0; c <= 20; c += 0.5) {
+      const ri = c * 1000 * (yieldPct / 100);
+      const retained = ri * (1 - rewardShare / 100);
+      points.push({ circulation: c, retained, rewards: ri * (rewardShare / 100) });
+    }
+    return points;
+  }, [yieldPct, rewardShare]);
+
+  const labelStyle = {
+    fontFamily: '"Inconsolata", monospace',
+    fontSize: 11,
+    letterSpacing: "0.18em",
+    textTransform: "uppercase",
+    color: "rgba(245,239,225,0.6)",
+    display: "block",
+    marginBottom: 6,
+  };
+
+  const valueStyle = {
+    fontFamily: '"Playfair Display", Georgia, serif',
+    fontSize: 22,
+    color: CREAM,
+    fontWeight: 700,
+    letterSpacing: "-0.01em",
+  };
+
+  return (
+    <Reveal>
+      <figure
+        style={{
+          margin: "56px 0",
+          background: NAVY,
+          color: CREAM,
+          padding: "34px 30px 30px",
+          position: "relative",
+          boxShadow: "0 20px 40px -20px rgba(15,42,68,0.5)",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: 60,
+            height: 5,
+            background: GOLD,
+          }}
+        />
+        <div
+          style={{
+            fontFamily: '"Inconsolata", monospace',
+            fontSize: 11,
+            letterSpacing: "0.25em",
+            textTransform: "uppercase",
+            color: GOLD,
+            fontWeight: 700,
+            marginTop: 6,
+            marginBottom: 10,
+          }}
+        >
+          Interactive · Figure 1
+        </div>
+        <h3
+          style={{
+            fontFamily: '"Playfair Display", Georgia, serif',
+            fontSize: 28,
+            lineHeight: 1.2,
+            margin: "0 0 6px",
+            fontWeight: 700,
+            letterSpacing: "-0.01em",
+          }}
+        >
+          The monetisation of trust
+        </h3>
+        <div
+          style={{
+            fontFamily: 'Georgia, serif',
+            fontSize: 15,
+            color: "rgba(245,239,225,0.7)",
+            marginBottom: 24,
+            fontStyle: "italic",
+          }}
+        >
+          Adjust the circulating supply, Treasury yield and rewards share to model SEN Coin's float economics.
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: 24,
+            marginBottom: 28,
+          }}
+        >
+          <div>
+            <label style={labelStyle}>Circulating supply</label>
+            <div style={valueStyle}>${circulation.toFixed(1)}bn</div>
+            <input
+              type="range"
+              min={1}
+              max={20}
+              step={0.5}
+              value={circulation}
+              onChange={(e) => setCirculation(parseFloat(e.target.value))}
+            />
+            <div style={{ display: "flex", justifyContent: "space-between", fontFamily: '"Inconsolata", monospace', fontSize: 10, color: "rgba(245,239,225,0.45)", marginTop: 4 }}>
+              <span>$1bn</span><span>$20bn</span>
+            </div>
+          </div>
+          <div>
+            <label style={labelStyle}>T-bill yield</label>
+            <div style={valueStyle}>{yieldPct.toFixed(2)}%</div>
+            <input
+              type="range"
+              min={1.5}
+              max={6}
+              step={0.1}
+              value={yieldPct}
+              onChange={(e) => setYieldPct(parseFloat(e.target.value))}
+            />
+            <div style={{ display: "flex", justifyContent: "space-between", fontFamily: '"Inconsolata", monospace', fontSize: 10, color: "rgba(245,239,225,0.45)", marginTop: 4 }}>
+              <span>1.5%</span><span>6.0%</span>
+            </div>
+          </div>
+          <div>
+            <label style={labelStyle}>Rewards share of yield</label>
+            <div style={valueStyle}>{rewardShare}%</div>
+            <input
+              type="range"
+              min={0}
+              max={40}
+              step={1}
+              value={rewardShare}
+              onChange={(e) => setRewardShare(parseInt(e.target.value))}
+            />
+            <div style={{ display: "flex", justifyContent: "space-between", fontFamily: '"Inconsolata", monospace', fontSize: 10, color: "rgba(245,239,225,0.45)", marginTop: 4 }}>
+              <span>0%</span><span>40%</span>
+            </div>
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: 0,
+            border: `1px solid rgba(245,239,225,0.15)`,
+            marginBottom: 24,
+          }}
+        >
+          <ResultCell label="Total reserve income" value={`$${reserveIncome.toFixed(0)}m`} sub="per year, pre-rewards" accent={CREAM} />
+          <ResultCell label="Sony retains" value={`$${sonyRetains.toFixed(0)}m`} sub={`${(100 - rewardShare)}% of float yield`} accent={GOLD} divider />
+          <ResultCell label="Interchange avoided" value={`$${interchangeSavings.toFixed(0)}m`} sub="on-platform, at 2% blended" accent={GOLD_SOFT} divider />
+        </div>
+
+        <div style={{ height: 240 }}>
+          <ResponsiveContainer>
+            <AreaChart data={curve} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
+              <defs>
+                <linearGradient id="retGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={GOLD} stopOpacity={0.85} />
+                  <stop offset="100%" stopColor={GOLD} stopOpacity={0.25} />
+                </linearGradient>
+                <linearGradient id="rewGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={GOLD_SOFT} stopOpacity={0.7} />
+                  <stop offset="100%" stopColor={GOLD_SOFT} stopOpacity={0.2} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid stroke="rgba(245,239,225,0.08)" strokeDasharray="2 4" />
+              <XAxis
+                dataKey="circulation"
+                stroke="rgba(245,239,225,0.5)"
+                tick={{ fill: "rgba(245,239,225,0.7)", fontSize: 11, fontFamily: "Inconsolata, monospace" }}
+                tickFormatter={(v) => `$${v}bn`}
+              />
+              <YAxis
+                stroke="rgba(245,239,225,0.5)"
+                tick={{ fill: "rgba(245,239,225,0.7)", fontSize: 11, fontFamily: "Inconsolata, monospace" }}
+                tickFormatter={(v) => `$${v}m`}
+              />
+              <Tooltip
+                contentStyle={{
+                  background: NAVY_DEEP,
+                  border: `1px solid ${GOLD}`,
+                  fontFamily: "Inconsolata, monospace",
+                  fontSize: 12,
+                }}
+                labelStyle={{ color: GOLD }}
+                itemStyle={{ color: CREAM }}
+                formatter={(v, name) => [`$${v.toFixed(0)}m`, name]}
+                labelFormatter={(v) => `Circulation: $${v}bn`}
+              />
+              <ReferenceLine x={circulation} stroke={GOLD} strokeWidth={2} strokeDasharray="4 4" />
+              <Area type="monotone" dataKey="retained" stackId="1" name="Sony retains" stroke={GOLD} strokeWidth={2} fill="url(#retGrad)" />
+              <Area type="monotone" dataKey="rewards" stackId="1" name="Rewards to users" stroke={GOLD_SOFT} strokeWidth={2} fill="url(#rewGrad)" />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+        <div
+          style={{
+            marginTop: 14,
+            paddingTop: 12,
+            borderTop: `1px solid rgba(245,239,225,0.15)`,
+            fontFamily: '"Inconsolata", monospace',
+            fontSize: 11,
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+            color: "rgba(245,239,225,0.55)",
+          }}
+        >
+          Source: The Ledger, from Sony OCC filing projections and GENIUS Act reserve provisions
+        </div>
+      </figure>
+    </Reveal>
+  );
+}
+
+function ResultCell({ label, value, sub, accent, divider }) {
+  return (
+    <div
+      style={{
+        padding: "18px 20px",
+        borderLeft: divider ? `1px solid rgba(245,239,225,0.15)` : "none",
+      }}
+    >
+      <div
+        style={{
+          fontFamily: '"Inconsolata", monospace',
+          fontSize: 10,
+          letterSpacing: "0.2em",
+          textTransform: "uppercase",
+          color: "rgba(245,239,225,0.6)",
+          marginBottom: 8,
+        }}
+      >
+        {label}
+      </div>
+      <div
+        style={{
+          fontFamily: '"Playfair Display", Georgia, serif',
+          fontSize: 30,
+          fontWeight: 700,
+          color: accent,
+          lineHeight: 1,
+          letterSpacing: "-0.02em",
+        }}
+      >
+        {value}
+      </div>
+      <div
+        style={{
+          fontFamily: "Georgia, serif",
+          fontSize: 12,
+          color: "rgba(245,239,225,0.6)",
+          marginTop: 6,
+          fontStyle: "italic",
+        }}
+      >
+        {sub}
+      </div>
+    </div>
+  );
+}
+
+// ————————————————————————————————————————————————————————————————
+// FIGURE 2 — Ecosystem
+// ————————————————————————————————————————————————————————————————
+const ECOSYSTEM = [
+  { name: "PlayStation Network", reach: 145, unit: "M monthly users", spend: "$26bn/yr", color: NAVY },
+  { name: "Sony Pictures", reach: 100, unit: "countries reached", spend: "~25 films/yr", color: NAVY_SOFT },
+  { name: "Sony Music", reach: 33, unit: "% global market share", spend: "Billions of streams/mo", color: GOLD_DEEP },
+  { name: "Bravia TVs", reach: 60, unit: "M households (est.)", spend: "Primary screen", color: GOLD },
+  { name: "Alpha Cameras", reach: 22, unit: "% pro mirrorless share", spend: "Recurring hardware/SW", color: "#8B6F3F" },
+];
+
+function EcosystemPanel() {
+  const [hover, setHover] = useState(null);
+  return (
+    <Reveal>
+      <figure
+        style={{
+          margin: "48px 0",
+          padding: "26px 26px 22px",
+          background: "white",
+          border: `1px solid ${RULE}`,
+          position: "relative",
+          boxShadow: "0 10px 30px -18px rgba(15,42,68,0.18)",
+        }}
+      >
+        <div style={{ position: "absolute", top: 0, left: 0, width: 60, height: 5, background: GOLD }} />
+        <div
+          style={{
+            fontFamily: '"Inconsolata", monospace',
+            fontSize: 11,
+            letterSpacing: "0.25em",
+            textTransform: "uppercase",
+            color: GOLD_DEEP,
+            fontWeight: 700,
+            marginTop: 6,
+            marginBottom: 10,
+          }}
+        >
+          Interactive · Figure 2
+        </div>
+        <h3
+          style={{
+            fontFamily: '"Playfair Display", Georgia, serif',
+            fontSize: 24,
+            lineHeight: 1.2,
+            margin: "0 0 4px",
+            color: NAVY,
+            fontWeight: 700,
+            letterSpacing: "-0.01em",
+          }}
+        >
+          Five walled gardens, one wallet
+        </h3>
+        <div
+          style={{
+            fontFamily: 'Georgia, serif',
+            fontSize: 15,
+            color: MUTED,
+            marginBottom: 20,
+            fontStyle: "italic",
+          }}
+        >
+          The businesses SEN Coin is designed to unify. Hover or tap each pillar.
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(5, 1fr)",
+            gap: 2,
+            minHeight: 260,
+          }}
+        >
+          {ECOSYSTEM.map((e, i) => {
+            const isHover = hover === i;
+            const isOther = hover !== null && hover !== i;
+            return (
+              <div
+                key={e.name}
+                onMouseEnter={() => setHover(i)}
+                onMouseLeave={() => setHover(null)}
+                onClick={() => setHover(hover === i ? null : i)}
+                style={{
+                  background: isHover ? e.color : CREAM_DEEP,
+                  color: isHover ? CREAM : INK,
+                  padding: "22px 16px",
+                  cursor: "pointer",
+                  transition: "all 420ms cubic-bezier(.2,.8,.2,1)",
+                  opacity: isOther ? 0.35 : 1,
+                  transform: isHover ? "translateY(-4px)" : "none",
+                  borderTop: `3px solid ${e.color}`,
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  position: "relative",
+                  overflow: "hidden",
+                }}
+              >
+                <div>
+                  <div
+                    style={{
+                      fontFamily: '"Inconsolata", monospace',
+                      fontSize: 10,
+                      letterSpacing: "0.2em",
+                      textTransform: "uppercase",
+                      opacity: 0.7,
+                      marginBottom: 10,
+                    }}
+                  >
+                    0{i + 1}
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: '"Playfair Display", Georgia, serif',
+                      fontSize: 17,
+                      fontWeight: 700,
+                      lineHeight: 1.2,
+                      marginBottom: 14,
+                      letterSpacing: "-0.01em",
+                    }}
+                  >
+                    {e.name}
+                  </div>
+                </div>
+                <div>
+                  <div
+                    style={{
+                      fontFamily: '"Playfair Display", Georgia, serif',
+                      fontSize: 36,
+                      fontWeight: 800,
+                      lineHeight: 1,
+                      letterSpacing: "-0.02em",
+                    }}
+                  >
+                    {e.reach}
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: "Georgia, serif",
+                      fontSize: 11,
+                      fontStyle: "italic",
+                      marginTop: 6,
+                      opacity: 0.85,
+                    }}
+                  >
+                    {e.unit}
+                  </div>
+                  <div
+                    style={{
+                      marginTop: 10,
+                      paddingTop: 10,
+                      borderTop: `1px solid ${isHover ? "rgba(245,239,225,0.3)" : RULE}`,
+                      fontFamily: '"Inconsolata", monospace',
+                      fontSize: 11,
+                      letterSpacing: "0.05em",
+                    }}
+                  >
+                    {e.spend}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div
+          style={{
+            marginTop: 20,
+            padding: "14px 18px",
+            background: CREAM_DEEP,
+            borderLeft: `3px solid ${GOLD}`,
+            fontFamily: "Georgia, serif",
+            fontSize: 14,
+            color: INK,
+            lineHeight: 1.55,
+          }}
+        >
+          <strong style={{ fontFamily: '"Playfair Display", Georgia, serif' }}>
+            Estimated combined reach:
+          </strong>{" "}
+          roughly <CountUp value={700} suffix="m" /> people worldwide, across gaming, film,
+          music, photography and consumer electronics — today paying Sony through five
+          disconnected systems.
+        </div>
+
+        <div
+          style={{
+            marginTop: 14,
+            paddingTop: 12,
+            borderTop: `1px solid ${RULE}`,
+            fontFamily: '"Inconsolata", monospace',
+            fontSize: 11,
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+            color: MUTED,
+          }}
+        >
+          Source: The Ledger, from company disclosures and industry estimates
+        </div>
+      </figure>
+    </Reveal>
+  );
+}
+
+// ————————————————————————————————————————————————————————————————
+// FIGURE 3 — Payment Flow
+// ————————————————————————————————————————————————————————————————
+function PaymentFlow() {
+  const [mode, setMode] = useState("after");
+
+  const ButtonTab = ({ value, label }) => (
+    <button
+      onClick={() => setMode(value)}
+      style={{
+        background: mode === value ? NAVY : "transparent",
+        color: mode === value ? CREAM : NAVY,
+        border: `1px solid ${NAVY}`,
+        padding: "10px 18px",
+        fontFamily: '"Inconsolata", monospace',
+        fontSize: 11,
+        letterSpacing: "0.2em",
+        textTransform: "uppercase",
+        cursor: "pointer",
+        transition: "all 200ms",
+        fontWeight: 600,
+      }}
+    >
+      {label}
+    </button>
+  );
+
+  return (
+    <Reveal>
+      <figure
+        style={{
+          margin: "48px 0",
+          padding: "26px 26px 22px",
+          background: "white",
+          border: `1px solid ${RULE}`,
+          position: "relative",
+          boxShadow: "0 10px 30px -18px rgba(15,42,68,0.18)",
+        }}
+      >
+        <div style={{ position: "absolute", top: 0, left: 0, width: 60, height: 5, background: GOLD }} />
+        <div
+          style={{
+            fontFamily: '"Inconsolata", monospace',
+            fontSize: 11,
+            letterSpacing: "0.25em",
+            textTransform: "uppercase",
+            color: GOLD_DEEP,
+            fontWeight: 700,
+            marginTop: 6,
+            marginBottom: 10,
+          }}
+        >
+          Interactive · Figure 3
+        </div>
+        <h3
+          style={{
+            fontFamily: '"Playfair Display", Georgia, serif',
+            fontSize: 24,
+            lineHeight: 1.2,
+            margin: "0 0 4px",
+            color: NAVY,
+            fontWeight: 700,
+            letterSpacing: "-0.01em",
+          }}
+        >
+          Where the money stops
+        </h3>
+        <div
+          style={{
+            fontFamily: 'Georgia, serif',
+            fontSize: 15,
+            color: MUTED,
+            marginBottom: 20,
+            fontStyle: "italic",
+          }}
+        >
+          A $100 on-platform purchase, traced through today's rails and through SEN Coin.
+        </div>
+
+        <div style={{ display: "flex", gap: 0, marginBottom: 26 }}>
+          <ButtonTab value="before" label="Today · Card rails" />
+          <ButtonTab value="after" label="After · SEN Coin" />
+        </div>
+
+        <div style={{ minHeight: 240 }}>
+          {mode === "before" ? (
+            <FlowStage
+              steps={[
+                { label: "Consumer", detail: "Pays $100.00", color: NAVY },
+                { label: "Card network", detail: "Interchange ~$2.00", color: CRIMSON, loss: true },
+                { label: "Issuing bank", detail: "Assessment & fees ~$0.50", color: CRIMSON, loss: true },
+                { label: "Acquirer", detail: "Processor margin ~$0.30", color: CRIMSON, loss: true },
+                { label: "Sony receives", detail: "≈ $97.20", color: NAVY_SOFT },
+              ]}
+              leak="≈ $2.80 per $100 leaves Sony's ecosystem"
+            />
+          ) : (
+            <FlowStage
+              steps={[
+                { label: "Consumer", detail: "Loads $100 into wallet", color: NAVY },
+                { label: "Sony Financial Trust", detail: "Holds T-bill reserves 1:1", color: GOLD_DEEP, gain: true },
+                { label: "SEN Coin balance", detail: "Yield accrues to Sony", color: GOLD_DEEP, gain: true },
+                { label: "On-platform spend", detail: "Zero transaction fee", color: "#2F6A3F", gain: true },
+                { label: "Sony receives", detail: "$100.00 + float yield", color: GOLD },
+              ]}
+              leak="100% of the dollar stays inside the walls"
+            />
+          )}
+        </div>
+
+        <div
+          style={{
+            marginTop: 14,
+            paddingTop: 12,
+            borderTop: `1px solid ${RULE}`,
+            fontFamily: '"Inconsolata", monospace',
+            fontSize: 11,
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+            color: MUTED,
+          }}
+        >
+          Source: The Ledger, from industry interchange data and GENIUS Act reserve rules
+        </div>
+      </figure>
+    </Reveal>
+  );
+}
+
+function FlowStage({ steps, leak }) {
+  return (
+    <div>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: `repeat(${steps.length}, 1fr)`,
+          gap: 0,
+          position: "relative",
+        }}
+      >
+        {steps.map((s, i) => (
+          <div
+            key={i}
+            style={{
+              padding: "18px 14px",
+              borderTop: `3px solid ${s.color}`,
+              background: i === 0 || i === steps.length - 1 ? CREAM_DEEP : "white",
+              position: "relative",
+              minHeight: 130,
+              animation: `slideIn 500ms ${i * 90}ms both cubic-bezier(.2,.8,.2,1)`,
+            }}
+          >
+            <div
+              style={{
+                fontFamily: '"Inconsolata", monospace',
+                fontSize: 10,
+                letterSpacing: "0.2em",
+                textTransform: "uppercase",
+                color: MUTED,
+                marginBottom: 8,
+              }}
+            >
+              Step {i + 1}
+            </div>
+            <div
+              style={{
+                fontFamily: '"Playfair Display", Georgia, serif',
+                fontSize: 15,
+                fontWeight: 700,
+                color: NAVY,
+                marginBottom: 6,
+                letterSpacing: "-0.005em",
+              }}
+            >
+              {s.label}
+            </div>
+            <div
+              style={{
+                fontFamily: "Georgia, serif",
+                fontSize: 13,
+                color: s.loss ? CRIMSON : s.gain ? "#2F6A3F" : INK,
+                fontStyle: "italic",
+                lineHeight: 1.4,
+              }}
+            >
+              {s.detail}
+            </div>
+            {i < steps.length - 1 && (
+              <div
+                style={{
+                  position: "absolute",
+                  right: -8,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  fontSize: 18,
+                  color: MUTED,
+                  zIndex: 2,
+                  background: "white",
+                  padding: "0 4px",
+                }}
+              >
+                →
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+      <div
+        style={{
+          marginTop: 18,
+          padding: "12px 16px",
+          background: NAVY,
+          color: CREAM,
+          fontFamily: '"Inconsolata", monospace',
+          fontSize: 12,
+          letterSpacing: "0.12em",
+          textTransform: "uppercase",
+          textAlign: "center",
+        }}
+      >
+        {leak}
+      </div>
+    </div>
+  );
+}
+
+// ————————————————————————————————————————————————————————————————
+// FIGURE 4 — Content Flywheel
+// ————————————————————————————————————————————————————————————————
+function Flywheel() {
+  const [active, setActive] = useState(0);
+  const nodes = [
+    { label: "Content incentives", detail: "Exclusive release windows, day-one DLC, discounted subs — available only to SEN Coin holders" },
+    { label: "SEN Coin adoption", detail: "Wallet loads grow across PSN, streaming, music, photography" },
+    { label: "Float expands", detail: "Reserve pool compounds under GENIUS Act 1:1 Treasury backing" },
+    { label: "Reserve income", detail: "T-bill yield accrues at ~4.3% on the circulating supply" },
+    { label: "Content & rewards reinvestment", detail: "Richer exclusives, fatter SEN Credits — which then accelerate adoption" },
+  ];
+
+  useEffect(() => {
+    const id = setInterval(() => setActive((a) => (a + 1) % nodes.length), 2600);
+    return () => clearInterval(id);
+  }, [nodes.length]);
+
+  const size = 420;
+  const radius = 150;
+  const center = size / 2;
+
+  return (
+    <Reveal>
+      <figure
+        style={{
+          margin: "56px 0",
+          padding: "30px 26px 22px",
+          background: CREAM_DEEP,
+          border: `1px solid ${RULE}`,
+          position: "relative",
+        }}
+      >
+        <div style={{ position: "absolute", top: 0, left: 0, width: 60, height: 5, background: GOLD }} />
+        <div
+          style={{
+            fontFamily: '"Inconsolata", monospace',
+            fontSize: 11,
+            letterSpacing: "0.25em",
+            textTransform: "uppercase",
+            color: GOLD_DEEP,
+            fontWeight: 700,
+            marginTop: 6,
+            marginBottom: 10,
+          }}
+        >
+          Interactive · Figure 4
+        </div>
+        <h3
+          style={{
+            fontFamily: '"Playfair Display", Georgia, serif',
+            fontSize: 26,
+            lineHeight: 1.2,
+            margin: "0 0 4px",
+            color: NAVY,
+            fontWeight: 700,
+            letterSpacing: "-0.01em",
+          }}
+        >
+          The content flywheel
+        </h3>
+        <div
+          style={{
+            fontFamily: 'Georgia, serif',
+            fontSize: 15,
+            color: MUTED,
+            marginBottom: 20,
+            fontStyle: "italic",
+          }}
+        >
+          Payment and content reinforce each other. Click any node to inspect the loop.
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 30,
+            alignItems: "center",
+          }}
+        >
+          <svg viewBox={`0 0 ${size} ${size}`} style={{ width: "100%", height: "auto", maxWidth: size }}>
+            <circle cx={center} cy={center} r={radius} fill="none" stroke={NAVY} strokeOpacity={0.15} strokeWidth={1} strokeDasharray="4 5" />
+            {nodes.map((_, i) => {
+              const a1 = (i / nodes.length) * Math.PI * 2 - Math.PI / 2 + 0.2;
+              const a2 = ((i + 1) / nodes.length) * Math.PI * 2 - Math.PI / 2 - 0.2;
+              const x1 = center + Math.cos(a1) * radius;
+              const y1 = center + Math.sin(a1) * radius;
+              const x2 = center + Math.cos(a2) * radius;
+              const y2 = center + Math.sin(a2) * radius;
+              const mid = (a1 + a2) / 2;
+              const mx = center + Math.cos(mid) * (radius + 16);
+              const my = center + Math.sin(mid) * (radius + 16);
+              return (
+                <g key={`arc-${i}`}>
+                  <path
+                    d={`M ${x1} ${y1} A ${radius} ${radius} 0 0 1 ${x2} ${y2}`}
+                    fill="none"
+                    stroke={active === i ? GOLD_DEEP : NAVY}
+                    strokeOpacity={active === i ? 0.9 : 0.3}
+                    strokeWidth={active === i ? 2.5 : 1.5}
+                    style={{ transition: "all 400ms" }}
+                  />
+                  <text
+                    x={mx}
+                    y={my}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fontSize="14"
+                    fill={active === i ? GOLD_DEEP : NAVY}
+                    opacity={active === i ? 1 : 0.4}
+                    style={{ transition: "all 400ms" }}
+                  >
+                    ↻
+                  </text>
+                </g>
+              );
+            })}
+
+            {nodes.map((n, i) => {
+              const angle = (i / nodes.length) * Math.PI * 2 - Math.PI / 2;
+              const x = center + Math.cos(angle) * radius;
+              const y = center + Math.sin(angle) * radius;
+              const isActive = active === i;
+              return (
+                <g key={i} onClick={() => setActive(i)} style={{ cursor: "pointer" }}>
+                  <circle
+                    cx={x}
+                    cy={y}
+                    r={isActive ? 26 : 20}
+                    fill={isActive ? GOLD : "white"}
+                    stroke={NAVY}
+                    strokeWidth={2}
+                    style={{ transition: "all 400ms cubic-bezier(.2,.8,.2,1)" }}
+                  />
+                  <text
+                    x={x}
+                    y={y}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fontSize="14"
+                    fontWeight="700"
+                    fill={isActive ? NAVY : NAVY}
+                    style={{ fontFamily: "Playfair Display, Georgia, serif" }}
+                  >
+                    {i + 1}
+                  </text>
+                </g>
+              );
+            })}
+
+            <circle cx={center} cy={center} r={48} fill={NAVY} />
+            <text
+              x={center}
+              y={center - 6}
+              textAnchor="middle"
+              fontSize="11"
+              fill={GOLD}
+              style={{ fontFamily: "Inconsolata, monospace", letterSpacing: "0.15em" }}
+            >
+              SEN
+            </text>
+            <text
+              x={center}
+              y={center + 12}
+              textAnchor="middle"
+              fontSize="16"
+              fill={CREAM}
+              fontWeight="700"
+              style={{ fontFamily: "Playfair Display, Georgia, serif" }}
+            >
+              FLYWHEEL
+            </text>
+          </svg>
+
+          <div>
+            {nodes.map((n, i) => (
+              <div
+                key={i}
+                onClick={() => setActive(i)}
+                style={{
+                  padding: "14px 16px",
+                  marginBottom: 8,
+                  background: active === i ? "white" : "transparent",
+                  borderLeft: `3px solid ${active === i ? GOLD : RULE}`,
+                  cursor: "pointer",
+                  transition: "all 300ms",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 4 }}>
+                  <span
+                    style={{
+                      fontFamily: '"Inconsolata", monospace',
+                      fontSize: 11,
+                      color: active === i ? GOLD_DEEP : MUTED,
+                      fontWeight: 700,
+                      letterSpacing: "0.15em",
+                    }}
+                  >
+                    0{i + 1}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: '"Playfair Display", Georgia, serif',
+                      fontSize: 17,
+                      fontWeight: 700,
+                      color: NAVY,
+                      letterSpacing: "-0.005em",
+                    }}
+                  >
+                    {n.label}
+                  </span>
+                </div>
+                <div
+                  style={{
+                    fontFamily: "Georgia, serif",
+                    fontSize: 13,
+                    color: MUTED,
+                    lineHeight: 1.5,
+                    marginLeft: 28,
+                    maxHeight: active === i ? 100 : 0,
+                    overflow: "hidden",
+                    opacity: active === i ? 1 : 0,
+                    transition: "all 400ms cubic-bezier(.2,.8,.2,1)",
+                  }}
+                >
+                  {n.detail}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div
+          style={{
+            marginTop: 20,
+            paddingTop: 12,
+            borderTop: `1px solid ${RULE}`,
+            fontFamily: '"Inconsolata", monospace',
+            fontSize: 11,
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+            color: MUTED,
+          }}
+        >
+          Source: The Ledger, from Sony OCC filing and analyst briefings
+        </div>
+      </figure>
+    </Reveal>
+  );
+}
+
+// ————————————————————————————————————————————————————————————————
+// FIGURE 5 — Timeline
+// ————————————————————————————————————————————————————————————————
+function Timeline() {
+  const events = [
+    { date: "Jul 2026", title: "GENIUS Act signed", body: "Federal framework for payment stablecoins becomes law. OCC named as primary trust-charter authority.", status: "done" },
+    { date: "Late 2026", title: "Sony files 47-page application", body: "Sony Financial Trust, N.A. lodges its trust charter application with the OCC.", status: "done" },
+    { date: "Oct 2026", title: "Comptroller Gould signals intent", body: `Calls GENIUS Act "the most consequential financial infrastructure legislation since Dodd-Frank."`, status: "done" },
+    { date: "Q1 2027", title: "Expected OCC ruling", body: "Conditional approval is the base case. Narrow vs broad charter will define Sony's competitive reach.", status: "pending" },
+    { date: "+90 days", title: "Stablecoin Certification", body: "SCC certification typically follows OCC approval by ~90 days when reserves have been pre-reviewed.", status: "pending" },
+    { date: "H2 2027", title: "SEN Coin goes live", body: "Initial rollout across PSN wallets. Migration away from PlayStation Credits completes.", status: "pending" },
+  ];
+
+  return (
+    <Reveal>
+      <figure
+        style={{
+          margin: "56px 0",
+          padding: "30px 26px 26px",
+          background: "white",
+          border: `1px solid ${RULE}`,
+          position: "relative",
+          boxShadow: "0 10px 30px -18px rgba(15,42,68,0.18)",
+        }}
+      >
+        <div style={{ position: "absolute", top: 0, left: 0, width: 60, height: 5, background: GOLD }} />
+        <div
+          style={{
+            fontFamily: '"Inconsolata", monospace',
+            fontSize: 11,
+            letterSpacing: "0.25em",
+            textTransform: "uppercase",
+            color: GOLD_DEEP,
+            fontWeight: 700,
+            marginTop: 6,
+            marginBottom: 10,
+          }}
+        >
+          Figure 5
+        </div>
+        <h3
+          style={{
+            fontFamily: '"Playfair Display", Georgia, serif',
+            fontSize: 24,
+            lineHeight: 1.2,
+            margin: "0 0 4px",
+            color: NAVY,
+            fontWeight: 700,
+            letterSpacing: "-0.01em",
+          }}
+        >
+          The road to approval
+        </h3>
+        <div
+          style={{
+            fontFamily: 'Georgia, serif',
+            fontSize: 15,
+            color: MUTED,
+            marginBottom: 30,
+            fontStyle: "italic",
+          }}
+        >
+          From statute to wallet, on the consensus timeline.
+        </div>
+
+        <div style={{ position: "relative", paddingLeft: 24 }}>
+          <div
+            style={{
+              position: "absolute",
+              left: 7,
+              top: 8,
+              bottom: 8,
+              width: 2,
+              background: `linear-gradient(to bottom, ${NAVY} 0%, ${NAVY} 45%, ${RULE} 45%, ${RULE} 100%)`,
+            }}
+          />
+          {events.map((e, i) => (
+            <div
+              key={i}
+              style={{
+                position: "relative",
+                paddingBottom: i === events.length - 1 ? 0 : 28,
+                animation: `fadeUp 600ms ${i * 120}ms both cubic-bezier(.2,.8,.2,1)`,
+              }}
+            >
+              <div
+                style={{
+                  position: "absolute",
+                  left: -23,
+                  top: 4,
+                  width: 16,
+                  height: 16,
+                  borderRadius: "50%",
+                  background: e.status === "done" ? NAVY : "white",
+                  border: `2px solid ${e.status === "done" ? NAVY : GOLD_DEEP}`,
+                }}
+              />
+              <div
+                style={{
+                  fontFamily: '"Inconsolata", monospace',
+                  fontSize: 11,
+                  letterSpacing: "0.18em",
+                  textTransform: "uppercase",
+                  color: e.status === "done" ? MUTED : GOLD_DEEP,
+                  fontWeight: 700,
+                  marginBottom: 4,
+                }}
+              >
+                {e.date} · {e.status === "done" ? "Completed" : "Expected"}
+              </div>
+              <div
+                style={{
+                  fontFamily: '"Playfair Display", Georgia, serif',
+                  fontSize: 19,
+                  fontWeight: 700,
+                  color: NAVY,
+                  marginBottom: 4,
+                  letterSpacing: "-0.005em",
+                }}
+              >
+                {e.title}
+              </div>
+              <div
+                style={{
+                  fontFamily: "Georgia, serif",
+                  fontSize: 14,
+                  color: MUTED,
+                  lineHeight: 1.55,
+                  maxWidth: 620,
+                }}
+              >
+                {e.body}
+              </div>
+            </div>
+          ))}
+        </div>
+      </figure>
+    </Reveal>
+  );
+}
+
+// ————————————————————————————————————————————————————————————————
+// FIGURE 6 — Personal Yield
+// ————————————————————————————————————————————————————————————————
+function PersonalYield() {
+  const [balance, setBalance] = useState(150);
+  const [yieldPct, setYieldPct] = useState(4.3);
+  const [share, setShare] = useState(15);
+
+  const gross = balance * (yieldPct / 100);
+  const userCredits = gross * (share / 100);
+  const sonyKeeps = gross - userCredits;
+
+  return (
+    <Reveal>
+      <figure
+        style={{
+          margin: "48px 0",
+          padding: "26px 26px 22px",
+          background: CREAM_DEEP,
+          border: `1px solid ${RULE}`,
+          position: "relative",
+        }}
+      >
+        <div style={{ position: "absolute", top: 0, left: 0, width: 60, height: 5, background: GOLD }} />
+        <div
+          style={{
+            fontFamily: '"Inconsolata", monospace',
+            fontSize: 11,
+            letterSpacing: "0.25em",
+            textTransform: "uppercase",
+            color: GOLD_DEEP,
+            fontWeight: 700,
+            marginTop: 6,
+            marginBottom: 10,
+          }}
+        >
+          Interactive · Figure 6
+        </div>
+        <h3
+          style={{
+            fontFamily: '"Playfair Display", Georgia, serif',
+            fontSize: 24,
+            lineHeight: 1.2,
+            margin: "0 0 4px",
+            color: NAVY,
+            fontWeight: 700,
+            letterSpacing: "-0.01em",
+          }}
+        >
+          Your wallet, Sony's yield
+        </h3>
+        <div
+          style={{
+            fontFamily: 'Georgia, serif',
+            fontSize: 15,
+            color: MUTED,
+            marginBottom: 22,
+            fontStyle: "italic",
+          }}
+        >
+          The per-consumer economics. Dial your own balance.
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 28, alignItems: "center" }}>
+          <div>
+            <div style={{ marginBottom: 18 }}>
+              <div style={{ fontFamily: '"Inconsolata", monospace', fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: MUTED, marginBottom: 6 }}>
+                Average wallet balance
+              </div>
+              <div style={{ fontFamily: '"Playfair Display", Georgia, serif', fontSize: 28, color: NAVY, fontWeight: 700, marginBottom: 6, letterSpacing: "-0.01em" }}>
+                ${balance}
+              </div>
+              <input type="range" min={25} max={500} step={5} value={balance} onChange={(e) => setBalance(parseInt(e.target.value))} />
+            </div>
+            <div style={{ marginBottom: 18 }}>
+              <div style={{ fontFamily: '"Inconsolata", monospace', fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: MUTED, marginBottom: 6 }}>
+                T-bill yield
+              </div>
+              <div style={{ fontFamily: '"Playfair Display", Georgia, serif', fontSize: 28, color: NAVY, fontWeight: 700, marginBottom: 6, letterSpacing: "-0.01em" }}>
+                {yieldPct.toFixed(2)}%
+              </div>
+              <input type="range" min={1.5} max={6} step={0.1} value={yieldPct} onChange={(e) => setYieldPct(parseFloat(e.target.value))} />
+            </div>
+            <div>
+              <div style={{ fontFamily: '"Inconsolata", monospace', fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: MUTED, marginBottom: 6 }}>
+                Rewards share
+              </div>
+              <div style={{ fontFamily: '"Playfair Display", Georgia, serif', fontSize: 28, color: NAVY, fontWeight: 700, marginBottom: 6, letterSpacing: "-0.01em" }}>
+                {share}%
+              </div>
+              <input type="range" min={0} max={40} step={1} value={share} onChange={(e) => setShare(parseInt(e.target.value))} />
+            </div>
+          </div>
+
+          <div style={{ background: "white", padding: 26, border: `1px solid ${RULE}` }}>
+            <div style={{ fontFamily: '"Inconsolata", monospace', fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: MUTED, marginBottom: 14 }}>
+              Annual yield on your ${balance} balance
+            </div>
+            <div style={{ display: "flex", height: 32, marginBottom: 20, border: `1px solid ${NAVY}` }}>
+              <div style={{ width: `${share}%`, background: GOLD_SOFT, transition: "width 400ms cubic-bezier(.2,.8,.2,1)" }} />
+              <div style={{ width: `${100 - share}%`, background: GOLD_DEEP, transition: "width 400ms cubic-bezier(.2,.8,.2,1)" }} />
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                  <span style={{ width: 10, height: 10, background: GOLD_SOFT, display: "inline-block" }} />
+                  <span style={{ fontFamily: '"Inconsolata", monospace', fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase", color: MUTED }}>You earn</span>
+                </div>
+                <div style={{ fontFamily: '"Playfair Display", Georgia, serif', fontSize: 28, color: NAVY, fontWeight: 700, letterSpacing: "-0.01em" }}>
+                  ${userCredits.toFixed(2)}
+                </div>
+                <div style={{ fontFamily: "Georgia, serif", fontSize: 12, color: MUTED, fontStyle: "italic" }}>
+                  in SEN Credits
+                </div>
+              </div>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                  <span style={{ width: 10, height: 10, background: GOLD_DEEP, display: "inline-block" }} />
+                  <span style={{ fontFamily: '"Inconsolata", monospace', fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase", color: MUTED }}>Sony keeps</span>
+                </div>
+                <div style={{ fontFamily: '"Playfair Display", Georgia, serif', fontSize: 28, color: NAVY, fontWeight: 700, letterSpacing: "-0.01em" }}>
+                  ${sonyKeeps.toFixed(2)}
+                </div>
+                <div style={{ fontFamily: "Georgia, serif", fontSize: 12, color: MUTED, fontStyle: "italic" }}>
+                  as reserve income
+                </div>
+              </div>
+            </div>
+            <div
+              style={{
+                marginTop: 20,
+                paddingTop: 16,
+                borderTop: `1px solid ${RULE}`,
+                fontFamily: "Georgia, serif",
+                fontSize: 13,
+                color: MUTED,
+                lineHeight: 1.55,
+                fontStyle: "italic",
+              }}
+            >
+              Multiplied across <strong style={{ color: NAVY, fontStyle: "normal" }}>145 million</strong> PlayStation
+              users, the $<strong style={{ color: NAVY, fontStyle: "normal" }}>{sonyKeeps.toFixed(2)}</strong> Sony
+              retains per consumer becomes an institutional funding line.
+            </div>
+          </div>
+        </div>
+        <div
+          style={{
+            marginTop: 16,
+            paddingTop: 12,
+            borderTop: `1px solid ${RULE}`,
+            fontFamily: '"Inconsolata", monospace',
+            fontSize: 11,
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+            color: MUTED,
+          }}
+        >
+          Source: The Ledger modelling, based on disclosed GENIUS Act reserve rules
+        </div>
+      </figure>
+    </Reveal>
+  );
+}
+
+// ————————————————————————————————————————————————————————————————
+// FIGURE 7 — Generational
+// ————————————————————————————————————————————————————————————————
+function GenerationalStrip() {
+  const data = [
+    { cohort: "13–17", pct: 14 },
+    { cohort: "18–24", pct: 28 },
+    { cohort: "25–34", pct: 30 },
+    { cohort: "35–44", pct: 16 },
+    { cohort: "45–54", pct: 8 },
+    { cohort: "55+", pct: 4 },
+  ];
+
+  return (
+    <ChartFrame
+      eyebrow="Figure 7"
+      title="Catching the formation moment"
+      subtitle="PlayStation Network monthly active users, estimated age distribution. 58% sit inside the 18–34 primary-financial-habit window."
+      source="The Ledger, from platform disclosures and industry estimates"
+    >
+      <ResponsiveContainer>
+        <BarChart data={data} margin={{ top: 10, right: 20, left: 0, bottom: 30 }}>
+          <CartesianGrid stroke={RULE} strokeDasharray="2 3" vertical={false} />
+          <XAxis
+            dataKey="cohort"
+            stroke={MUTED}
+            tick={{ fill: INK, fontSize: 12, fontFamily: "Inconsolata, monospace" }}
+            tickLine={false}
+          />
+          <YAxis
+            stroke={MUTED}
+            tick={{ fill: INK, fontSize: 11, fontFamily: "Inconsolata, monospace" }}
+            tickFormatter={(v) => `${v}%`}
+            tickLine={false}
+            axisLine={false}
+          />
+          <Tooltip
+            contentStyle={{
+              background: NAVY,
+              border: `1px solid ${GOLD}`,
+              fontFamily: "Inconsolata, monospace",
+              fontSize: 12,
+              color: CREAM,
+            }}
+            labelStyle={{ color: GOLD }}
+            itemStyle={{ color: CREAM }}
+            formatter={(v) => [`${v}%`, "Share of MAUs"]}
+          />
+          <ReferenceLine y={0} stroke={NAVY} />
+          <Bar dataKey="pct" radius={[0, 0, 0, 0]}>
+            {data.map((d, i) => (
+              <Cell
+                key={i}
+                fill={d.cohort === "18–24" || d.cohort === "25–34" ? GOLD_DEEP : NAVY}
+                fillOpacity={d.cohort === "18–24" || d.cohort === "25–34" ? 1 : 0.55}
+              />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </ChartFrame>
+  );
+}
+
+// ————————————————————————————————————————————————————————————————
+// FIGURE 8 — Queue
+// ————————————————————————————————————————————————————————————————
+function QueueViz() {
+  return (
+    <Reveal>
+      <figure
+        style={{
+          margin: "48px 0 32px",
+          padding: "34px 28px",
+          background: NAVY,
+          color: CREAM,
+          position: "relative",
+          boxShadow: "0 20px 40px -20px rgba(15,42,68,0.5)",
+        }}
+      >
+        <div style={{ position: "absolute", top: 0, left: 0, width: 60, height: 5, background: GOLD }} />
+        <div
+          style={{
+            fontFamily: '"Inconsolata", monospace',
+            fontSize: 11,
+            letterSpacing: "0.25em",
+            textTransform: "uppercase",
+            color: GOLD,
+            fontWeight: 700,
+            marginTop: 6,
+            marginBottom: 14,
+          }}
+        >
+          Figure 8 · The queue
+        </div>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 20, flexWrap: "wrap" }}>
+          <div
+            style={{
+              fontFamily: '"Playfair Display", Georgia, serif',
+              fontSize: 120,
+              lineHeight: 0.85,
+              fontWeight: 900,
+              color: GOLD,
+              letterSpacing: "-0.04em",
+            }}
+          >
+            <CountUp value={11} />
+          </div>
+          <div style={{ maxWidth: 520, paddingBottom: 14 }}>
+            <div
+              style={{
+                fontFamily: '"Playfair Display", Georgia, serif',
+                fontSize: 22,
+                fontWeight: 700,
+                marginBottom: 8,
+                letterSpacing: "-0.005em",
+              }}
+            >
+              Other pre-applications in informal discussion with the OCC
+            </div>
+            <div
+              style={{
+                fontFamily: "Georgia, serif",
+                fontSize: 15,
+                color: "rgba(245,239,225,0.7)",
+                lineHeight: 1.55,
+                fontStyle: "italic",
+              }}
+            >
+              Sony's filing is the first consumer-platform trust charter application to reach
+              public view. It will not be the last. The queue forms to the right.
+            </div>
+          </div>
+        </div>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(11, 1fr)",
+            gap: 6,
+            marginTop: 24,
+          }}
+        >
+          {Array.from({ length: 11 }).map((_, i) => (
+            <div
+              key={i}
+              style={{
+                height: 44,
+                background: i === 0 ? GOLD : "rgba(245,239,225,0.12)",
+                border: `1px solid ${i === 0 ? GOLD : "rgba(245,239,225,0.2)"}`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontFamily: '"Inconsolata", monospace',
+                fontSize: 12,
+                color: i === 0 ? NAVY : "rgba(245,239,225,0.5)",
+                fontWeight: 700,
+                animation: `pulseIn 500ms ${i * 80}ms both cubic-bezier(.2,.8,.2,1)`,
+              }}
+            >
+              {i === 0 ? "SONY" : `#${i + 1}`}
+            </div>
+          ))}
+        </div>
+      </figure>
+    </Reveal>
+  );
+}
+
+// ————————————————————————————————————————————————————————————————
+// Editorial helpers
+// ————————————————————————————————————————————————————————————————
+function Para({ children, dropCap = false }) {
+  return (
+    <p
+      style={{
+        fontFamily: 'Georgia, "EB Garamond", "Source Serif Pro", serif',
+        fontSize: 18,
+        lineHeight: 1.65,
+        color: INK,
+        margin: "0 0 22px",
+        textAlign: "justify",
+        hyphens: "auto",
+      }}
+    >
+      {dropCap ? (
+        <>
+          <span
+            style={{
+              fontFamily: '"Playfair Display", Georgia, serif',
+              fontSize: 78,
+              lineHeight: 0.9,
+              fontWeight: 900,
+              float: "left",
+              marginRight: 12,
+              marginTop: 6,
+              marginBottom: -8,
+              color: NAVY,
+              letterSpacing: "-0.03em",
+            }}
+          >
+            {typeof children === "string" ? children.charAt(0) : ""}
+          </span>
+          {typeof children === "string" ? children.slice(1) : children}
+        </>
+      ) : (
+        children
+      )}
+    </p>
+  );
+}
+
+function SmallCaps({ children }) {
+  return (
+    <strong
+      style={{
+        fontFamily: '"Playfair Display", Georgia, serif',
+        fontVariant: "small-caps",
+        letterSpacing: "0.06em",
+        fontWeight: 700,
+        color: NAVY,
+      }}
+    >
+      {children}
+    </strong>
+  );
+}
+
+function SectionHead({ children, kicker }) {
+  return (
+    <Reveal>
+      <div style={{ margin: "54px 0 26px" }}>
+        {kicker && (
+          <div
+            style={{
+              fontFamily: '"Inconsolata", monospace',
+              fontSize: 11,
+              letterSpacing: "0.28em",
+              textTransform: "uppercase",
+              color: GOLD_DEEP,
+              fontWeight: 700,
+              marginBottom: 10,
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+            }}
+          >
+            <span style={{ display: "inline-block", width: 28, height: 1, background: GOLD_DEEP }} />
+            {kicker}
+          </div>
+        )}
+        <h2
+          style={{
+            fontFamily: '"Playfair Display", Georgia, serif',
+            fontSize: 32,
+            lineHeight: 1.15,
+            margin: 0,
+            color: NAVY,
+            fontWeight: 800,
+            letterSpacing: "-0.02em",
+            borderBottom: `2px solid ${NAVY}`,
+            paddingBottom: 12,
+          }}
+        >
+          {children}
+        </h2>
+      </div>
+    </Reveal>
+  );
+}
+
+// ————————————————————————————————————————————————————————————————
+// Main article
+// ————————————————————————————————————————————————————————————————
+function PressStartToPay() {
+  return (
+    <div
+      style={{
+        background: CREAM,
+        color: INK,
+        minHeight: "100vh",
+        paddingBottom: 80,
+        fontFamily: 'Georgia, "EB Garamond", serif',
+      }}
+    >
+      {/* Paper grain */}
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          pointerEvents: "none",
+          opacity: 0.035,
+          backgroundImage:
+            "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>\")",
+          zIndex: 1,
+        }}
+      />
+
+      <Masthead />
+      <SectionStrip />
+
+      {/* Hero */}
+      <div
+        style={{
+          position: "relative",
+          background: `linear-gradient(180deg, ${CREAM} 0%, ${CREAM_DEEP} 100%)`,
+          borderBottom: `1px solid ${RULE}`,
+          paddingTop: 44,
+          paddingBottom: 52,
+        }}
+      >
+        <div style={{ maxWidth: 1180, margin: "0 auto", padding: "0 28px", position: "relative", zIndex: 2 }}>
+          <Reveal>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                marginBottom: 18,
+                fontFamily: '"Inconsolata", monospace',
+                fontSize: 12,
+                letterSpacing: "0.22em",
+                textTransform: "uppercase",
+                color: MUTED,
+              }}
+            >
+              <span
+                style={{
+                  background: NAVY,
+                  color: GOLD,
+                  padding: "3px 9px",
+                  fontWeight: 700,
+                }}
+              >
+                Briefing
+              </span>
+              <span>·</span>
+              <span>Stablecoins</span>
+              <span>·</span>
+              <span style={{ color: GOLD_DEEP, fontWeight: 700 }}>Interactive</span>
+            </div>
+          </Reveal>
+
+          <Reveal delay={120}>
+            <h1
+              style={{
+                fontFamily: '"Playfair Display", Georgia, serif',
+                fontSize: "clamp(46px, 7vw, 96px)",
+                lineHeight: 0.95,
+                margin: "0 0 22px",
+                fontWeight: 900,
+                letterSpacing: "-0.035em",
+                color: NAVY,
+                maxWidth: 1000,
+              }}
+            >
+              Press start to <span style={{ color: GOLD }}>pay</span>
+            </h1>
+          </Reveal>
+
+          <Reveal delay={240}>
+            <div
+              style={{
+                fontFamily: '"Playfair Display", Georgia, serif',
+                fontSize: "clamp(19px, 2vw, 24px)",
+                lineHeight: 1.4,
+                color: MUTED,
+                fontStyle: "italic",
+                maxWidth: 780,
+                marginBottom: 28,
+                fontWeight: 400,
+                letterSpacing: "-0.005em",
+              }}
+            >
+              Sony's application for a national trust charter is under active review at the
+              OCC. If Comptroller Gould approves it — and most expect he will — it will be
+              the first time an entertainment conglomerate has been granted the powers to
+              issue its own regulated digital dollar. The implications stretch well beyond
+              gaming.
+            </div>
+          </Reveal>
+
+          <Reveal delay={360}>
+            <div
+              style={{
+                display: "flex",
+                gap: 30,
+                flexWrap: "wrap",
+                paddingTop: 18,
+                borderTop: `1px solid ${RULE}`,
+                fontFamily: '"Inconsolata", monospace',
+                fontSize: 11,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                color: MUTED,
+              }}
+            >
+              <span>
+                <span style={{ color: NAVY, fontWeight: 700 }}>Tokyo</span> · New York · Washington, D.C.
+              </span>
+              <span>11-minute read</span>
+              <span>8 interactive figures</span>
+            </div>
+          </Reveal>
+        </div>
+      </div>
+
+      {/* Body */}
+      <article style={{ maxWidth: 780, margin: "0 auto", padding: "56px 28px 0", position: "relative", zIndex: 2 }}>
+        <Reveal>
+          <Para dropCap>
+            {`The filing arrived at the Office of the Comptroller of the Currency in late 2026, forty-seven pages of dense regulatory prose submitted under the name Sony Financial Trust, N.A. Applications for national trust charters are not ordinarily newsworthy. This one is different. Buried in section four, under the heading "Proposed Activities and Services," is a single sentence that has set the payments industry on edge: the applicant intends, upon approval of its charter and subject to certification by the Stablecoin Certification Commission under the GENIUS Act of 2026, to issue a fully reserved, US dollar-denominated payment stablecoin for use across Sony's global digital ecosystem.`}
+          </Para>
+        </Reveal>
+
+        <Reveal>
+          <Para>
+            Sony is, in other words, applying to become a bank. Not a retail bank — it is
+            not proposing to take deposits from the public or make loans in any
+            conventional sense. A trust bank: a narrowly chartered institution holding
+            assets on behalf of others, and in this case, holding the Treasury-bill
+            reserves that would back a Sony-issued digital dollar intended to circulate
+            across PlayStation Network, Sony Pictures, Sony Music, the Bravia
+            connected-TV platform, and a constellation of affiliated digital services
+            that together touch the daily lives of an estimated 700 million people
+            worldwide.
+          </Para>
+        </Reveal>
+
+        <Reveal>
+          <Para>
+            The OCC has not yet ruled. But Comptroller Gould has made little secret of
+            his disposition. In a speech to the American Bankers Association in October,
+            he described the GENIUS Act as "the most consequential piece of financial
+            infrastructure legislation since Dodd-Frank" and argued that the OCC's
+            mandate under the Act was to enable regulated innovation, not to protect
+            incumbent business models. People familiar with the review process say a
+            conditional approval is the most likely outcome, probably in the first
+            quarter of 2027. The payments industry is not waiting to find out.
+          </Para>
+        </Reveal>
+
+        <PullQuote attribution="Senior executive, large card-issuing bank">
+          We are modelling the approval as a near-certainty. The question we are
+          spending our time on is not whether it happens. It is what we do when it
+          does.
+        </PullQuote>
+
+        <SectionHead kicker="Part I">The ecosystem Sony has been quietly assembling</SectionHead>
+
+        <Reveal>
+          <Para>
+            Sony's ambitions in financial services have been visible to attentive
+            observers for several years, assembled in pieces that only resolve into a
+            coherent picture when set alongside the trust charter application. The
+            digital wallet integrations, the gradual consolidation of payment flows
+            across PlayStation and Sony's streaming services, the restructuring of the
+            PlayStation Credits system to accommodate fiat-currency balances — each
+            individual move looked, in isolation, like routine platform housekeeping.
+            Together, they look like the groundwork for a monetary system.
+          </Para>
+        </Reveal>
+
+        <Reveal>
+          <Para>
+            Consider what Sony actually controls. PlayStation Network has{" "}
+            <SmallCaps>145 million</SmallCaps> active monthly users who collectively
+            spend an estimated <SmallCaps>$26bn</SmallCaps> annually on games,
+            downloadable content, subscriptions, and in-game purchases. Sony Pictures
+            releases roughly 25 films per year and controls a streaming library that
+            reaches over 100 countries. Sony Music is one of the three major labels,
+            representing artists whose combined monthly streams run to billions. Sony's
+            Alpha camera ecosystem has cultivated a community of professional and
+            semi-professional photographers and videographers who buy hardware, software
+            subscriptions, and cloud storage in recurring cycles. Sony's Bravia
+            televisions are the primary entertainment screen in tens of millions of
+            households globally.
+          </Para>
+        </Reveal>
+      </article>
+
+      <div style={{ maxWidth: 1060, margin: "0 auto", padding: "0 28px" }}>
+        <EcosystemPanel />
+      </div>
+
+      <article style={{ maxWidth: 780, margin: "0 auto", padding: "0 28px" }}>
+        <Reveal>
+          <Para>
+            Each of these businesses currently handles payments through a fragmented
+            mixture of credit cards, regional processors, and platform-specific wallet
+            systems that do not communicate with each other. A PlayStation gamer who
+            also subscribes to Sony's streaming service, purchases Sony Music content,
+            and stores photographs on Sony's cloud pays for each of these separately,
+            through different interfaces, generating interchange fees — typically{" "}
+            <SmallCaps>2% to 3%</SmallCaps> — on every transaction. A Sony-issued
+            stablecoin that unified these payment flows would eliminate that friction
+            entirely, keeping the value within the Sony ecosystem from the moment it is
+            loaded to the moment it is spent.
+          </Para>
+        </Reveal>
+      </article>
+
+      <div style={{ maxWidth: 1060, margin: "0 auto", padding: "0 28px" }}>
+        <PaymentFlow />
+      </div>
+
+      <article style={{ maxWidth: 780, margin: "0 auto", padding: "0 28px" }}>
+        <Reveal>
+          <Para>
+            The interchange saving, at a conservative 2% on Sony's own-platform
+            transaction volume, is estimated at roughly <SmallCaps>$520m</SmallCaps>{" "}
+            annually at full adoption. Significant, but it is not the primary
+            commercial logic of the application. The more compelling calculation is the
+            float. Under the GENIUS Act's reserve requirements, stablecoin issuers must
+            hold one-to-one backing in short-duration Treasury bills. At current T-bill
+            yields of approximately <SmallCaps>4.3%</SmallCaps>, a circulating SEN Coin
+            supply of $5bn at steady-state adoption would generate roughly{" "}
+            <SmallCaps>$215m</SmallCaps> in annual reserve income — income that the Act
+            permits Sony to retain. At $10bn in circulation, that figure doubles. The
+            consumer holding a balance in a Sony wallet is, in effect, lending Sony
+            money that Sony invests in government securities and pockets the return.
+            The consumer gets access to a seamless entertainment payment system. Sony
+            gets a funding mechanism.
+          </Para>
+        </Reveal>
+      </article>
+
+      <div style={{ maxWidth: 1060, margin: "0 auto", padding: "0 28px" }}>
+        <FloatCalculator />
+      </div>
+
+      <article style={{ maxWidth: 780, margin: "0 auto", padding: "0 28px" }}>
+        <SectionHead kicker="Part II">The trust charter question</SectionHead>
+
+        <Reveal>
+          <Para>
+            The decision to seek a national trust charter rather than a state
+            money-transmitter licence or a banking partnership reflects a calculation
+            about control and permanence. A money-transmitter licence is a
+            state-by-state patchwork that limits the types of reserve assets that can
+            be held and imposes operational constraints incompatible with a global
+            payment system. A banking partnership gives the chartered partner
+            meaningful oversight and extracts a commercial margin. A national trust
+            charter, issued by the OCC and valid in all fifty states, gives Sony a
+            federally regulated institution of its own — the authority to hold and
+            manage Treasury assets without intermediation, to operate within the
+            federal payments system, and to issue a stablecoin that carries the
+            regulatory legitimacy of a nationally chartered bank.
+          </Para>
+        </Reveal>
+
+        <Reveal>
+          <Para>
+            The legal pathway is well-trodden in principle, if not in practice for an
+            applicant of Sony's profile. The OCC has issued trust charters to a range
+            of non-traditional applicants in recent years, and the GENIUS Act's
+            framework was explicitly designed to accommodate non-bank stablecoin
+            issuers who could demonstrate adequate reserve management and consumer
+            protection infrastructure. Comptroller Gould has publicly argued that
+            restricting trust charters to traditional financial institutions would be
+            inconsistent with the Act's intent.
+          </Para>
+        </Reveal>
+
+        <Reveal>
+          <Para>
+            <SmallCaps>The banking lobby</SmallCaps> disagrees, volubly. The
+            Independent Community Bankers of America has filed a detailed comment
+            letter arguing that granting trust charters to technology conglomerates
+            creates an uneven playing field — large corporations obtaining the benefits
+            of bank charters without the full obligations of full-service banking,
+            including Community Reinvestment Act requirements and comprehensive
+            consumer lending responsibilities. The letter has the ring of an argument
+            made by people who know they are losing but feel compelled to make the
+            record. The OCC has shown limited appetite for arguments that amount to
+            incumbent protection, and Gould has been explicit that the GENIUS Act
+            requires him to evaluate applicants on their merits, not on the convenience
+            of existing institutions.
+          </Para>
+        </Reveal>
+
+        <Reveal>
+          <Para>
+            The more substantive concern, which the OCC's own staff have reportedly
+            raised in the review process, is the concentration of financial and
+            behavioural data. A Sony trust entity intermediating payments across
+            gaming, streaming, music, photography, and consumer electronics would
+            accumulate a dataset of extraordinary granularity — not merely what
+            consumers buy, but the full texture of how they spend their leisure time
+            and their disposable income. The consumer protection implications of that
+            data sitting inside a financial institution, subject to bank privacy rules
+            that were written long before the concept of an entertainment-conglomerate
+            bank existed, are not trivial. The conditional approval that observers
+            expect will almost certainly include enhanced data-governance requirements
+            and strict separation between payment data and commercial data.
+          </Para>
+        </Reveal>
+
+        <SectionHead kicker="Part III">What SEN Coin would actually look like</SectionHead>
+
+        <Reveal>
+          <Para>
+            Sony has disclosed relatively little about the operational design of what
+            it refers to internally, according to three people familiar with the
+            matter, as SEN Coin — for Sony Entertainment Network. The OCC filing is
+            more revealing. The stablecoin would be issued by Sony Financial Trust,
+            N.A., backed one-to-one by short-duration US Treasury bills held in a
+            segregated trust account, and redeemable at par on demand. It would be
+            denominated in US dollars and carry the regulatory imprimatur of a GENIUS
+            Act-certified payment stablecoin.
+          </Para>
+        </Reveal>
+
+        <Reveal>
+          <Para>
+            Consumers would load SEN Coin from a linked bank account or debit card
+            directly into a Sony wallet integrated across PlayStation, Sony's streaming
+            apps, and the company's broader digital services. The wallet would replace,
+            rather than sit alongside, the existing PlayStation Credits system — a
+            migration that Sony has reportedly been preparing its user base for with a
+            gradual deprecation of Credits-only features over the past eighteen months.
+            Spending SEN Coin within the Sony ecosystem would carry no transaction fee.
+            Conversion back to dollars would be available at any time at par, subject
+            to standard AML verification.
+          </Para>
+        </Reveal>
+
+        <Reveal>
+          <Para>
+            The rewards architecture, which Sony has not yet publicly detailed but
+            which industry analysts have been modelling from the OCC filing's
+            financial projections, is expected to take the form of SEN Credits
+            distributed to wallet holders as a fraction of the yield earned on their
+            balances — redeemable for game content, streaming subscriptions, hardware
+            discounts, and eventually, if the merchant acceptance programme proceeds,
+            purchases at third-party retailers. The effect is a loyalty programme
+            funded not by merchant interchange but by the return on the consumer's own
+            money. A consumer maintaining a $150 average SEN Coin balance at a 4.3%
+            T-bill yield earns approximately $6.45 in SEN Credits annually — modest
+            individually, but the structure is more sustainable than the
+            interchange-funded points programmes it would compete with, because Sony
+            does not pay for the rewards out of margin. It redistributes a fraction of
+            the float.
+          </Para>
+        </Reveal>
+      </article>
+
+      <div style={{ maxWidth: 1060, margin: "0 auto", padding: "0 28px" }}>
+        <PersonalYield />
+      </div>
+
+      <article style={{ maxWidth: 780, margin: "0 auto", padding: "0 28px" }}>
+        <PullQuote attribution="Thomas Osei, fintech investor">
+          It's the most elegant monetisation of trust I've seen proposed in financial
+          services in years. They're taking the consumer's own money, investing it in
+          Treasuries, and giving back a slice of the return as entertainment rewards.
+          The consumer feels rewarded. Sony keeps the rest of the yield.
+        </PullQuote>
+
+        <SectionHead kicker="Part IV">The generational dimension</SectionHead>
+
+        <Reveal>
+          <Para>
+            The feature of Sony's application that most unsettles the established
+            payments industry is not the arithmetic but the demography. The population
+            that Sony is targeting with SEN Coin — the 145 million monthly PlayStation
+            Network users, skewed heavily toward the 18-to-35 cohort — is at precisely
+            the stage of life when primary financial habits are formed. Visa and
+            Mastercard built their cardholder bases by being present at the moment a
+            young adult applied for their first credit card. Sony is proposing to be
+            present at an earlier moment: the point at which a young adult's
+            entertainment spending, which for this demographic is substantial and
+            frequent, migrates to a payment system native to the platform they already
+            inhabit.
+          </Para>
+        </Reveal>
+      </article>
+
+      <div style={{ maxWidth: 1060, margin: "0 auto", padding: "0 28px" }}>
+        <GenerationalStrip />
+      </div>
+
+      <article style={{ maxWidth: 780, margin: "0 auto", padding: "0 28px" }}>
+        <Reveal>
+          <Para>
+            A 22-year-old who adopts SEN Coin for PlayStation spending is not merely
+            adopting a payment method. They are establishing a wallet relationship with
+            a regulated financial institution, learning to maintain a balance in a
+            Sony-controlled account, and beginning to accumulate the transaction
+            history and reward balance that will make switching to an alternative
+            payment system progressively more costly. The network effects in payment
+            systems are well-documented and durable. First-mover advantages, once
+            established, are difficult to displace. Sony is not proposing to compete
+            with Visa in the general-purpose payments market — not yet, at any rate.
+            It is proposing to capture the formation moment, before the
+            general-purpose card relationship is established, in the specific context
+            of entertainment spending.
+          </Para>
+        </Reveal>
+
+        <PullQuote attribution="Senior executive, major card network">
+          The card became the default because it was the first one. Sony is trying to
+          be present at an even earlier moment — before the first card application, in
+          the spending context that young people actually care about. If they get the
+          wallet relationship at twenty-two, the card relationship at twenty-five is a
+          different conversation. That's what keeps us up at night.
+        </PullQuote>
+
+        <Reveal>
+          <Para>
+            <SmallCaps>The cross-media dimension</SmallCaps> amplifies the strategic
+            logic in ways that have no precedent in the payments industry. Sony does
+            not merely want to process payments for its existing services. It wants
+            the payment system and the content library to reinforce each other. A
+            consumer who loads SEN Coin to buy a PlayStation game may find that the
+            same wallet offers a discounted first month of Sony's streaming service. A
+            Sony Music subscriber who pays with SEN Coin earns SEN Credits redeemable
+            for PlayStation content. A Bravia television owner who activates the Sony
+            wallet integration gets early access to new Sony Pictures releases. None
+            of these linkages requires consumers to think of themselves as using a
+            financial product. The payment is invisible. The rewards accumulate. The
+            loop tightens.
+          </Para>
+        </Reveal>
+
+        <SectionHead kicker="Part V">The content flywheel</SectionHead>
+
+        <Reveal>
+          <Para>
+            The most ambitious element of Sony's vision — and the one that is
+            generating the most regulatory scrutiny alongside the OCC review — is what
+            its internal strategists have been calling the content flywheel: a
+            self-reinforcing cycle in which the payment system and the content
+            business drive each other's growth.
+          </Para>
+        </Reveal>
+
+        <Reveal>
+          <Para>
+            The mechanism is straightforward in concept. SEN Coin adoption is
+            accelerated by content incentives — exclusive release windows, day-one DLC
+            access, discounted subscriptions, early film rentals — available only to
+            wallet holders. The broader the SEN Coin adoption, the larger the float
+            and the greater the reserve income. The reserve income funds more content
+            investment and more generous rewards. Better content and rewards drive
+            further SEN Coin adoption. The financial infrastructure and the creative
+            infrastructure become, in this model, a single integrated engine rather
+            than parallel businesses that happen to share a parent company.
+          </Para>
+        </Reveal>
+      </article>
+
+      <div style={{ maxWidth: 1060, margin: "0 auto", padding: "0 28px" }}>
+        <Flywheel />
+      </div>
+
+      <article style={{ maxWidth: 780, margin: "0 auto", padding: "0 28px" }}>
+        <Reveal>
+          <Para>
+            Sony has been careful not to describe this model in public in terms that
+            would attract immediate antitrust attention. The OCC filing describes the
+            content incentives as "optional commercial promotions available at Sony's
+            discretion" rather than structural features of the payment product.
+            Competition lawyers who have reviewed the filing publicly note that the
+            distinction between a promotional tie and an anticompetitive tie depends
+            heavily on implementation — that offering SEN Coin holders a discount on a
+            Sony streaming subscription is quite different, legally, from making a
+            Sony streaming subscription unavailable to those who do not use SEN Coin.
+            Sony has explicitly disclaimed any intention to engage in the latter.
+            Whether the commercial pressure to maximise SEN Coin adoption will, in
+            practice, preserve that distinction over time is a question that the
+            Department of Justice's antitrust division has reportedly begun to ask.
+          </Para>
+        </Reveal>
+
+        <PullQuote attribution="The Ledger">
+          Sony has disclaimed any intention to make content unavailable to non-SEN
+          Coin users. Whether the commercial pressure to maximise adoption will
+          preserve that distinction over time is a question the DOJ has reportedly
+          begun to ask.
+        </PullQuote>
+
+        <Reveal>
+          <Para>
+            <SmallCaps>The data flywheel</SmallCaps> runs alongside the content
+            flywheel and is, in some respects, more powerful. A Sony Financial Trust
+            entity intermediating payments across gaming, streaming, music, film, and
+            photography generates a dataset that is without parallel in the
+            entertainment industry: not merely what consumers enjoy, which platform
+            analytics already reveal, but how much they are willing to pay for it, how
+            quickly they spend after loading their wallet, how their entertainment
+            consumption correlates with their financial behaviour, and which content
+            investments generate the highest consumer financial engagement. This is a
+            dataset that transforms Sony from a content company that knows what its
+            customers watch into a financial institution that understands how its
+            customers value their own leisure and their own money. The CFPB has
+            already indicated it will scrutinise Sony's data-governance commitments
+            closely if and when a charter is granted.
+          </Para>
+        </Reveal>
+
+        <SectionHead kicker="Part VI">The road to approval</SectionHead>
+
+        <Reveal>
+          <Para>
+            The OCC is expected to issue its ruling on Sony's trust charter
+            application in the first quarter of 2027. The Stablecoin Certification
+            Commission, which must separately certify any GENIUS Act-compliant
+            stablecoin, typically follows an OCC trust charter approval within ninety
+            days for applicants whose reserve architecture has already been reviewed
+            as part of the charter process. If both approvals proceed on the expected
+            timeline, SEN Coin could be in the hands of consumers before the end of
+            2027.
+          </Para>
+        </Reveal>
+      </article>
+
+      <div style={{ maxWidth: 1060, margin: "0 auto", padding: "0 28px" }}>
+        <Timeline />
+      </div>
+
+      <article style={{ maxWidth: 780, margin: "0 auto", padding: "0 28px" }}>
+        <Reveal>
+          <Para>
+            The form of the approval matters as much as the fact of it. A narrow
+            charter, restricting SEN Coin to closed-loop use within Sony's own digital
+            services, would validate the immediate commercial logic while deferring the
+            broader question of whether Sony can build a general-purpose payment
+            network. A broad charter — authorising SEN Coin for use at third-party
+            merchants who choose to accept it — would immediately position Sony as a
+            payment network competitor rather than a platform loyalty programme, with
+            all the competitive and regulatory consequences that implies.
+          </Para>
+        </Reveal>
+
+        <Reveal>
+          <Para>
+            Comptroller Gould has not signalled his preference publicly. People
+            familiar with his thinking say he is inclined toward a broad charter on
+            the grounds that an artificially restricted approval would be inconsistent
+            with the GENIUS Act's intent to enable competition in the payments market.
+            If that is the outcome, the implications for Visa, Mastercard, and the
+            banks that issue credit cards would be immediate and significant. The card
+            networks have spent the past year building their responses. None of them
+            believes those responses are ready for a broad-charter scenario.
+          </Para>
+        </Reveal>
+
+        <Reveal>
+          <Para>
+            The Independent Community Bankers and the major card networks have one
+            remaining avenue of resistance: Congress. Several members of the Senate
+            Banking Committee have signalled interest in amending the GENIUS Act to
+            impose additional restrictions on large-platform stablecoin issuers,
+            including minimum holding periods before float income can be retained,
+            mandatory CRA-equivalent obligations, and caps on the total circulating
+            supply of any single non-bank stablecoin. Whether these amendments could
+            pass, and whether they could be enacted before Gould issues his ruling,
+            is uncertain. The legislative calendar is crowded and the fintech lobby is
+            well-resourced.
+          </Para>
+        </Reveal>
+
+        <Reveal>
+          <Para>
+            What is not uncertain is that the GENIUS Act has created a legal framework
+            under which a consumer electronics and entertainment company can plausibly
+            obtain the powers of a federally chartered financial institution and issue
+            its own digital dollar. That framework exists. Sony's application is
+            testing it for the first time at commercial scale, and the answer
+            Comptroller Gould provides will determine not just Sony's future but the
+            future of every large consumer-platform company that is watching the
+            review process and preparing its own filing.
+          </Para>
+        </Reveal>
+      </article>
+
+      <div style={{ maxWidth: 1060, margin: "0 auto", padding: "0 28px" }}>
+        <QueueViz />
+      </div>
+
+      <article style={{ maxWidth: 780, margin: "0 auto", padding: "0 28px" }}>
+        <Reveal>
+          <Para>
+            There are, by the OCC's own count, eleven such pre-applications currently
+            under informal discussion with the agency's licensing staff. The queue
+            forms to the right.
+          </Para>
+        </Reveal>
+
+        <Reveal>
+          <div
+            style={{
+              textAlign: "center",
+              margin: "40px 0 20px",
+              fontFamily: '"Playfair Display", Georgia, serif',
+              fontSize: 22,
+              color: GOLD,
+              fontWeight: 900,
+              letterSpacing: "0.4em",
+            }}
+          >
+            § § §
+          </div>
+        </Reveal>
+
+        <Reveal>
+          <div
+            style={{
+              marginTop: 56,
+              padding: "22px 24px",
+              background: CREAM_DEEP,
+              borderLeft: `3px solid ${NAVY_SOFT}`,
+              fontFamily: "Georgia, serif",
+              fontSize: 13,
+              color: MUTED,
+              fontStyle: "italic",
+              lineHeight: 1.6,
+            }}
+          >
+            This is a work of narrative fiction set in 2027, extrapolated from real
+            regulatory frameworks, the GENIUS Act of 2026, and industry trends. SEN
+            Coin, Sony Financial Trust, N.A., and the specific statements attributed to
+            named regulators are fictional constructs for illustrative purposes.
+          </div>
+        </Reveal>
+
+        <Reveal>
+          <div
+            style={{
+              marginTop: 48,
+              paddingTop: 24,
+              borderTop: `2px solid ${NAVY}`,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 16,
+              fontFamily: '"Inconsolata", monospace',
+              fontSize: 11,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: MUTED,
+            }}
+          >
+            <span>
+              <span style={{ color: NAVY, fontWeight: 700 }}>The Ledger</span>{" "}
+              <span style={{ color: GOLD_DEEP }}>· Interactive Edition</span>
+            </span>
+            <span>Filed from Tokyo, New York, D.C.</span>
+          </div>
+        </Reveal>
+      </article>
+    </div>
+  );
+}
+
+// Mount
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<PressStartToPay />);
+</script>
+
+<!-- ====================================================================
+     ROBUST DEPENDENCY LOADER
+     Tries unpkg first. If a script fails (network, CDN outage, blocked),
+     automatically falls back to jsdelivr. If both fail for any dep, shows
+     a readable error in the loading area instead of an infinite spinner.
+     ==================================================================== -->
+<script>
+(function () {
+  "use strict";
+
+  var DEPS = [
+    {
+      name: "React",
+      globalKey: "React",
+      urls: [
+        "https://unpkg.com/react@18.3.1/umd/react.production.min.js",
+        "https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js"
+      ]
+    },
+    {
+      name: "ReactDOM",
+      globalKey: "ReactDOM",
+      urls: [
+        "https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js",
+        "https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"
+      ]
+    },
+    {
+      name: "PropTypes",
+      globalKey: "PropTypes",
+      urls: [
+        "https://unpkg.com/prop-types@15.8.1/prop-types.min.js",
+        "https://cdn.jsdelivr.net/npm/prop-types@15.8.1/prop-types.min.js"
+      ]
+    },
+    {
+      name: "Recharts",
+      globalKey: "Recharts",
+      urls: [
+        "https://unpkg.com/recharts@2.12.7/umd/Recharts.js",
+        "https://cdn.jsdelivr.net/npm/recharts@2.12.7/umd/Recharts.js"
+      ]
+    },
+    {
+      name: "Babel",
+      globalKey: "Babel",
+      urls: [
+        "https://unpkg.com/@babel/standalone@7.24.7/babel.min.js",
+        "https://cdn.jsdelivr.net/npm/@babel/standalone@7.24.7/babel.min.js"
+      ]
+    }
+  ];
+
+  var statusEl = document.querySelector("#root-loading .tag");
+  function setStatus(msg) {
+    if (statusEl) statusEl.textContent = msg;
+  }
+
+  function showError(title, detail) {
+    var root = document.getElementById("root");
+    if (!root) return;
+    root.innerHTML = ""
+      + '<div style="max-width:640px;margin:80px auto;padding:28px 32px;'
+      + 'background:#F5EFE1;border-left:4px solid #9A2A2A;'
+      + 'font-family:Georgia,serif;color:#1A1814;line-height:1.6;">'
+      + '<div style="font-family:\'Playfair Display\',Georgia,serif;font-size:22px;'
+      + 'font-weight:800;color:#0F2A44;margin-bottom:10px;">'
+      + 'Could not load The Ledger</div>'
+      + '<div style="font-size:15px;margin-bottom:14px;">' + title + '</div>'
+      + '<div style="font-family:Inconsolata,monospace;font-size:12px;color:#6B6354;'
+      + 'background:#EBE2CE;padding:10px 12px;border-radius:2px;word-break:break-all;">'
+      + detail + '</div>'
+      + '<div style="font-size:13px;color:#6B6354;margin-top:14px;font-style:italic;">'
+      + 'This page uses React, Recharts, and Babel loaded from a public CDN. '
+      + 'If you are viewing this from GitHub\u2019s raw file view or opening '
+      + 'it directly from disk in a restrictive browser, please serve it via '
+      + 'GitHub Pages or a local HTTP server instead.'
+      + '</div></div>';
+  }
+
+  function loadScript(urls, globalKey, name) {
+    return new Promise(function (resolve, reject) {
+      var attempt = 0;
+      function tryNext() {
+        if (attempt >= urls.length) {
+          reject(new Error(name + ": all " + urls.length + " CDN sources failed"));
+          return;
+        }
+        var url = urls[attempt++];
+        var s = document.createElement("script");
+        s.src = url;
+        s.async = false;
+        s.crossOrigin = "anonymous";
+        s.onload = function () {
+          if (typeof window[globalKey] !== "undefined") {
+            resolve();
+          } else {
+            // loaded but global missing — try next CDN
+            tryNext();
+          }
+        };
+        s.onerror = function () { tryNext(); };
+        document.head.appendChild(s);
+      }
+      tryNext();
+    });
+  }
+
+  function loadAll() {
+    var chain = Promise.resolve();
+    DEPS.forEach(function (d) {
+      chain = chain.then(function () {
+        setStatus("Loading " + d.name + "\u2026");
+        return loadScript(d.urls, d.globalKey, d.name);
+      });
+    });
+    return chain;
+  }
+
+  function compileAndRun() {
+    setStatus("Compiling interactive figures\u2026");
+    var srcEl = document.getElementById("article-jsx");
+    if (!srcEl) {
+      throw new Error("Article source not found");
+    }
+    var jsxSource = srcEl.textContent;
+    var compiled = window.Babel.transform(jsxSource, {
+      presets: ["react"]
+    }).code;
+    // Evaluate in the global scope so it behaves like the original
+    // type="text/babel" block did.
+    (new Function(compiled))();
+  }
+
+  // Kick off.
+  loadAll()
+    .then(function () {
+      try {
+        compileAndRun();
+      } catch (err) {
+        console.error(err);
+        showError(
+          "The interactive figures failed to compile.",
+          String(err && err.stack ? err.stack : err)
+        );
+      }
+    })
+    .catch(function (err) {
+      console.error(err);
+      showError(
+        "A required library could not be loaded from the CDN.",
+        String(err && err.message ? err.message : err)
+      );
+    });
+
+  // If for some reason the page is still "loading" 20 seconds in, assume
+  // something is silently wrong (e.g. network blocked) and surface it.
+  setTimeout(function () {
+    var loading = document.getElementById("root-loading");
+    if (loading && loading.isConnected && typeof window.React === "undefined") {
+      showError(
+        "The page has been loading for 20 seconds with no library available yet.",
+        "Your browser could not reach unpkg.com or cdn.jsdelivr.net. "
+          + "Check your network connection, or host this file through GitHub "
+          + "Pages (or any HTTP server) rather than opening it directly from disk."
+      );
+    }
+  }, 20000);
+})();
+</script>
+</body>
+</html>
