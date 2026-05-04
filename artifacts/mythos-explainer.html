@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Claude Mythos — Financial Regulatory Briefing</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0a0e1a;
+      --surface:   #111827;
+      --surface2:  #0d1220;
+      --border:    #1e293b;
+      --border2:   #334155;
+      --text:      #e2e8f0;
+      --muted:     #94a3b8;
+      --faint:     #64748b;
+      --fainter:   #475569;
+      --faintest:  #334155;
+      --accent:    #818cf8;
+      --accent-lt: #a5b4fc;
+      --red:       #ef4444;
+      --amber:     #f59e0b;
+      --blue:      #3b82f6;
+      --purple:    #8b5cf6;
+      --green:     #10b981;
+    }
+
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+      border-bottom: 1px solid var(--border2);
+      padding: 2.5rem 2rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(99,102,241,.08) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 50%, rgba(239,68,68,.05) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .header-inner { max-width: 900px; margin: 0 auto; position: relative; }
+
+    .badge-row { display: flex; align-items: center; gap: .75rem; margin-bottom: .5rem; flex-wrap: wrap; }
+    .badge {
+      background: var(--red); color: #fff;
+      font-family: monospace; font-size: .65rem;
+      letter-spacing: .15em; font-weight: bold;
+      padding: .2rem .6rem; border-radius: 2px;
+    }
+    .meta { font-family: monospace; font-size: .7rem; color: var(--faint); letter-spacing: .1em; }
+
+    h1 { font-size: clamp(1.8rem, 5vw, 3rem); font-weight: normal; letter-spacing: -.02em; line-height: 1.1; margin-bottom: .4rem; }
+    h1 em { color: var(--accent); }
+    .tagline { color: var(--muted); font-size: 1.05rem; font-style: italic; }
+
+    /* ── NAV TABS ── */
+    .nav { border-bottom: 1px solid var(--border); background: var(--surface2); }
+    .nav-inner { max-width: 900px; margin: 0 auto; display: flex; overflow-x: auto; }
+    .tab-btn {
+      padding: .85rem 1.25rem;
+      background: none; border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--faint);
+      font-family: Georgia, serif; font-size: .82rem;
+      cursor: pointer; transition: color .2s, border-color .2s;
+      white-space: nowrap; letter-spacing: .01em;
+    }
+    .tab-btn.active { border-bottom-color: var(--accent); color: #c7d2fe; }
+    .tab-btn:hover:not(.active) { color: var(--muted); }
+
+    /* ── MAIN ── */
+    .main { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+    }
+    .card p { color: #cbd5e1; line-height: 1.8; font-size: .97rem; }
+    .card p + p { margin-top: 1rem; }
+
+    .section-label {
+      font-size: .8rem; color: var(--accent-lt); letter-spacing: .05em;
+      font-weight: normal; text-transform: uppercase; margin-bottom: 1rem;
+      font-family: monospace;
+    }
+
+    /* ── STATS GRID ── */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .stat-card {
+      background: var(--surface); border-radius: 6px;
+      padding: 1.25rem; border-left: 3px solid var(--accent);
+    }
+    .stat-value { font-size: 1.6rem; font-weight: bold; font-family: monospace; }
+    .stat-label { font-size: .75rem; font-weight: bold; font-family: monospace; letter-spacing: .05em; text-transform: uppercase; margin: .25rem 0 .2rem; }
+    .stat-note  { font-size: .75rem; color: var(--faint); }
+
+    /* ── PARTNER TAGS ── */
+    .partner-wrap { display: flex; flex-wrap: wrap; gap: .5rem; }
+    .partner-tag {
+      background: var(--border); border: 1px solid var(--border2);
+      border-radius: 4px; padding: .25rem .6rem;
+      font-size: .72rem; color: var(--muted); font-family: monospace;
+    }
+
+    /* ── CONCERNS ── */
+    .concern-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1.4rem;
+      display: grid; grid-template-columns: 2.5rem 1fr;
+      gap: 1rem; align-items: start;
+      margin-bottom: 1rem;
+      transition: border-color .2s;
+    }
+    .concern-card:hover { border-color: var(--border2); }
+    .concern-icon { font-size: 1.6rem; line-height: 1; }
+    .concern-title { color: var(--text); font-size: .95rem; font-weight: bold; margin-bottom: .5rem; }
+    .concern-body  { color: var(--muted); font-size: .87rem; line-height: 1.7; }
+
+    .callout {
+      background: linear-gradient(135deg, #1c1917, #1e1b4b);
+      border: 1px solid #44403c; border-left: 3px solid var(--amber);
+      border-radius: 8px; padding: 1.4rem; margin-top: 1rem;
+    }
+    .callout-label { color: #fbbf24; font-size: .75rem; letter-spacing: .15em; text-transform: uppercase; margin-bottom: .75rem; font-family: monospace; }
+    .callout p { color: #d6d3d1; font-size: .92rem; line-height: 1.75; }
+
+    /* ── TIMELINE ── */
+    .filter-row { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.5rem; }
+    .filter-btn {
+      padding: .3rem .75rem;
+      border-radius: 4px; font-family: monospace;
+      font-size: .73rem; letter-spacing: .05em;
+      cursor: pointer; transition: all .15s;
+    }
+
+    .timeline { position: relative; }
+    .timeline::before {
+      content: '';
+      position: absolute; left: 7rem; top: 0; bottom: 0;
+      width: 1px; background: var(--border);
+    }
+    .tl-row {
+      display: grid; grid-template-columns: 7rem 1fr;
+      gap: 1.5rem; margin-bottom: 1rem; align-items: start;
+    }
+    .tl-date { text-align: right; padding-right: 1.5rem; padding-top: .9rem; }
+    .tl-date span { font-size: .68rem; color: var(--fainter); font-family: monospace; line-height: 1.4; }
+    .tl-item {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; padding: 1rem 1.2rem;
+      cursor: pointer; transition: all .2s;
+      position: relative;
+    }
+    .tl-item:hover { border-color: var(--border2); }
+    .tl-item.open { background: var(--border); }
+    .tl-dot {
+      position: absolute; left: -1.75rem; top: 50%; transform: translateY(-50%);
+      width: 8px; height: 8px; border-radius: 50%;
+    }
+    .tl-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .tl-cat { font-size: .62rem; font-family: monospace; letter-spacing: .1em; text-transform: uppercase; margin-right: .6rem; }
+    .tl-title { font-size: .88rem; color: var(--text); font-weight: bold; }
+    .tl-arrow { color: var(--fainter); font-size: .7rem; }
+    .tl-body {
+      display: none;
+      color: var(--muted); font-size: .85rem; line-height: 1.7;
+      margin-top: .75rem;
+    }
+    .tl-item.open .tl-body { display: block; }
+    .tl-source { display: block; margin-top: .5rem; color: var(--fainter); font-family: monospace; font-size: .68rem; }
+
+    /* ── VOICES ── */
+    .voice-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1.5rem;
+      display: grid; grid-template-columns: 3rem 1fr;
+      gap: 1rem; margin-bottom: 1.25rem;
+    }
+    .voice-flag { font-size: 1.8rem; line-height: 1; }
+    .voice-name { color: #f8fafc; font-weight: bold; font-size: .95rem; }
+    .voice-role { color: var(--fainter); font-size: .75rem; font-family: monospace; margin-left: .6rem; }
+    .voice-quote {
+      color: var(--muted); font-size: .88rem; line-height: 1.7;
+      font-style: italic; border-left: 2px solid var(--border2);
+      padding-left: .75rem; margin-top: .5rem;
+    }
+
+    .dark-card {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1.5rem; margin-bottom: 1.25rem;
+    }
+    .dark-card-label { color: var(--muted); font-size: .75rem; letter-spacing: .15em; text-transform: uppercase; margin-bottom: 1rem; font-family: monospace; }
+    .dark-card p { color: var(--muted); font-size: .87rem; line-height: 1.75; }
+    .dark-card p + p { margin-top: .75rem; }
+    .dark-card em { color: #cbd5e1; }
+
+    .outlook-card {
+      background: linear-gradient(135deg, #0f172a, #1e1b4b);
+      border: 1px solid #312e81; border-radius: 8px; padding: 1.5rem;
+    }
+    .outlook-label { color: var(--accent-lt); font-size: .75rem; letter-spacing: .15em; text-transform: uppercase; margin-bottom: .75rem; font-family: monospace; }
+    .outlook-card ul { color: var(--muted); font-size: .87rem; line-height: 1.9; padding-left: 1.25rem; }
+
+    /* ── FOOTER ── */
+    .footer {
+      margin-top: 2.5rem; padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: .5rem;
+    }
+    .footer span { color: var(--faintest); font-size: .7rem; font-family: monospace; }
+
+    /* ── GLASSWING CARD (overview) ── */
+    .glasswing-card {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1.5rem;
+    }
+    .glasswing-card p { color: #cbd5e1; line-height: 1.75; font-size: .95rem; margin-bottom: 1rem; }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .tl-row { grid-template-columns: 5rem 1fr; gap: 1rem; }
+      .timeline::before { left: 5rem; }
+      .tl-dot { left: -1.4rem; }
+      .tl-date { padding-right: 1rem; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div class="badge-row">
+      <span class="badge">RESTRICTED ACCESS</span>
+      <span class="meta">ASL-4 · PROJECT GLASSWING · APRIL 2026</span>
+    </div>
+    <h1>Claude <em>Mythos</em></h1>
+    <p class="tagline">Why Anthropic's most powerful model has financial regulators worldwide on high alert</p>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <div class="nav-inner">
+    <button class="tab-btn active" onclick="switchTab('overview', this)">Overview</button>
+    <button class="tab-btn" onclick="switchTab('concerns', this)">Why Regulators Are Concerned</button>
+    <button class="tab-btn" onclick="switchTab('timeline', this)">Timeline</button>
+    <button class="tab-btn" onclick="switchTab('voices', this)">Key Voices</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- ══ OVERVIEW ══ -->
+  <div id="panel-overview" class="panel active">
+
+    <div class="card" style="background: linear-gradient(135deg,#1e1b4b,#1e293b);">
+      <div class="section-label">What Is Claude Mythos?</div>
+      <p>Claude Mythos is Anthropic's most powerful AI model ever built — a tier above its public Opus line, first revealed not through a press release but through an accidental data exposure on March 26, 2026. Its internal codename was <em>Capybara</em>.</p>
+      <p>What distinguishes Mythos from all prior models is not merely raw capability — it is Anthropic's own publicly stated fear of what the model can do in the wrong hands. Mythos can <strong>autonomously identify and exploit software vulnerabilities</strong>, including flaws that had evaded expert human review for decades, across every major operating system and browser it was tested against. Anthropic found it "exceeds all but the most skilled humans" in detecting security weaknesses.</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card" style="border-left-color: var(--red);">
+        <div class="stat-value" style="color:var(--red);">Thousands</div>
+        <div class="stat-label" style="color:var(--text);">Zero-days discovered</div>
+        <div class="stat-note">Across all major OSes &amp; browsers</div>
+      </div>
+      <div class="stat-card" style="border-left-color: var(--amber);">
+        <div class="stat-value" style="color:var(--amber);">27 yrs</div>
+        <div class="stat-label" style="color:var(--text);">Oldest bug found</div>
+        <div class="stat-note">Patched flaw in OpenBSD</div>
+      </div>
+      <div class="stat-card" style="border-left-color: var(--blue);">
+        <div class="stat-value" style="color:var(--blue);">$100M</div>
+        <div class="stat-label" style="color:var(--text);">Glasswing budget</div>
+        <div class="stat-note">Defensive initiative with 12 partners</div>
+      </div>
+      <div class="stat-card" style="border-left-color: var(--purple);">
+        <div class="stat-value" style="color:var(--purple);">Days→mins</div>
+        <div class="stat-label" style="color:var(--text);">Attack cycle compression</div>
+        <div class="stat-note">From weeks of skilled manual effort</div>
+      </div>
+    </div>
+
+    <div class="glasswing-card">
+      <div class="section-label" style="color:var(--muted);">Project Glasswing — The Defensive Response</div>
+      <p>Rather than release Mythos publicly, Anthropic launched <strong>Project Glasswing</strong> on April 7, 2026 — named for the glasswing butterfly whose transparent wings hide in plain sight. It provides controlled access exclusively for defensive cybersecurity work, backed by a $100M usage credit pool and $4M in open-source security donations.</p>
+      <div class="partner-wrap">
+        <span class="partner-tag">AWS</span>
+        <span class="partner-tag">Apple</span>
+        <span class="partner-tag">Broadcom</span>
+        <span class="partner-tag">Cisco</span>
+        <span class="partner-tag">CrowdStrike</span>
+        <span class="partner-tag">Google</span>
+        <span class="partner-tag">JPMorgan Chase</span>
+        <span class="partner-tag">Linux Foundation</span>
+        <span class="partner-tag">Microsoft</span>
+        <span class="partner-tag">NVIDIA</span>
+        <span class="partner-tag">Palo Alto Networks</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CONCERNS ══ -->
+  <div id="panel-concerns" class="panel">
+    <p style="color:var(--faint);font-size:.85rem;margin-bottom:1rem;font-style:italic;">Six structural concerns driving regulatory urgency across global financial supervisors:</p>
+
+    <div class="concern-card">
+      <div class="concern-icon">⚡</div>
+      <div>
+        <div class="concern-title">Unprecedented Vulnerability Discovery Speed</div>
+        <div class="concern-body">Mythos can surface decades-old bugs — including a 27-year-old flaw in OpenBSD and critical issues across every major OS and browser — at a pace that outstrips entire human security teams. Elite researchers typically require weeks or months for what Mythos achieves in hours.</div>
+      </div>
+    </div>
+
+    <div class="concern-card">
+      <div class="concern-icon">🔗</div>
+      <div>
+        <div class="concern-title">Autonomous Exploit Chaining</div>
+        <div class="concern-body">The model doesn't just find bugs — it can construct working exploits without human guidance. Palo Alto Networks warns this shifts the paradigm from AI-assisted to AI-driven attacks, compressing attack cycle times from days or weeks to minutes.</div>
+      </div>
+    </div>
+
+    <div class="concern-card">
+      <div class="concern-icon">🏦</div>
+      <div>
+        <div class="concern-title">Financial Sector Concentration Risk</div>
+        <div class="concern-body">Unlike dispersed critical infrastructure, banking is highly consolidated. Bank of England Governor Andrew Bailey noted the model "makes it easier to detect existing vulnerabilities in core IT systems" that cybercriminals could exploit — at scale, across interconnected institutions.</div>
+      </div>
+    </div>
+
+    <div class="concern-card">
+      <div class="concern-icon">🔓</div>
+      <div>
+        <div class="concern-title">Access Control Integrity</div>
+        <div class="concern-body">Mythos' restricted access has already been compromised: individuals linked to an Anthropic contractor guessed the model's endpoint using leaked naming conventions. Anthropic itself had two disclosure incidents in the weeks before launch, raising questions about containment.</div>
+      </div>
+    </div>
+
+    <div class="concern-card">
+      <div class="concern-icon">📋</div>
+      <div>
+        <div class="concern-title">Regulatory Lag</div>
+        <div class="concern-body">The EU AI Act's next enforcement phase doesn't take effect until August 2026. Most banks are operating on patching cycles designed for a 2019 threat surface. The window between vulnerability disclosure and weaponization has compressed from 19 days (2023) to under 72 hours today.</div>
+      </div>
+    </div>
+
+    <div class="concern-card">
+      <div class="concern-icon">⚖️</div>
+      <div>
+        <div class="concern-title">Dual-Mandate Tension</div>
+        <div class="concern-body">Regulators face a structural dilemma: encourage AI adoption for efficiency gains while preventing the same AI from becoming an attack vector. The White House simultaneously encouraged defensive deployment and raised national security objections to broader access.</div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">Regulator's Core Dilemma</div>
+      <p>As one expert framed it: "Frontier AI systems don't create a new category of risk — they collapse the timelines of every existing one." Banks are defending 2026 attacks with 2019 standard operating procedures. Regulators must simultaneously push institutions toward AI-driven efficiency gains while preventing the same AI from becoming the attack vector against the infrastructure it is meant to modernize.</p>
+    </div>
+  </div>
+
+  <!-- ══ TIMELINE ══ -->
+  <div id="panel-timeline" class="panel">
+    <div class="filter-row" id="filter-row">
+      <button class="filter-btn active" data-cat="all" onclick="setFilter('all',this)">All Events</button>
+      <button class="filter-btn" data-cat="discovery" onclick="setFilter('discovery',this)" style="border:1px solid var(--amber);color:var(--amber);">Discovery</button>
+      <button class="filter-btn" data-cat="launch"    onclick="setFilter('launch',this)"    style="border:1px solid var(--blue);color:var(--blue);">Launch</button>
+      <button class="filter-btn" data-cat="regulatory" onclick="setFilter('regulatory',this)" style="border:1px solid var(--red);color:var(--red);">Regulatory</button>
+      <button class="filter-btn" data-cat="market"   onclick="setFilter('market',this)"   style="border:1px solid var(--green);color:var(--green);">Market Response</button>
+    </div>
+
+    <div class="timeline" id="timeline">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+
+  <!-- ══ VOICES ══ -->
+  <div id="panel-voices" class="panel">
+    <p style="color:var(--faint);font-size:.85rem;margin-bottom:1rem;font-style:italic;">Key figures shaping the global regulatory response:</p>
+
+    <div class="voice-card">
+      <div class="voice-flag">🇺🇸</div>
+      <div>
+        <div><span class="voice-name">Jerome Powell</span><span class="voice-role">Fed Chair</span></div>
+        <div class="voice-quote">Met urgently with major U.S. bank CEOs to assess Mythos-driven cyber risk to financial infrastructure.</div>
+      </div>
+    </div>
+
+    <div class="voice-card">
+      <div class="voice-flag">🇺🇸</div>
+      <div>
+        <div><span class="voice-name">Scott Bessent</span><span class="voice-role">Treasury Secretary</span></div>
+        <div class="voice-quote">Convened an "urgent" meeting with bank CEOs to assess the threat landscape created by this new class of AI.</div>
+      </div>
+    </div>
+
+    <div class="voice-card">
+      <div class="voice-flag">🇬🇧</div>
+      <div>
+        <div><span class="voice-name">Andrew Bailey</span><span class="voice-role">Bank of England Governor</span></div>
+        <div class="voice-quote">We are having to look very carefully now what this latest AI development could mean for the risk of cyber crime. The consequence could be that there is a development of AI which makes it easier to detect existing vulnerabilities in sort of core IT systems.</div>
+      </div>
+    </div>
+
+    <div class="voice-card">
+      <div class="voice-flag">🌐</div>
+      <div>
+        <div><span class="voice-name">Dario Amodei</span><span class="voice-role">Anthropic CEO</span></div>
+        <div class="voice-quote">There is a real opportunity to create a fundamentally more secure internet and world than we had before the advent of AI-powered cyber capabilities — if we get this right.</div>
+      </div>
+    </div>
+
+    <div class="dark-card">
+      <div class="dark-card-label">The Skeptic's View</div>
+      <p>Not everyone has accepted the alarm at face value. Security expert Bruce Schneier called the launch "very much a PR play by Anthropic — and it worked," noting reporters were "breathlessly repeating Anthropic's talking points without engaging critically."</p>
+      <p>Proofpoint CSO Ryan Kalember offered a simpler prediction: <em>"I think this gets solved on its own, because the other models will catch up."</em> He added: "We're not seeing EternalBlue or world-melting vulnerabilities fall out of it." His view — that banks are unusually well-resourced and the financial sector warrants attention but not panic — represents a meaningful counterweight to the regulatory emergency framing.</p>
+    </div>
+
+    <div class="outlook-card">
+      <div class="outlook-label">What's Next for Regulators</div>
+      <ul>
+        <li>EU AI Act next enforcement phase — August 2026 — may trigger Mythos-specific provisions for "high-risk" autonomous cyber systems</li>
+        <li>APRA and other prudential regulators expected to issue formal guidance on AI cyber risk frameworks</li>
+        <li>Cyber insurance industry repricing expected as insurers incorporate Mythos-style capability into control verification</li>
+        <li>Anthropic has signaled Mythos-class safety safeguards will eventually ship in a future public Opus model</li>
+        <li>Access conflict between national data localization rules (India, EU) and Mythos' U.S.-based controlled infrastructure remains unresolved</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <span>Sources: CNBC · Reuters · Raconteur · FT · Dark Reading · Forrester · Schneier on Security</span>
+    <span>Last updated: May 4, 2026</span>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+  /* ── DATA ── */
+  const CAT_COLORS = {
+    discovery:  '#f59e0b',
+    launch:     '#3b82f6',
+    regulatory: '#ef4444',
+    market:     '#10b981',
+  };
+  const CAT_LABELS = {
+    discovery:  'Discovery',
+    launch:     'Launch',
+    regulatory: 'Regulatory',
+    market:     'Market',
+  };
+
+  const EVENTS = [
+    { date:'Mar 26, 2026', label:'The Leak',      cat:'discovery',
+      title:'Anthropic CMS Misconfiguration',
+      body:'A routine configuration error at Anthropic exposed nearly 3,000 unpublished internal assets — including a draft post describing "by far the most powerful AI model we\'ve ever developed." The model\'s codename: Mythos.',
+      source:'dplooy.com' },
+    { date:'Mar 31, 2026', label:'Code Leak',     cat:'discovery',
+      title:'Claude Code Source Exposed',
+      body:'Over 512,000 lines of Claude Code source code were leaked via an npm packaging error, further revealing planned capabilities and the Mythos roadmap.',
+      source:'infotech.com' },
+    { date:'Apr 7, 2026',  label:'Official Launch', cat:'launch',
+      title:'Mythos Preview + Project Glasswing Announced',
+      body:'Anthropic officially announces Claude Mythos Preview and Project Glasswing simultaneously — a $100M defensive cybersecurity initiative giving exclusive access to 12 partners including AWS, Apple, Google, Microsoft, JPMorgan Chase, and NVIDIA. Mythos is withheld from public release due to its ability to autonomously discover and exploit zero-day vulnerabilities.',
+      source:'cnbc.com' },
+    { date:'Apr 9–10, 2026', label:'U.S. Summit', cat:'regulatory',
+      title:'Treasury & Fed Meet with Bank CEOs',
+      body:'Treasury Secretary Scott Bessent and Fed Chair Jerome Powell convene an urgent meeting with major U.S. bank CEOs — Dimon the only notable absence — to assess Mythos-driven cyber risks to financial infrastructure. The Bank of Canada held a parallel session.',
+      source:'cnbc.com' },
+    { date:'Apr 10, 2026', label:'White House', cat:'regulatory',
+      title:'White House Engages Directly',
+      body:'The White House convenes its own meeting with major bank representatives. It simultaneously encourages banks to deploy Mythos defensively while the DOD had labeled Anthropic a supply chain risk — adding a national security dimension to the operational risk story.',
+      source:'pymnts.com' },
+    { date:'Mid-Apr 2026', label:'UK Response', cat:'regulatory',
+      title:'Bank of England Calls Urgent Meeting',
+      body:'The Bank of England schedules an emergency convening with the NCSC, FCA, UK Treasury, and major financial institutions — banks, insurers, and infrastructure providers — to evaluate Mythos vulnerabilities and consider stricter AI testing requirements for banks.',
+      source:'raconteur.net' },
+    { date:'Mid-Apr 2026', label:'EU/Australia', cat:'regulatory',
+      title:'APRA Warning; European Supervisors Probe Banks',
+      body:"Australia's APRA warns banks they are falling behind on frontier-AI cyber risk. European supervisors begin probing banks on Mythos preparedness. Central banks in Australia and New Zealand confirm monitoring.",
+      source:'cutoday.info' },
+    { date:'Apr 24, 2026', label:'Japan Task Force', cat:'regulatory',
+      title:"Japan FSA Convenes Finance Minister + Megabanks",
+      body:"Japan's finance minister, central bank governor, presidents of the three megabanks, and the stock exchange meet at FSA headquarters to form a working group on AI-driven cyber threats to financial infrastructure.",
+      source:'darkreading.com' },
+    { date:'Apr 28, 2026', label:'India Access Push', cat:'regulatory',
+      title:'India Seeks Glasswing Access',
+      body:'MeitY Secretary S. Krishnan confirms India is negotiating with the U.S. and Anthropic for access. Nasscom writes to Anthropic arguing Indian firms maintain critical global code. Data localization rules create a compliance conflict for Indian payment processors.',
+      source:'medianama.com' },
+    { date:'Early May 2026', label:'IT Spending Surge', cat:'market',
+      title:'Public Sector Banks Increase IT Budgets',
+      body:'Indian public sector banks — including Punjab & Sind Bank and UCO Bank — publicly commit to increased IT security spending. A government panel under SBI Chairman C.S. Setty is formed to assess Mythos risks and develop mitigation strategies.',
+      source:'msn.com' },
+  ];
+
+  /* ── TAB SWITCHING ── */
+  function switchTab(id, btn) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('panel-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  /* ── TIMELINE ── */
+  let activeFilter = 'all';
+  let openEvent = null;
+
+  function buildTimeline() {
+    const tl = document.getElementById('timeline');
+    tl.innerHTML = '';
+    const filtered = activeFilter === 'all' ? EVENTS : EVENTS.filter(e => e.cat === activeFilter);
+
+    filtered.forEach((ev, i) => {
+      const color = CAT_COLORS[ev.cat];
+      const row = document.createElement('div');
+      row.className = 'tl-row';
+      row.dataset.index = i;
+      row.innerHTML = `
+        <div class="tl-date"><span>${ev.date}</span></div>
+        <div class="tl-item" id="tl-item-${i}" onclick="toggleEvent(${i})">
+          <div class="tl-dot" style="background:${color};box-shadow:0 0 8px ${color};"></div>
+          <div class="tl-head">
+            <div>
+              <span class="tl-cat" style="color:${color};">${ev.label}</span>
+              <span class="tl-title">${ev.title}</span>
+            </div>
+            <span class="tl-arrow" id="tl-arrow-${i}">▼</span>
+          </div>
+          <div class="tl-body" id="tl-body-${i}">
+            ${ev.body}
+            <span class="tl-source">Source: ${ev.source}</span>
+          </div>
+        </div>`;
+      tl.appendChild(row);
+    });
+    openEvent = null;
+  }
+
+  function toggleEvent(i) {
+    const item  = document.getElementById('tl-item-' + i);
+    const arrow = document.getElementById('tl-arrow-' + i);
+    if (openEvent === i) {
+      item.classList.remove('open');
+      arrow.textContent = '▼';
+      openEvent = null;
+    } else {
+      if (openEvent !== null) {
+        const prev = document.getElementById('tl-item-' + openEvent);
+        const prevArrow = document.getElementById('tl-arrow-' + openEvent);
+        if (prev) { prev.classList.remove('open'); prevArrow.textContent = '▼'; }
+      }
+      item.classList.add('open');
+      arrow.textContent = '▲';
+      openEvent = i;
+    }
+  }
+
+  /* ── FILTER ── */
+  function setFilter(cat, btn) {
+    activeFilter = cat;
+    document.querySelectorAll('.filter-btn').forEach(b => {
+      b.style.background = '#111827';
+      b.style.color = b.dataset.cat === 'all' ? 'var(--muted)' : CAT_COLORS[b.dataset.cat] || 'var(--muted)';
+    });
+    btn.style.background = cat === 'all' ? 'var(--border2)' : CAT_COLORS[cat];
+    btn.style.color = '#fff';
+    buildTimeline();
+  }
+
+  /* Style the "All" filter button initially */
+  (function initFilters() {
+    const allBtn = document.querySelector('[data-cat="all"]');
+    allBtn.style.background = 'var(--border2)';
+    allBtn.style.color = '#fff';
+    allBtn.style.border = '1px solid var(--border2)';
+  })();
+
+  buildTimeline();
+</script>
+</body>
+</html>
