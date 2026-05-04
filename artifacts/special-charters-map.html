@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Innovative Financial Charters & Licenses</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink:          #08111E;
+  --ink-panel:    #0B1728;
+  --ink-card:     #0E1C2F;
+  --ink-border:   #172338;
+
+  --red:          #BF1B2C;
+  --red-hi:       #D92035;
+  --red-dim:      rgba(191,27,44,0.13);
+
+  --blue:         #2558A8;
+  --blue-hi:      #3570CC;
+  --blue-dim:     rgba(37,88,168,0.13);
+
+  --both:         #6E1E28;
+  --both-hi:      #8C2635;
+  --both-dim:     rgba(110,30,40,0.13);
+
+  --default:      #111B2C;
+
+  --white:        #FFFFFF;
+  --cream:        #D8E4F4;
+  --accent:       #96B4D8;
+  --accent-dim:   rgba(150,180,216,0.15);
+  --accent-hair:  rgba(150,180,216,0.07);
+
+  --text:         #7A9CBE;
+  --text-bright:  #B8D0EC;
+  --text-dim:     #344E68;
+  --rule:         rgba(150,180,216,0.12);
+  --rule-strong:  rgba(150,180,216,0.26);
+
+  --era-found:    #4A6480;
+  --era-digital:  #6080A8;
+  --era-crypto:   #96B4D8;
+  --era-modern:   #C8DCF4;
+}
+
+body {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  background: var(--ink);
+  color: var(--text);
+  height: 100vh;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  opacity: 0.45;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  z-index: 9000;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23n)' opacity='0.055'/%3E%3C/svg%3E");
+}
+
+#app { display: flex; flex-direction: column; height: 100vh; }
+
+/* ── HEADER ─────────────────────────────────── */
+header {
+  background: var(--ink);
+  border-bottom: 1px solid var(--rule-strong);
+  padding: 0 22px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 100;
+}
+
+.header-left { display: flex; align-items: baseline; gap: 14px; }
+
+.header-left h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-style: italic;
+  color: var(--white);
+  letter-spacing: 0.01em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.header-pipe { width: 1px; height: 13px; background: var(--rule-strong); flex-shrink: 0; }
+
+.header-sub {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.55rem;
+  color: var(--text-dim);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ── LEGEND ─────────────────────────────────── */
+.legend { display: flex; gap: 18px; align-items: center; }
+
+.legend-item {
+  display: flex; align-items: center; gap: 6px;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.54rem; color: var(--text-dim);
+  letter-spacing: 0.1em; text-transform: uppercase;
+}
+
+.lswatch { width: 11px; height: 11px; border-radius: 2px; flex-shrink: 0; }
+.lswatch.charter  { background: var(--red); }
+.lswatch.license  { background: var(--blue); }
+.lswatch.both     { background: var(--both); }
+.lswatch.standard { background: #1C2A3E; }
+
+/* ── MAIN ────────────────────────────────────── */
+.main { display: flex; flex: 1; overflow: hidden; }
+
+/* ── MAP ─────────────────────────────────────── */
+#map-area {
+  flex: 1; position: relative; background: var(--ink);
+}
+
+#map-area::after {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 48%, transparent 50%, rgba(8,17,30,0.55) 100%);
+  pointer-events: none; z-index: 2;
+}
+
+#us-map { width: 100%; height: 100%; display: block; }
+
+/* ── STATE PATHS ────────────────────────────── */
+@keyframes mapFade { from { opacity: 0; } to { opacity: 1; } }
+
+.state-path {
+  stroke: #08111E; stroke-width: 0.55;
+  cursor: default; opacity: 0;
+  animation: mapFade 0.6s ease forwards;
+}
+
+.state-path.default { fill: var(--default); }
+.state-path.charter { fill: var(--red);  cursor: pointer; }
+.state-path.license { fill: var(--blue); cursor: pointer; }
+.state-path.both    { fill: var(--both); cursor: pointer; }
+
+.state-path.clickable:hover {
+  filter: brightness(1.2);
+  stroke: rgba(255,255,255,0.45);
+  stroke-width: 1.1;
+}
+.state-path.selected {
+  stroke: var(--white);
+  stroke-width: 1.7;
+  filter: brightness(1.2) drop-shadow(0 0 5px rgba(255,255,255,0.25));
+}
+
+/* ── STATE LABELS ────────────────────────────── */
+@keyframes labelFade { from { opacity: 0; } to { opacity: 1; } }
+
+.state-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 9.5px; font-weight: 600;
+  pointer-events: none;
+  text-anchor: middle; dominant-baseline: central;
+  letter-spacing: 0.04em; opacity: 0;
+  animation: labelFade 0.6s ease forwards;
+}
+.state-label.on-color { fill: rgba(255,255,255,0.82); }
+.state-label.on-dark  { fill: rgba(150,180,216,0.28); }
+
+/* ── PUERTO RICO ─────────────────────────────── */
+#pr-container { position: absolute; bottom: 66px; left: 18px; cursor: pointer; z-index: 5; }
+
+#pr-box {
+  width: 76px; height: 41px; background: var(--blue);
+  border-radius: 2px; border: 1px solid rgba(8,17,30,0.65);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.78rem; font-weight: 600;
+  color: rgba(255,255,255,0.85); letter-spacing: 0.06em;
+  transition: filter 0.15s, border-color 0.15s;
+}
+#pr-box:hover { filter: brightness(1.18); border-color: rgba(255,255,255,0.4); }
+#pr-box.selected {
+  border: 1.5px solid var(--white);
+  filter: brightness(1.2) drop-shadow(0 0 4px rgba(255,255,255,0.25));
+}
+
+#pr-label {
+  font-family: 'Libre Baskerville', serif; font-size: 0.5rem;
+  color: var(--text-dim); text-align: center; margin-top: 5px;
+  letter-spacing: 0.15em; text-transform: uppercase;
+}
+
+/* ── TOOLTIP ─────────────────────────────────── */
+#tooltip {
+  position: absolute;
+  background: rgba(8,17,30,0.97);
+  border: 1px solid var(--rule-strong);
+  border-left: 2px solid var(--white);
+  padding: 9px 14px; pointer-events: none;
+  display: none; z-index: 500; max-width: 240px;
+}
+.tt-state {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem; font-weight: 600; font-style: italic;
+  color: var(--white); margin-bottom: 5px;
+}
+.tt-tag {
+  display: inline-block; font-family: 'Libre Baskerville', serif;
+  font-size: 0.5rem; padding: 1px 6px; border-radius: 2px;
+  margin-bottom: 5px; margin-right: 4px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+}
+.tt-tag.charter { background: var(--red-dim);  color: var(--red-hi);  border: 1px solid rgba(191,27,44,0.3); }
+.tt-tag.license { background: var(--blue-dim); color: var(--blue-hi); border: 1px solid rgba(37,88,168,0.3); }
+.tt-tag.both    { background: var(--both-dim); color: var(--both-hi); border: 1px solid rgba(110,30,40,0.3); }
+.tt-items { font-size: 0.63rem; color: var(--text-dim); line-height: 1.65; }
+
+/* ── INFO PANEL ─────────────────────────────── */
+#info-panel {
+  width: 392px; background: var(--ink-panel);
+  border-left: 1px solid var(--rule-strong);
+  overflow-y: auto; flex-shrink: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ink-border) transparent;
+}
+#info-panel::-webkit-scrollbar { width: 3px; }
+#info-panel::-webkit-scrollbar-thumb { background: var(--ink-border); }
+
+/* ── WELCOME ─────────────────────────────────── */
+.welcome {
+  padding: 36px 28px 36px 24px;
+  min-height: 100%; display: flex; flex-direction: column;
+  position: relative;
+}
+
+.welcome::before {
+  content: ''; position: absolute; top: 0; bottom: 0; left: 38px; width: 1px;
+  background: linear-gradient(to bottom, transparent 3%, var(--rule) 12%, var(--rule) 88%, transparent 97%);
+}
+
+.w-inner { margin-left: 28px; }
+
+.w-kicker {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.52rem; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 10px;
+}
+
+.w-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.75rem; font-weight: 600; font-style: italic;
+  color: var(--white); line-height: 1.15; margin-bottom: 18px;
+}
+
+.w-body {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.7rem; color: var(--text-dim); line-height: 1.85; max-width: 290px;
+}
+
+.w-rule { width: 100%; height: 1px; background: var(--rule); margin: 22px 0; }
+
+.w-cat { display: flex; align-items: flex-start; gap: 9px; margin-bottom: 13px; }
+.w-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; margin-top: 3px; }
+.w-dot.charter { background: var(--red); }
+.w-dot.license { background: var(--blue); }
+.w-dot.both    { background: var(--both); }
+
+.w-cat-text { font-family: 'Libre Baskerville', serif; font-size: 0.63rem; color: var(--text-dim); line-height: 1.6; }
+.w-cat-text strong { color: var(--text-bright); font-weight: 700; }
+
+.w-hint {
+  margin-top: auto; padding-top: 30px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.72rem; font-style: italic; color: var(--text-dim); opacity: 0.7;
+}
+
+/* ── PANEL HEADER ────────────────────────────── */
+.panel-hd {
+  padding: 16px 22px 14px; border-bottom: 1px solid var(--rule-strong);
+  background: var(--ink-panel); position: sticky; top: 0; z-index: 20;
+}
+
+.panel-kicker {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.5rem; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px;
+}
+
+.panel-hd h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.45rem; font-weight: 600; font-style: italic;
+  color: var(--white); line-height: 1.1; margin-bottom: 8px;
+}
+
+.badge-row { display: flex; gap: 5px; flex-wrap: wrap; }
+
+.badge {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.49rem; padding: 2px 7px; border-radius: 2px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+}
+.badge.charter { background: var(--red-dim);  color: var(--red-hi);  border: 1px solid rgba(191,27,44,0.22); }
+.badge.license { background: var(--blue-dim); color: var(--blue-hi); border: 1px solid rgba(37,88,168,0.22); }
+
+/* ── SPINE WRAP ──────────────────────────────── */
+.spine-wrap { padding: 6px 0 36px; position: relative; }
+
+.spine-wrap::before {
+  content: ''; position: absolute; top: 0; bottom: 0; left: 38px; width: 1px;
+  background: linear-gradient(to bottom, transparent 1%, var(--rule) 6%, var(--rule) 94%, transparent 99%);
+}
+
+/* ── CARD (flat, non-expandable) ─────────────── */
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.card {
+  position: relative;
+  padding: 0 18px 0 60px;
+  animation: cardIn 0.32s ease both;
+}
+
+.card-node {
+  position: absolute; left: 33px; top: 20px;
+  width: 11px; height: 11px; border-radius: 50%;
+  background: var(--ink-panel);
+  border: 1.5px solid var(--rule-strong); z-index: 2;
+}
+
+.card-tick {
+  position: absolute; left: 44px; top: 25px;
+  width: 16px; height: 1px; background: var(--rule);
+}
+
+/* Card label row — no longer a button */
+.card-label { padding: 16px 0 10px; border-bottom: 1px solid var(--rule); }
+
+.card-era {
+  font-family: 'Libre Baskerville', serif; font-size: 0.5rem;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  margin-bottom: 5px; display: flex; align-items: center; gap: 7px;
+}
+
+.era-dash { display: inline-block; height: 1px; width: 14px; flex-shrink: 0; }
+
+.card-type {
+  display: inline-block; font-family: 'Libre Baskerville', serif;
+  font-size: 0.49rem; letter-spacing: 0.14em; text-transform: uppercase;
+  padding: 1px 6px; border-radius: 2px; margin-bottom: 5px;
+}
+.card-type.charter { background: var(--red-dim);  color: var(--red-hi);  border: 1px solid rgba(191,27,44,0.2); }
+.card-type.license { background: var(--blue-dim); color: var(--blue-hi); border: 1px solid rgba(37,88,168,0.2); }
+
+.card-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.97rem; font-weight: 600; color: var(--white); line-height: 1.3;
+}
+
+/* Card content — always visible */
+.card-content { padding: 4px 0 18px; }
+
+.sec-lbl {
+  font-family: 'Libre Baskerville', serif; font-size: 0.5rem;
+  font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--accent); margin-top: 13px; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 8px;
+}
+.sec-lbl::after { content: ''; flex: 1; height: 1px; background: var(--rule); }
+
+.overview {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.67rem; color: var(--text-dim); line-height: 1.9;
+}
+
+ul.reqs, ul.nots, ul.facts { list-style: none; padding: 0; }
+
+ul.reqs li, ul.nots li, ul.facts li {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 0.64rem; color: var(--text-dim);
+  padding: 3px 0 3px 14px; position: relative; line-height: 1.65;
+}
+ul.reqs li::before {
+  content: "›"; position: absolute; left: 0;
+  color: var(--blue-hi); font-size: 0.95rem; line-height: 1; top: 3px;
+}
+ul.nots li::before {
+  content: "★"; position: absolute; left: 1px;
+  color: var(--accent); font-size: 0.5rem; top: 5px;
+}
+ul.facts li::before {
+  content: "◆"; position: absolute; left: 1px;
+  color: var(--text-dim); font-size: 0.46rem; top: 6px; opacity: 0.5;
+}
+
+.ent { color: var(--text-bright); font-weight: 700; }
+
+.callout {
+  margin-top: 13px; background: var(--accent-hair);
+  border-left: 2px solid var(--accent); padding: 9px 13px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.82rem; font-style: italic;
+  color: var(--cream); line-height: 1.65;
+}
+
+.c-divider { height: 1px; background: var(--rule); margin: 3px 0 3px 60px; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <div class="header-left">
+      <h1>Innovative Financial Charters &amp; Licenses</h1>
+      <div class="header-pipe"></div>
+      <span class="header-sub">U.S. Regulatory Innovation Map</span>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="lswatch charter"></div>Special Charter</div>
+      <div class="legend-item"><div class="lswatch license"></div>Special License</div>
+      <div class="legend-item"><div class="lswatch both"></div>Charter + License</div>
+      <div class="legend-item"><div class="lswatch standard"></div>Standard</div>
+    </div>
+  </header>
+
+  <div class="main">
+    <div id="map-area">
+      <svg id="us-map"></svg>
+      <div id="pr-container" onclick="selectPR()">
+        <div id="pr-box">PR · IFE</div>
+        <div id="pr-label">Puerto Rico</div>
+      </div>
+      <div id="tooltip"></div>
+    </div>
+
+    <div id="info-panel">
+      <div class="welcome">
+        <div class="w-inner">
+          <div class="w-kicker">U.S. Regulatory Innovation</div>
+          <div class="w-title">Innovative<br>Charters &amp;<br>Licenses</div>
+          <div class="w-body">This map documents states and territories that have enacted specialized financial charters and licenses — frameworks outside the standard insured depository model that reflect the frontier of American financial regulation.</div>
+          <div class="w-rule"></div>
+          <div class="w-cat">
+            <div class="w-dot charter"></div>
+            <div class="w-cat-text"><strong>Special Charter</strong> — State authority to operate as a specialized depository or financial institution, typically without FDIC insurance or with narrowly scoped banking powers.</div>
+          </div>
+          <div class="w-cat">
+            <div class="w-dot license"></div>
+            <div class="w-cat-text"><strong>Special License</strong> — A regulatory license enabling virtual currency or other digital financial asset business activity, distinct from a full bank or trust charter.</div>
+          </div>
+          <div class="w-cat">
+            <div class="w-dot both"></div>
+            <div class="w-cat-text"><strong>Charter + License</strong> — Jurisdictions with both a notable specialized charter and an innovative financial services license. Currently California and New York.</div>
+          </div>
+          <div class="w-hint">Select any highlighted state to explore its framework.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<script>
+
+const FIPS_CAT = {
+  "06":"both","08":"charter","09":"charter","13":"charter",
+  "15":"charter","16":"charter","18":"charter","22":"license",
+  "23":"charter","27":"charter","31":"charter","32":"charter",
+  "36":"both","38":"charter","49":"charter","50":"charter","56":"charter"
+};
+
+const FIPS_NAME = {
+  "01":"Alabama","02":"Alaska","04":"Arizona","05":"Arkansas","06":"California",
+  "08":"Colorado","09":"Connecticut","10":"Delaware","11":"D.C.",
+  "12":"Florida","13":"Georgia","15":"Hawaii","16":"Idaho","17":"Illinois",
+  "18":"Indiana","19":"Iowa","20":"Kansas","21":"Kentucky","22":"Louisiana",
+  "23":"Maine","24":"Maryland","25":"Massachusetts","26":"Michigan","27":"Minnesota",
+  "28":"Mississippi","29":"Missouri","30":"Montana","31":"Nebraska","32":"Nevada",
+  "33":"New Hampshire","34":"New Jersey","35":"New Mexico","36":"New York",
+  "37":"North Carolina","38":"North Dakota","39":"Ohio","40":"Oklahoma","41":"Oregon",
+  "42":"Pennsylvania","44":"Rhode Island","45":"South Carolina","46":"South Dakota",
+  "47":"Tennessee","48":"Texas","49":"Utah","50":"Vermont","51":"Virginia",
+  "53":"Washington","54":"West Virginia","55":"Wisconsin","56":"Wyoming"
+};
+
+const FIPS_ABBR = {
+  "01":"AL","02":"AK","04":"AZ","05":"AR","06":"CA","08":"CO","09":"CT",
+  "10":"DE","11":"DC","12":"FL","13":"GA","15":"HI","16":"ID","17":"IL",
+  "18":"IN","19":"IA","20":"KS","21":"KY","22":"LA","23":"ME","24":"MD",
+  "25":"MA","26":"MI","27":"MN","28":"MS","29":"MO","30":"MT","31":"NE",
+  "32":"NV","33":"NH","34":"NJ","35":"NM","36":"NY","37":"NC","38":"ND",
+  "39":"OH","40":"OK","41":"OR","42":"PA","44":"RI","45":"SC","46":"SD",
+  "47":"TN","48":"TX","49":"UT","50":"VT","51":"VA","53":"WA","54":"WV",
+  "55":"WI","56":"WY"
+};
+
+const ERAS = {
+  foundational: { color:"#4A6480", label:"Foundational Era",    range:"pre-2000" },
+  digital:      { color:"#6080A8", label:"Digital Finance Era", range:"2000–2018" },
+  crypto:       { color:"#96B4D8", label:"Crypto Banking Era",  range:"2019–2021" },
+  modern:       { color:"#C8DCF4", label:"Modern Regulation",   range:"2022–present" }
+};
+
+const DATA = {
+  "56": { name:"Wyoming", items:[
+    { type:"charter", era:"crypto", year:2019,
+      name:"Special Purpose Depository Institution (SPDI)",
+      overview:"Wyoming's SPDI charter is a first-of-its-kind state bank charter enabling crypto-native and fintech firms to hold digital assets as qualified custodians without FDIC insurance. Enacted through Wyoming's landmark 2019 blockchain legislative package, SPDIs operate on a strict 100% full-reserve basis — no fractional reserve lending permitted — and must maintain liquid assets sufficient to cover all deposit liabilities at all times.",
+      reqs:["100% liquid reserve ratio against all deposit liabilities","Minimum capital: greater of $5M or projected liability coverage","No FDIC insurance; deposits are uninsured by design","FFIEC-compliant BSA/AML compliance program","Wyoming Division of Banking oversight","May hold digital assets directly as a qualified custodian"],
+      notables:[{n:"Kraken Financial",d:"Received Federal Reserve master account access in 2025 — the first crypto-native firm to achieve this, enabling direct Fed payment infrastructure access without a correspondent bank."},{n:"Custodia Bank",d:"Applied for a Fed master account; denied by the Kansas City Fed. Ongoing federal court litigation challenges the denial."},{n:"WisdomTree Prime",d:"Received an SPDI charter but ultimately discontinued operations."}],
+      facts:["Wyoming's 2019 blockchain legislative package included 20+ separate bills — the SPDI was the cornerstone financial charter innovation.","Kraken's Fed master account was a watershed: the first time a crypto-focused state-chartered bank achieved direct Federal Reserve System membership.","SPDIs cannot make loans against digital asset deposits, distinguishing them fundamentally from fractional reserve banks."],
+      callout:"Kraken Financial's 2025 Federal Reserve master account access is among the most significant milestones in crypto banking — the first time a crypto-native depository institution achieved direct Fed System membership."
+    },
+    { type:"charter", era:"foundational", year:"Historic",
+      name:"Uninsured Bank Charter",
+      overview:"Wyoming also authorizes state-chartered banks to operate without FDIC deposit insurance — distinct from but complementary to the SPDI. These institutions serve institutional, corporate, or sophisticated clients who neither need nor qualify for federal deposit insurance, enabling specialized depository services outside the traditional retail banking model. Wyoming is one of six states offering this pathway.",
+      reqs:["Wyoming Division of Banking charter approval","FDIC insurance not required or held","Capital requirements commensurate with safety and soundness","Primarily serves institutional or sophisticated non-retail clients","Subject to Wyoming state banking examination"],
+      notables:[{n:"Institutional custodians & family offices",d:"Sophisticated wealth managers and institutional investors have explored this charter for specialized asset custody without FDIC insurance overhead."}],
+      facts:["Wyoming offers both the SPDI and uninsured bank charter, providing two distinct pathways depending on business model.","Wyoming is one of six states (CT, ID, ME, NE, VT, WY) permitting uninsured bank charters — recognizing that not all institutional depository activity requires the FDIC safety net."]
+    }
+  ]},
+  "09": { name:"Connecticut", items:[
+    { type:"charter", era:"foundational", year:"Historic",
+      name:"Uninsured Bank Charter",
+      overview:"Connecticut's Banking Law permits state-chartered banks to operate without FDIC deposit insurance, enabling specialized financial institutions to serve institutional, corporate, and high-net-worth clients. Connecticut is one of six states offering this structure alongside Idaho, Maine, Nebraska, Vermont, and Wyoming.",
+      reqs:["Connecticut Department of Banking charter approval","No FDIC insurance requirement","Capital requirements proportionate to risk and business scope","AML/BSA compliance program required","Periodic examination by Connecticut Department of Banking"],
+      notables:[{n:"Institutional trust & custody firms",d:"Family offices, institutional custodians, and specialized wealth managers have utilized Connecticut's uninsured bank framework."}],
+      facts:["Connecticut has a long history as a financial services hub — the uninsured bank charter reflects pragmatic accommodation of institutional banking innovation.","Uninsured bank charters recognize that sophisticated institutional parties have fundamentally different risk profiles than retail depositors.","Enables custody and trust services tailored to institutional clients without FDIC membership overhead."]
+    }
+  ]},
+  "16": { name:"Idaho", items:[
+    { type:"charter", era:"foundational", year:"Historic",
+      name:"Uninsured Bank Charter",
+      overview:"Idaho permits state-chartered banks to operate without FDIC deposit insurance, enabling specialized institutional financial service providers to hold a bank charter outside the federal deposit insurance framework. Idaho is one of six states permitting this structure alongside CT, ME, NE, VT, and WY.",
+      reqs:["Idaho Department of Finance charter approval","FDIC insurance not required","Adequate capital for safety and soundness","Compliance with Idaho banking statutes and examination requirements"],
+      notables:[{n:"Institutional entities",d:"Idaho's flexible chartering environment has been examined by institutional and trust-focused entities seeking bank charter flexibility without the FDIC insurance framework."}],
+      facts:["Idaho joins CT, ME, NE, VT, and WY in permitting uninsured bank charters.","Particularly well-suited to sophisticated institutional custody and trust businesses that serve accredited or institutional counterparties."]
+    }
+  ]},
+  "23": { name:"Maine", items:[
+    { type:"charter", era:"foundational", year:"Historic",
+      name:"Uninsured Bank Charter",
+      overview:"Maine authorizes state-chartered banks to operate without mandatory FDIC deposit insurance, providing institutional financial service providers a pathway to bank charter status outside the full FDIC regulatory framework. One of six states offering this flexibility.",
+      reqs:["Maine Bureau of Financial Institutions approval","No FDIC insurance membership required","Capital requirements commensurate with business activities","Primarily serves non-retail, institutional clientele"],
+      notables:[{n:"Specialized financial institutions",d:"Maine's framework allows niche financial service providers bank charter flexibility tailored to institutional markets."}],
+      facts:["Maine is one of six states (CT, ID, ME, NE, VT, WY) offering uninsured bank charter pathways.","The structure enables institutional custody, fiduciary, and trust businesses that serve sophisticated counterparties rather than retail depositors."]
+    }
+  ]},
+  "50": { name:"Vermont", items:[
+    { type:"charter", era:"foundational", year:"Historic",
+      name:"Uninsured Bank Charter",
+      overview:"Vermont permits state-chartered banks to operate without FDIC deposit insurance, supporting specialized financial institutions serving institutional and corporate clients. Vermont has long positioned itself as a flexible regulator for specialized financial services, including one of the nation's leading captive insurance industries.",
+      reqs:["Vermont Department of Financial Regulation approval","No mandatory FDIC insurance","Capital requirements tailored to business activities and risk profile","Safety-and-soundness oversight by Vermont DFR"],
+      notables:[{n:"Captive finance & trust entities",d:"Vermont's well-established captive insurance and trust industry provides a complementary ecosystem for uninsured bank charter holders."}],
+      facts:["Vermont's uninsured bank charter is part of the six-state cluster (CT, ID, ME, NE, VT, WY) offering this pathway.","Vermont's track record as a flexible regulator for alternative financial structures makes it a natural fit for the uninsured bank model."]
+    }
+  ]},
+  "31": { name:"Nebraska", items:[
+    { type:"charter", era:"foundational", year:"Historic",
+      name:"Uninsured Bank Charter",
+      overview:"Nebraska permits state-chartered banks to operate without FDIC deposit insurance, enabling specialized financial institutions to serve institutional clients outside the traditional retail insured depository model. Nebraska's uninsured bank charter is complemented by the separately enacted Digital Asset Depository framework.",
+      reqs:["Nebraska Department of Banking and Finance approval","FDIC insurance not required","Capital requirements consistent with safety and soundness","State examination and ongoing oversight"],
+      notables:[{n:"Institutional service providers",d:"Nebraska's flexible chartering environment supports specialized financial entities and custodians serving institutional markets."}],
+      facts:["Nebraska offers both an uninsured bank charter and a dedicated Digital Asset Depository charter.","Nebraska's dual framework reflects the state's ambition to become a hub for financial services innovation."]
+    },
+    { type:"charter", era:"crypto", year:2021,
+      name:"Digital Asset Depository (DAD)",
+      overview:"Enacted through the Nebraska Financial Innovation Act (LB 649, 2021), the Digital Asset Depository is one of the first state banking frameworks specifically designed to authorize depository institutions focused on digital asset custody. DADs must maintain 100% reserves in digital assets held on behalf of customers — no fractional reserve lending permitted.",
+      reqs:["Nebraska Department of Banking and Finance charter approval","100% reserve requirement for all digital assets held in custody","No fractional reserve lending against digital asset deposits","Robust cybersecurity program and custody safeguard standards","BSA/AML compliance program","Minimum capital determined by the Department"],
+      notables:[{n:"Digital asset custodians",d:"The DAD charter attracted crypto businesses seeking a dedicated state-level custody charter with bank regulatory standing."},{n:"Blockchain innovators",d:"Nebraska's framework served as an early alternative to the OCC's proposed national trust charter for digital asset custodians."}],
+      facts:["The Nebraska Financial Innovation Act (2021) was among the first comprehensive state legislative efforts targeting digital asset banking, following Wyoming's 2019 SPDI.","Nebraska's DAD framework offers a state-level alternative to OCC national trust charters, maintaining state regulatory primacy.","Like Wyoming's SPDI, DADs are full-reserve institutions — limiting systemic risk in digital asset custody operations."]
+    }
+  ]},
+  "13": { name:"Georgia", items:[
+    { type:"charter", era:"digital", year:2012,
+      name:"Merchant Acquirer Limited Purpose Bank (MALPB)",
+      overview:"Georgia's Merchant Acquirer Limited Purpose Bank charter is the most narrowly scoped bank charter in the United States, designed exclusively for merchant acquiring activities. It enables payment technology companies and processors to hold a state bank charter — and gain direct card network membership — without engaging in traditional deposit-taking or lending. Georgia's position as the epicenter of U.S. payment processing ('Transaction Alley') made this a natural regulatory innovation.",
+      reqs:["Georgia Department of Banking and Finance charter approval","Activities strictly limited to merchant acquiring functions","No retail deposit-taking; no consumer or commercial lending","Capital requirements commensurate with acquirer risk profile","Compliance with Visa/Mastercard card network rules","AML and fraud prevention program required"],
+      notables:[{n:"Global Payments",d:"A leading payment technology company headquartered in Georgia that has utilized the MALPB framework."},{n:"Payment processors & ISOs",d:"Georgia-based payment companies have leveraged the MALPB to access card network membership directly, reducing sponsor bank reliance."},{n:"Transaction Alley ecosystem",d:"Multiple processors from Georgia's fintech corridor have explored or utilized the MALPB structure."}],
+      facts:["The MALPB is the only bank charter in the U.S. specifically designed for merchant acquiring — no other state has replicated it.","Atlanta and surrounding Georgia counties process a significant share of all U.S. payment transactions, earning the region the nickname 'Transaction Alley.'","Direct card network membership via MALPB improves interchange economics and reduces sponsor bank dependency.","The charter's narrow scope exempts MALPB holders from many traditional banking requirements."]
+    }
+  ]},
+  "38": { name:"North Dakota", items:[
+    { type:"charter", era:"foundational", year:1919,
+      name:"Bank of North Dakota — State-Owned Bank",
+      overview:"The Bank of North Dakota (BND) is the only state-owned bank in the United States, established in 1919 under Governor Lynn Frazier during the Non-Partisan League movement. BND is owned entirely by the State of North Dakota and operates as a 'banker's bank' — partnering with community banks rather than competing against them. It accepts deposits of state and political subdivision funds and functions as a quasi-central bank and development lender for North Dakota's economy.",
+      reqs:["State-owned enterprise; operates under North Dakota Century Code Chapter 6-09","Deposits consist primarily of state agency and political subdivision funds","Does not compete directly with community banks for retail deposits or loans","Governed by the North Dakota Industrial Commission","Subject to FDIC insurance and Federal Reserve membership","Participates in loans originated by local banks; does not undercut local lenders"],
+      notables:[{n:"Bank of North Dakota",d:"The institution itself is sui generis — the only U.S. state-owned bank, with over $10 billion in assets and a decades-long record of returning profits to the state general fund."},{n:"BND Student Loan Program",d:"Offers one of the most competitive student loan refinancing programs in the nation, leveraging state ownership for below-market rates."},{n:"Agricultural & Disaster Lending",d:"BND provides specialized agricultural and disaster recovery loans at favorable rates when private credit is constrained."}],
+      facts:["BND has returned over $1 billion in profits to the North Dakota general fund since 1997.","BND was founded in 1919 as a populist response to Wall Street domination of farm credit — a unique institutional origin with no American parallel.","The Public Banking movement in California, New York, and New Jersey consistently points to BND as the operational template for proposed state banks.","BND's mandate is North Dakota's economic development — not shareholder profit maximization.","During the 2008–2009 financial crisis, North Dakota was the only U.S. state with a budget surplus."],
+      callout:"BND is the only U.S. model for a state-owned bank operating within the federal banking system — a 105-year-old institution that has inspired a national public banking movement."
+    }
+  ]},
+  "49": { name:"Utah", items:[
+    { type:"charter", era:"foundational", year:"Est. 1905",
+      name:"Industrial Loan Company (ILC) Charter",
+      overview:"Utah is the undisputed national hub of Industrial Loan Companies, home to the vast majority of U.S. ILC assets. State-chartered and FDIC-insured, ILCs can be owned by commercial (non-bank) firms without those parent companies becoming subject to Federal Reserve oversight under the Bank Holding Company Act. Utah's business-friendly regulators and efficient charter process have made it the preferred ILC jurisdiction for fintech companies, manufacturers, and commercial enterprises.",
+      reqs:["Utah Department of Financial Institutions charter approval","FDIC deposit insurance required","Parent company exempt from Federal Reserve BHC Act oversight","Minimum capital: $7 million or FDIC-specified amount","FDIC serves as primary federal regulator; DFI as state supervisor","Annual FDIC safety-and-soundness examinations","Restrictions on affiliate transactions (23A/23B equivalent)"],
+      notables:[{n:"Square Financial Services (Block)",d:"Received Utah ILC charter and FDIC approval in 2021 — the first major fintech to obtain ILC approval after the FDIC's 14-year de facto moratorium, enabling direct FDIC-insured deposit-taking and small business lending."},{n:"WebBank",d:"Foundational Utah ILC serving as bank sponsor for dozens of fintech platforms including LendingClub, Prosper, and Klarna."},{n:"Celtic Bank",d:"Partners with fintech platforms for credit card and loan origination."},{n:"Sallie Mae Bank",d:"Student lending institution chartered as a Utah ILC."},{n:"BMW Bank / VW Bank USA",d:"Manufacturer ILCs headquartered in Utah, offering savings and vehicle financing through dealer networks."},{n:"Medallion Bank",d:"Utah ILC specializing in recreational vehicle, home improvement, and consumer installment loans."}],
+      facts:["Utah ILCs collectively hold the vast majority of approximately $200+ billion in total U.S. ILC assets.","The Utah ILC charter dates to 1905 — originally designed to serve miners and factory workers with small consumer loans when traditional banks would not.","When Block/Square's Utah ILC received FDIC approval in 2021, it ended a 15-year de facto moratorium on fintech ILC applications.","ILCs enable technology companies to own FDIC-insured banks without their technology operations being regulated as banking activities by the Federal Reserve.","Walmart's 2006 Utah ILC application triggered the FDIC moratorium after intense industry opposition — demonstrating the charter's political sensitivity."],
+      callout:"Utah's ILC ecosystem is a defining feature of U.S. financial services architecture, enabling the fintech revolution in lending and payments by allowing non-bank firms FDIC-insured banking infrastructure without BHC Act restrictions."
+    }
+  ]},
+  "32": { name:"Nevada", items:[
+    { type:"charter", era:"foundational", year:"Est. 1905",
+      name:"Industrial Loan Company (ILC) Charter",
+      overview:"Nevada is one of the two dominant states for Industrial Loan Companies alongside Utah, home to prominent manufacturer-affiliated banks, commercial finance companies, and specialty lenders. Nevada's business-friendly regulatory environment and historically favorable tax treatment have made it a natural ILC hub.",
+      reqs:["Nevada Financial Institutions Division charter approval","FDIC deposit insurance required","Parent company exempt from BHC Act oversight by Federal Reserve","Capital adequacy per FDIC requirements and Nevada FID standards","Annual FDIC safety-and-soundness examinations"],
+      notables:[{n:"Toyota Financial Savings Bank",d:"Toyota's manufacturer-affiliated ILC operating in Nevada, offering savings products and vehicle financing through the dealer network."},{n:"Manufacturer-affiliated financial firms",d:"Auto, retail, and technology companies have established Nevada ILC charters for branded financial products without BHC Act overhead."},{n:"Commercial specialty lenders",d:"Nevada hosts several commercial finance ILCs that originate credit at scale through retail and commercial channels."}],
+      facts:["Nevada was among the earliest states to authorize industrial banking, with roots in early 20th-century labor finance.","Nevada's historically favorable tax treatment has added to its appeal alongside Utah for ILC domicile.","The FDIC's 2006–2020 de facto moratorium on new ILC applications temporarily constrained Nevada's ILC market growth.","ILCs represent a uniquely American banking structure — no other major developed nation has an equivalent framework."]
+    }
+  ]},
+  "06": { name:"California", items:[
+    { type:"charter", era:"foundational", year:"Early 20th c.",
+      name:"Industrial Loan Company (ILC) Charter",
+      overview:"California is one of seven states authorizing Industrial Loan Companies — state-chartered, FDIC-insured depositories that can be owned by commercial (non-bank) firms without subjecting parent companies to Federal Reserve BHC Act oversight. This enables technology companies, retailers, or manufacturers to own an ILC and gain FDIC-insured deposit-taking and lending without the Fed's BHC scrutiny of their non-banking operations.",
+      reqs:["California DFPI charter approval","FDIC deposit insurance required","Parent company exempt from Bank Holding Company Act and Federal Reserve oversight","Capital adequacy per FDIC standards and DFPI requirements","FDIC serves as primary federal regulator"],
+      notables:[{n:"Diversified fintech & commercial lenders",d:"California's ILC framework has been utilized by commercial enterprises and fintech companies seeking limited bank charter access for consumer and commercial credit."},{n:"Auto & retail affiliates",d:"Manufacturer-affiliated financial companies have explored California ILC charters for retail and business lending."}],
+      facts:["California was among the original ILC-enabling states; the charter dates to the early 20th century.","Utah and Nevada dominate the ILC market nationally; California's framework is less prominent due to DFPI's more complex compliance environment.","The ILC ownership exemption from BHC Act oversight has been periodically challenged in Congress."]
+    },
+    { type:"license", era:"modern", year:2023,
+      name:"Digital Financial Assets Law (DFAL) License",
+      overview:"California's Digital Financial Assets Law — signed by Governor Newsom in October 2023, effective July 1, 2025 — created a comprehensive licensing framework for digital financial asset businesses regulated by the DFPI. DFAL requires any entity engaged in digital financial asset business activity in California to obtain a DFPI license. With 39+ million residents and its role as a global technology hub, DFAL's effective scope is near-national.",
+      reqs:["DFPI license required for digital financial asset business activity involving California residents","Minimum net worth requirements scaled to volume and risk","Risk disclosures and written customer agreements required","Complaint intake and dispute resolution procedures","AML/BSA program and suspicious activity reporting obligations","Cybersecurity standards and data breach incident reporting","Annual audits and periodic DFPI examinations"],
+      notables:[{n:"Coinbase",d:"One of the largest U.S. crypto exchanges, headquartered in California, subject to DFAL licensing."},{n:"Kraken, Gemini & major platforms",d:"All platforms serving California residents must evaluate DFAL licensing requirements."},{n:"All digital asset businesses with California customers",d:"DFAL's broad scope covers any firm engaging California residents in digital asset activities, regardless of domicile."}],
+      facts:["DFAL was enacted as a direct legislative response to the collapse of FTX in November 2022.","California's DFAL creates a near-national licensing standard — firms unable to obtain a license lose access to one of the world's largest consumer markets.","DFPI issued dozens of enforcement actions against unlicensed crypto businesses ahead of DFAL's formal effective date.","DFAL passed with bipartisan support, reflecting a consumer protection consensus rather than a partisan crypto stance."]
+    }
+  ]},
+  "08": { name:"Colorado", items:[
+    { type:"charter", era:"foundational", year:"Historic",
+      name:"Industrial Loan Company (ILC) Charter",
+      overview:"Colorado is among the seven states authorizing Industrial Loan Companies, providing a pathway for commercial enterprises to own an FDIC-insured depository institution without triggering full BHC Act regulation by the Federal Reserve.",
+      reqs:["Colorado Division of Banking charter approval","FDIC deposit insurance required","Parent company exempt from BHC Act and Federal Reserve oversight","Safety-and-soundness capital and liquidity requirements","FDIC serves as primary federal supervisor"],
+      notables:[{n:"Commercial & fintech entities",d:"Colorado's ILC framework has been utilized by commercial entities seeking limited bank charter access for consumer finance and specialty lending."}],
+      facts:["Colorado is among seven ILC-enabling states; Utah and Nevada dominate the national ILC asset base.","The FDIC lifted its de facto moratorium on new ILC applications in 2020, reopening the pathway for fintech applicants including in Colorado."]
+    }
+  ]},
+  "15": { name:"Hawaii", items:[
+    { type:"charter", era:"foundational", year:"Historic",
+      name:"Industrial Loan Company (ILC) Charter",
+      overview:"Hawaii authorizes Industrial Loan Companies under state law, allowing commercially-owned depository institutions to accept deposits and make loans while their parent companies avoid Federal Reserve oversight as Bank Holding Companies.",
+      reqs:["Hawaii Division of Financial Institutions charter approval","FDIC deposit insurance required","Parent exempt from BHC Act oversight","Capital and liquidity adequate for safety and soundness"],
+      notables:[{n:"Hawaii-based financial companies",d:"Hawaii's ILC charter has served specialty finance companies with Hawaii operations, though the market is limited compared to Utah and Nevada."}],
+      facts:["Hawaii is one of seven states authorizing ILCs; its geographic isolation has constrained the ILC market.","The ILC structure allows Hawaii-based commercial enterprises to access FDIC-insured banking without their parent entering the BHC regulatory perimeter."]
+    }
+  ]},
+  "18": { name:"Indiana", items:[
+    { type:"charter", era:"foundational", year:"Historic",
+      name:"Industrial Loan Company (ILC) Charter",
+      overview:"Indiana authorizes Industrial Loan Companies, enabling commercially-owned FDIC-insured depositories to operate under state charter without subjecting parent companies to Federal Reserve BHC Act supervision. Indiana's manufacturing heritage made ILCs a natural fit — the charter originated to serve factory workers with small consumer loans.",
+      reqs:["Indiana Department of Financial Institutions charter approval","FDIC deposit insurance required","Parent company exempt from BHC Act oversight","Capital adequacy and liquidity per FDIC standards"],
+      notables:[{n:"Indiana commercial & consumer lenders",d:"Indiana ILCs have historically served regional commercial finance, consumer lending, and manufacturing-affiliated financial companies."}],
+      facts:["Indiana's ILC charter has roots in the state's industrial economy — ILCs originally served manufacturing workers who lacked access to traditional bank credit.","Indiana is one of seven ILC states; its charter remains active but less prominent than Utah's."]
+    }
+  ]},
+  "27": { name:"Minnesota", items:[
+    { type:"charter", era:"foundational", year:"Historic",
+      name:"Industrial Loan Company (ILC) Charter",
+      overview:"Minnesota permits Industrial Loan Companies under state law, providing commercially-owned FDIC-insured institutions a path to bank charter status without triggering BHC Act oversight for their parent companies.",
+      reqs:["Minnesota Department of Commerce charter approval","FDIC deposit insurance required","Parent company not subject to BHC Act oversight","Capital and liquidity requirements per FDIC standards"],
+      notables:[{n:"Specialty commercial & consumer lenders",d:"Minnesota ILCs have served niche commercial finance, consumer credit, and specialty lending markets."}],
+      facts:["Minnesota is one of seven ILC-enabling states; its market is smaller than Utah and Nevada.","Minnesota's large financial services sector has generated ILC interest as a complement to existing insurance and investment management operations."]
+    }
+  ]},
+  "36": { name:"New York", items:[
+    { type:"charter", era:"digital", year:2015,
+      name:"Limited Purpose Trust Company (LP Trust)",
+      overview:"New York's Limited Purpose Trust Company charter, governed by Article XII of the New York Banking Law and regulated by NYDFS, has become the premier state trust charter for digital asset custodians and specialized financial firms. LP Trusts are not FDIC-insured and cannot engage in full-service retail banking — but they may exercise trust powers, hold assets in custody, and provide institutional-scale fiduciary services. NYDFS has adapted this historic framework extensively for digital asset operations.",
+      reqs:["NYDFS charter approval under NY Banking Law Article XII","No FDIC insurance; deposits are uninsured","Minimum capital: $10 million or NYDFS-determined amount based on risk","Robust AML/KYC program meeting NYDFS and federal BSA standards","Cybersecurity program compliant with NYDFS Part 500","Annual NYDFS safety-and-soundness examination","Change of control requires NYDFS prior approval"],
+      notables:[{n:"Paxos Trust Company",d:"NYDFS-chartered LP Trust issuing regulated stablecoins (USDP) and providing institutional digital asset custody, brokerage, and settlement services."},{n:"Gemini Trust Company",d:"Winklevoss-founded crypto exchange and custodian; one of the first LP Trusts chartered by NYDFS for digital asset operations."},{n:"Coinbase Custody Trust Company",d:"Coinbase's institutional custody arm, providing qualified custodian services to institutional asset managers."},{n:"Fidelity Digital Assets",d:"Fidelity's crypto custody subsidiary operating under an NYDFS charter, serving institutional investors."}],
+      facts:["NYDFS has been the most active and rigorous state regulator in digital asset oversight — the LP Trust framework predates crypto by decades but has been comprehensively adapted.","The LP Trust provides regulated 'qualified custodian' status essential for serving registered investment advisors under SEC custody rules.","NYDFS requires LP Trust companies to segregate customer digital assets, maintain substantial capital buffers, and demonstrate robust cybersecurity.","The LP Trust framework has become the de facto institutional digital asset custody standard for Wall Street-adjacent crypto firms."]
+    },
+    { type:"license", era:"digital", year:2015,
+      name:"BitLicense",
+      overview:"Issued by NYDFS beginning in 2015, the BitLicense was the first comprehensive state-level virtual currency business license in the United States. Any entity engaging in virtual currency business activity involving New York residents must hold a BitLicense or obtain a full NYDFS charter. The license has set the global standard for crypto business licensing, with requirements stringent enough that BitLicense holders are among the most thoroughly regulated crypto entities in the world.",
+      reqs:["NYDFS application, background investigation, and approval required","AML/KYC program meeting Bank Secrecy Act and NYDFS standards","Cybersecurity program compliant with NYDFS Part 500","Capital requirements: minimum determined by NYDFS, commonly $5M+","Consumer protection disclosures and complaint handling procedures","Change of control requires NYDFS prior approval","Annual audited financial statements and quarterly reporting","Chief Compliance Officer designation"],
+      notables:[{n:"Coinbase",d:"Received one of the first BitLicenses in 2017; subsequently subject to a $100M NYDFS consent order in 2023 for compliance deficiencies."},{n:"Circle",d:"Holds a BitLicense; operates New York as a primary U.S. regulatory base for USDC stablecoin operations."},{n:"Grayscale Investments",d:"BitLicense holder operating the largest digital asset investment products in the U.S., including GBTC and ETHE."},{n:"Ripple",d:"Holds a BitLicense; New York has been among its most complex regulatory relationships given ongoing federal litigation."}],
+      facts:["Approximately 30+ companies hold a BitLicense — a small number reflecting the demanding requirements.","The BitLicense triggered a well-documented 'BitLicense exodus': dozens of companies restricted services to New York residents rather than apply.","Some BitLicense applications took three or more years to adjudicate.","Despite controversy, the BitLicense cohort represents some of the most institutionally trusted firms in the industry.","NYDFS has used the BitLicense framework aggressively for enforcement, issuing consent orders and fines against multiple licensees."]
+    }
+  ]},
+  "22": { name:"Louisiana", items:[
+    { type:"license", era:"crypto", year:2020,
+      name:"Virtual Currency License",
+      overview:"Louisiana's Virtual Currency Business Act, originally enacted in 2020 and subsequently amended, establishes a licensing regime administered by the Louisiana Office of Financial Institutions (OFI) for businesses engaged in virtual currency activities involving Louisiana residents. Structured similarly to a money transmitter license with crypto-specific additions, it covers exchanges, custodians, and other virtual currency operators.",
+      reqs:["Louisiana OFI license application and approval","AML/BSA compliance program","Surety bond or equivalent minimum net worth requirements","Consumer disclosure requirements for Louisiana customers","Background checks for principals, officers, and key personnel","Cybersecurity standards commensurate with business risk","Periodic OFI examinations and annual report filings"],
+      notables:[{n:"Virtual currency exchanges & custodians",d:"Any crypto business with Louisiana customers engaging in virtual currency activity must evaluate OFI licensing obligations."},{n:"Payment platforms",d:"Louisiana's framework covers payment-related virtual currency activity in addition to exchange and custody operations."}],
+      facts:["Louisiana's framework reflects a growing trend of states creating crypto-specific licensing on top of existing money transmitter laws.","OFI has positioned itself as a responsive and accessible regulator, engaging with industry during the licensing process.","Louisiana's approach is a pragmatic middle-ground: more targeted than applying existing money transmitter laws but less demanding than the New York BitLicense.","The Louisiana framework fills the regulatory void left by the absence of a comprehensive federal virtual currency licensing statute."]
+    }
+  ]},
+  "PR": { name:"Puerto Rico", items:[
+    { type:"license", era:"foundational", year:"Act 273, 1996",
+      name:"International Financial Entity (IFE) License",
+      overview:"Puerto Rico's International Financial Entity license, authorized under the International Financial Center Regulatory Act and regulated by Puerto Rico's Office of the Commissioner of Financial Institutions (OCIF), enables financial service businesses to operate from Puerto Rico while primarily serving non-resident (international) clients. IFEs benefit from Puerto Rico's dramatic tax incentives under Act 60 — including a flat 4% corporate tax rate versus the standard 21% federal rate.",
+      reqs:["OCIF license application and approval required","Must primarily serve non-Puerto Rico resident (international) clients","Minimum paid-in capital scaled to activity type and risk profile","AML/BSA compliance program required under U.S. federal law","Experienced management team with relevant financial services expertise","Bona fide physical presence in Puerto Rico required","Annual audits and periodic OCIF examination and reporting"],
+      notables:[{n:"GK8 (Galaxy Digital subsidiary)",d:"Digital asset custody firm holding an IFE license, leveraging Puerto Rico's framework for international digital asset services."},{n:"Crypto & fintech firms",d:"Multiple digital asset companies have established Puerto Rico IFE operations, often combined with Act 60 individual and corporate tax structures."},{n:"Latin American private banking",d:"Traditional IFE licensees include private banks and wealth managers serving Latin American, European, and other international UHNW clients from a U.S.-jurisdiction platform."}],
+      facts:["Puerto Rico's Act 60 also provides individual investors a 0% capital gains rate on assets acquired after establishing Puerto Rico residency — a major draw for crypto entrepreneurs.","The IFE license provides U.S. jurisdiction legal security combined with tax treatment unavailable anywhere in the 50 states.","Puerto Rico is an unincorporated U.S. territory — IFE licensees operate under full U.S. federal law (including BSA/AML) while benefiting from unique Puerto Rico tax treatment.","The crypto community's significant migration to Puerto Rico has created social tensions, with critics arguing Act 60 benefits primarily enrich transplants rather than long-term residents.","The 4% corporate rate is among the lowest available to U.S.-jurisdiction financial institutions."],
+      callout:"Puerto Rico occupies a uniquely privileged regulatory position: full U.S. legal infrastructure and BSA/AML protections combined with a 4% corporate tax rate unavailable anywhere in the 50 states."
+    }
+  ]}
+};
+
+// ── RENDER PANEL (flat, non-expandable) ──────
+function renderPanel(id) {
+  const d = DATA[id];
+  if (!d) return;
+
+  const types = [...new Set(d.items.map(i => i.type))];
+  const badgesHtml = types.map(t =>
+    `<span class="badge ${t}">${t === 'charter' ? 'Special Charter' : 'Special License'}</span>`
+  ).join('');
+
+  const cardsHtml = d.items.map((item, i) => {
+    const era = ERAS[item.era] || ERAS.foundational;
+    const reqsHtml  = item.reqs.map(r => `<li>${r}</li>`).join('');
+    const notsHtml  = item.notables.map(n => `<li><span class="ent">${n.n}</span> — ${n.d}</li>`).join('');
+    const factsHtml = item.facts.map(f => `<li>${f}</li>`).join('');
+    const callHtml  = item.callout ? `<div class="callout">${item.callout}</div>` : '';
+    const delay     = `${(i * 0.1).toFixed(2)}s`;
+
+    return `
+      ${i > 0 ? '<div class="c-divider"></div>' : ''}
+      <div class="card" style="animation-delay:${delay}">
+        <div class="card-node"></div>
+        <div class="card-tick"></div>
+        <div class="card-label">
+          <div class="card-era">
+            <span class="era-dash" style="background:${era.color}"></span>
+            <span style="color:${era.color}; font-weight:700; letter-spacing:0.06em;">${item.year}</span>
+            <span style="color:${era.color}; opacity:0.65">${era.label}</span>
+          </div>
+          <div class="card-type ${item.type}">${item.type === 'charter' ? '⬡ Charter' : '◉ License'}</div>
+          <div class="card-name">${item.name}</div>
+        </div>
+        <div class="card-content">
+          <div class="sec-lbl">Overview</div>
+          <div class="overview">${item.overview}</div>
+          <div class="sec-lbl">Key Requirements</div>
+          <ul class="reqs">${reqsHtml}</ul>
+          <div class="sec-lbl">Notable Entities</div>
+          <ul class="nots">${notsHtml}</ul>
+          <div class="sec-lbl">Noteworthy Facts</div>
+          <ul class="facts">${factsHtml}</ul>
+          ${callHtml}
+        </div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('info-panel').innerHTML = `
+    <div class="panel-hd">
+      <div class="panel-kicker">Regulatory Framework</div>
+      <h2>${d.name}</h2>
+      <div class="badge-row">${badgesHtml}</div>
+    </div>
+    <div class="spine-wrap">${cardsHtml}</div>`;
+}
+
+let selectedId = null;
+
+function selectState(fips) {
+  selectedId = fips;
+  d3.selectAll('.state-path').classed('selected', false);
+  document.getElementById('pr-box').classList.remove('selected');
+  if (fips !== 'PR') {
+    d3.select(`[data-fips="${fips}"]`).classed('selected', true);
+  } else {
+    document.getElementById('pr-box').classList.add('selected');
+  }
+  renderPanel(fips);
+}
+
+function selectPR() { selectState('PR'); }
+
+// ── TOOLTIP ───────────────────────────────────
+function showTooltip(event, fips, mapEl) {
+  const name = FIPS_NAME[fips], cat = FIPS_CAT[fips];
+  if (!cat || !name) return;
+  const label = cat === 'both' ? 'Charter + License' : cat === 'charter' ? 'Special Charter' : 'Special License';
+  const items = DATA[fips] ? DATA[fips].items.map(i => i.name).join('<br>') : '';
+  const tt = document.getElementById('tooltip');
+  tt.innerHTML = `<div class="tt-state">${name}</div><span class="tt-tag ${cat}">${label}</span><div class="tt-items">${items}</div>`;
+  tt.style.display = 'block';
+  placeTooltip(event, mapEl);
+}
+
+function placeTooltip(event, mapEl) {
+  const [mx, my] = d3.pointer(event, mapEl);
+  const tt = document.getElementById('tooltip');
+  let lx = mx + 14;
+  if (lx + 250 > mapEl.clientWidth - 400) lx = mx - 265;
+  tt.style.left = Math.max(4, lx) + 'px';
+  tt.style.top  = Math.max(4, my - 8) + 'px';
+}
+
+// ── D3 MAP ────────────────────────────────────
+async function initMap() {
+  const mapEl = document.getElementById('us-map');
+  const W = 960, H = 600;
+
+  const svg = d3.select('#us-map')
+    .attr('viewBox', `0 0 ${W} ${H}`)
+    .attr('preserveAspectRatio', 'xMidYMid meet');
+
+  const projection = d3.geoAlbersUsa().scale(1300).translate([490, 305]);
+  const path = d3.geoPath().projection(projection);
+
+  let us;
+  try {
+    us = await d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json');
+  } catch(e) {
+    document.getElementById('map-area').innerHTML +=
+      '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;color:#344E68;font-family:\'Cormorant Garamond\',serif;font-size:1rem;font-style:italic;">Map data unavailable.<br>Please check your connection.</div>';
+    return;
+  }
+
+  const states = topojson.feature(us, us.objects.states);
+
+  // State fills
+  svg.append('g').attr('id','states')
+    .selectAll('.state-path')
+    .data(states.features)
+    .enter()
+    .append('path')
+    .attr('class', d => {
+      const fips = d.id.toString().padStart(2,'0');
+      const cat  = FIPS_CAT[fips] || 'default';
+      return `state-path ${cat}${cat !== 'default' ? ' clickable' : ''}`;
+    })
+    .attr('data-fips', d => d.id.toString().padStart(2,'0'))
+    .attr('d', path)
+    .style('animation-delay', (d,i) => `${(i * 0.013).toFixed(3)}s`)
+    .on('mouseenter', function(event, d) {
+      const fips = d.id.toString().padStart(2,'0');
+      if (!FIPS_CAT[fips]) return;
+      showTooltip(event, fips, mapEl);
+    })
+    .on('mousemove', function(event) {
+      if (document.getElementById('tooltip').style.display === 'none') return;
+      placeTooltip(event, mapEl);
+    })
+    .on('mouseleave', () => { document.getElementById('tooltip').style.display = 'none'; })
+    .on('click', function(event, d) {
+      const fips = d.id.toString().padStart(2,'0');
+      if (!FIPS_CAT[fips]) return;
+      document.getElementById('tooltip').style.display = 'none';
+      selectState(fips);
+    });
+
+  // Internal borders
+  svg.append('path')
+    .datum(topojson.mesh(us, us.objects.states, (a,b) => a !== b))
+    .attr('fill','none').attr('stroke','#08111E').attr('stroke-width','0.7').attr('d',path);
+
+  // Outer border
+  svg.append('path')
+    .datum(topojson.merge(us, us.objects.states.geometries))
+    .attr('fill','none').attr('stroke','rgba(8,17,30,0.85)').attr('stroke-width','1.3').attr('d',path);
+
+  // State labels
+  svg.append('g').attr('id','labels')
+    .selectAll('.state-label')
+    .data(states.features)
+    .enter()
+    .append('text')
+    .attr('class', d => {
+      const fips = d.id.toString().padStart(2,'0');
+      return `state-label ${FIPS_CAT[fips] ? 'on-color' : 'on-dark'}`;
+    })
+    .attr('transform', d => {
+      try {
+        const c = path.centroid(d);
+        if (!c || isNaN(c[0]) || isNaN(c[1])) return 'translate(-9999,-9999)';
+        return `translate(${c[0]},${c[1]})`;
+      } catch(e) { return 'translate(-9999,-9999)'; }
+    })
+    .style('animation-delay', (d,i) => `${(i * 0.013 + 0.15).toFixed(3)}s`)
+    .text(d => FIPS_ABBR[d.id.toString().padStart(2,'0')] || '');
+}
+
+initMap();
+</script>
+</body>
+</html>

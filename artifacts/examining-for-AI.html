@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FFIEC Regulatory Briefing — Cloud & AI Examination Frameworks (2026)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inconsolata:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body { font-family: 'Georgia', 'Times New Roman', serif; background: #080E1F; color: #E8E2D9; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: #080E1F; }
+  ::-webkit-scrollbar-thumb { background: #1E2A45; border-radius: 2px; }
+
+  /* ── LAYOUT ── */
+  #app { display: flex; flex-direction: column; height: 100vh; }
+  #topbar { display: flex; align-items: center; gap: 20px; padding: 15px 32px; background: #050A17; border-bottom: 1px solid #152040; flex-shrink: 0; }
+  #layout { display: flex; flex: 1; overflow: hidden; }
+  #sidebar { width: 218px; flex-shrink: 0; border-right: 1px solid #152040; background: #050A17; overflow-y: auto; display: flex; flex-direction: column; }
+  #main { flex: 1; overflow-y: auto; background: linear-gradient(160deg, #0B1225 0%, #080E1F 55%); }
+  #chapter-header { padding: 38px 52px 30px; position: relative; overflow: hidden; border-bottom-width: 1px; border-bottom-style: solid; }
+  #chapter-header .top-stripe { position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+  #chapter-header .ghost-icon { position: absolute; right: 36px; top: 50%; transform: translateY(-50%); font-size: 88px; line-height: 1; user-select: none; pointer-events: none; font-family: 'Inconsolata', monospace; }
+  #chapter-body { padding: 38px 52px 64px; max-width: 840px; }
+
+  /* ── TOPBAR ── */
+  .topbar-label { font-family: 'Inconsolata', monospace; font-size: 10px; letter-spacing: 3px; color: #3A4A65; text-transform: uppercase; white-space: nowrap; }
+  .topbar-divider { flex: 1; height: 1px; background: #152040; }
+  .topbar-count { font-family: 'Inconsolata', monospace; font-size: 10px; letter-spacing: 2px; color: #3A4A65; white-space: nowrap; }
+  #progress-dots { display: flex; align-items: center; gap: 8px; }
+  .dot { height: 7px; border-radius: 4px; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.4,0,0.2,1); padding: 0; }
+
+  /* ── SIDEBAR ── */
+  #sidebar-header { padding: 22px 20px 18px; border-bottom: 1px solid #152040; }
+  #sidebar-header p { font-family: 'Libre Baskerville', serif; font-style: italic; font-size: 12px; color: #3A4A65; line-height: 1.65; }
+  #nav-list { flex: 1; padding-top: 8px; }
+  .nav-btn { display: flex; align-items: center; gap: 10px; width: 100%; padding: 11px 20px; background: transparent; border: none; border-left: 3px solid transparent; color: #445; text-align: left; cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+  .nav-btn:hover { background: rgba(255,255,255,0.03); }
+  .nav-btn.active { color: #E8E2D9; }
+  .nav-btn .nav-icon { font-size: 13px; flex-shrink: 0; transition: color 0.15s; }
+  .nav-btn .nav-label { font-size: 11px; font-family: 'Inconsolata', monospace; letter-spacing: 0.5px; line-height: 1.3; }
+  .nav-btn .nav-dot { margin-left: auto; width: 4px; height: 4px; border-radius: 50%; flex-shrink: 0; display: none; }
+  .nav-btn.active .nav-dot { display: block; }
+  #sidebar-footer { padding: 18px 20px; border-top: 1px solid #152040; font-family: 'Inconsolata', monospace; font-size: 9px; letter-spacing: 2px; color: #243040; text-transform: uppercase; line-height: 2; }
+  #sidebar-footer span { color: #2E3E55; }
+
+  /* ── CHAPTER HEADER ── */
+  .ch-eyebrow { font-family: 'Inconsolata', monospace; font-size: 10px; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 11px; }
+  .ch-title { font-family: 'Libre Baskerville', serif; font-size: 27px; font-weight: 700; color: #F0EBE3; margin-bottom: 7px; line-height: 1.2; letter-spacing: -0.3px; }
+  .ch-subtitle { font-family: 'Libre Baskerville', serif; font-style: italic; font-size: 14px; color: #5A6A8A; }
+
+  /* ── TYPOGRAPHY ── */
+  .intro-text { font-family: 'Libre Baskerville', serif; font-size: 15px; line-height: 1.85; color: #8A9AAA; margin-bottom: 36px; }
+  .section-label { font-family: 'Inconsolata', monospace; font-size: 10px; letter-spacing: 3px; color: #3A4A65; text-transform: uppercase; }
+  .micro-label { font-family: 'Inconsolata', monospace; font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: #3A4A65; }
+
+  /* ── CARDS ── */
+  .card { border: 1px solid #1A2A45; border-radius: 4px; background: #080E1F; overflow: hidden; margin-bottom: 10px; cursor: pointer; transition: box-shadow 0.2s, border-color 0.25s, background 0.2s; }
+  .card:hover { box-shadow: 0 2px 16px rgba(0,0,0,0.35); }
+  .card.open { background: #0D1830; }
+  .card-header { padding: 17px 22px; display: flex; align-items: center; gap: 14px; }
+  .card-body { border-top: 1px solid #1A2A45; padding: 0 22px 22px; }
+  .card-body-inner { padding-top: 18px; }
+  .chevron { color: #3A4A65; font-size: 18px; flex-shrink: 0; display: inline-block; transition: transform 0.25s cubic-bezier(0.4,0,0.2,1); line-height: 1; }
+  .chevron.open { transform: rotate(90deg); }
+
+  /* ── EXPANDABLE ── */
+  .expandable { overflow: hidden; max-height: 0; opacity: 0; transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.25s ease; }
+  .expandable.open { opacity: 1; }
+
+  /* ── LESSONS (OVERVIEW) ── */
+  .lesson-card { display: flex; gap: 22px; padding: 22px; background: #0D1830; border: 1px solid #1A2A45; border-radius: 4px; margin-bottom: 12px; }
+  .lesson-num { font-family: 'Inconsolata', monospace; font-size: 30px; color: #1A2A45; line-height: 1; flex-shrink: 0; font-weight: 700; }
+  .lesson-headline { font-family: 'Libre Baskerville', serif; font-size: 15px; font-weight: 700; color: #E8E2D9; margin-bottom: 7px; line-height: 1.4; }
+  .lesson-detail { font-family: 'Libre Baskerville', serif; font-size: 14px; color: #6A7A8A; line-height: 1.75; }
+
+  /* ── BOOKLET CARDS ── */
+  .year-badge { font-family: 'Inconsolata', monospace; font-size: 11px; padding: 4px 10px; border-radius: 2px; flex-shrink: 0; }
+  .booklet-name { font-family: 'Libre Baskerville', serif; font-size: 14px; font-weight: 700; color: #E8E2D9; }
+  .booklet-replaced { font-family: 'Inconsolata', monospace; font-size: 10px; color: #3A4A65; margin-top: 3px; }
+  .ai-box { border-radius: 3px; padding: 14px 16px; }
+
+  /* ── TIMELINE ── */
+  .timeline-item { display: flex; }
+  .timeline-spine { display: flex; flex-direction: column; align-items: center; width: 46px; flex-shrink: 0; }
+  .stage-circle { width: 34px; height: 34px; border-radius: 50%; border: 2px solid #1E2A45; color: #4A5A7A; font-family: 'Inconsolata', monospace; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.25s; flex-shrink: 0; z-index: 1; background: #0D1830; }
+  .stage-circle.active { color: #080E1F; }
+  .timeline-line { width: 2px; flex: 1; min-height: 18px; background: #1A2A45; margin: 4px 0; }
+  .timeline-content { flex: 1; padding-left: 16px; }
+  .stage-card { padding: 13px 18px; border: 1px solid transparent; border-radius: 4px; margin-bottom: 8px; cursor: pointer; transition: background 0.2s, border-color 0.2s; }
+  .stage-card:hover { box-shadow: 0 2px 16px rgba(0,0,0,0.35); }
+  .stage-card.open { background: #0D1830; }
+  .stage-title { font-family: 'Libre Baskerville', serif; font-size: 14px; font-weight: 700; color: #B8C0CA; display: flex; justify-content: space-between; align-items: center; }
+  .stage-card.open .stage-title { color: #F0EBE3; }
+
+  /* ── GRID ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .cloud-ai-card { background: #080E1F; border: 1px solid #1A2A45; border-radius: 3px; padding: 14px 16px; }
+  .cloud-ai-card p { font-family: 'Libre Baskerville', serif; font-size: 13px; color: #7A8A9A; line-height: 1.7; margin-top: 7px; }
+
+  /* ── EXAMINER CALLOUT ── */
+  .examiner-callout { border-left: 2px solid; padding: 10px 14px; border-radius: 0 3px 3px 0; }
+  .examiner-callout .label { font-family: 'Inconsolata', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; margin-right: 8px; }
+  .examiner-callout .text { font-family: 'Libre Baskerville', serif; font-style: italic; font-size: 13px; color: #8A9AAA; }
+
+  /* ── TABLE ── */
+  .data-table { border: 1px solid #1A2A45; border-radius: 4px; overflow: hidden; }
+  .data-table .thead { display: grid; background: #050A17; border-bottom: 1px solid #1A2A45; }
+  .data-table .tbody-row { display: grid; }
+  .data-table .tbody-row:not(:last-child) { border-bottom: 1px solid #1A2A45; }
+  .data-table .th { padding: 11px 15px; font-family: 'Inconsolata', monospace; font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: #3A4A65; }
+  .data-table .td { padding: 13px 15px; font-family: 'Libre Baskerville', serif; font-size: 13px; color: #7A8A9A; line-height: 1.55; }
+  .data-table .td.accent-col { font-family: 'Inconsolata', monospace; font-size: 11px; font-weight: 600; }
+  .border-right { border-right: 1px solid #1A2A45; }
+  .row-even { background: #0D1830; }
+  .row-odd { background: #080E1F; }
+
+  /* ── DUE DILIGENCE TABLE (3-col smaller) ── */
+  .dd-table-wrap { margin-bottom: 12px; }
+  .dd-table-wrap .micro-label { margin-bottom: 10px; }
+  .dd-table { border: 1px solid #1A2A45; border-radius: 3px; overflow: hidden; }
+  .dd-table .thead { display: grid; grid-template-columns: 1fr 1.3fr 1.3fr; background: #050A17; border-bottom: 1px solid #1A2A45; }
+  .dd-table .tbody-row { display: grid; grid-template-columns: 1fr 1.3fr 1.3fr; }
+  .dd-table .tbody-row:not(:last-child) { border-bottom: 1px solid #1A2A45; }
+  .dd-table .th { padding: 9px 13px; }
+  .dd-table .td { padding: 11px 13px; font-size: 12px; }
+
+  /* ── MRM RED FLAG ── */
+  .red-flag { background: #050A17; border: 1px solid rgba(192,92,74,0.16); border-radius: 3px; padding: 11px 15px; display: flex; align-items: flex-start; gap: 10px; margin-top: 14px; }
+  .red-flag .flag-icon { color: #C05C4A; font-size: 12px; flex-shrink: 0; margin-top: 2px; }
+  .red-flag .flag-text { font-family: 'Inconsolata', monospace; font-size: 12px; color: #C05C4A; line-height: 1.6; }
+
+  /* ── SYSTEMIC SCENARIO CARDS ── */
+  .scenario-card { margin-bottom: 13px; padding: 22px; background: #0D1830; border: 1px solid #1A2A45; border-radius: 4px; border-left: 3px solid; }
+  .scenario-title { font-family: 'Libre Baskerville', serif; font-size: 15px; font-weight: 700; color: #E8E2D9; margin-bottom: 10px; }
+  .scenario-body { font-family: 'Libre Baskerville', serif; font-size: 14px; line-height: 1.8; color: #6A7A8A; }
+
+  /* ── CALLOUT BOX ── */
+  .callout { border-radius: 4px; padding: 26px 30px; }
+  .callout .callout-eyebrow { font-family: 'Inconsolata', monospace; font-size: 9px; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 13px; }
+  .callout .callout-headline { font-family: 'Libre Baskerville', serif; font-size: 17px; font-weight: 700; color: #F0EBE3; margin-bottom: 14px; line-height: 1.35; }
+  .callout .callout-body { font-family: 'Libre Baskerville', serif; font-size: 14px; line-height: 1.8; color: #8A9AAA; }
+
+  /* ── QUANT ── */
+  .quant-tag-box { width: 42px; height: 42px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .quant-tag-text { font-family: 'Inconsolata', monospace; font-size: 13px; font-weight: 700; letter-spacing: -0.5px; }
+  .formula-box { border-radius: 4px; padding: 18px 22px; margin-bottom: 18px; }
+  .formula-text { font-family: 'Inconsolata', monospace; font-size: 15px; color: #E8E2D9; letter-spacing: 0.5px; margin: 12px 0 10px; word-break: break-all; line-height: 1.5; }
+  .formula-note { font-family: 'Libre Baskerville', serif; font-style: italic; font-size: 12px; color: #4A5A7A; line-height: 1.6; }
+  .cloud-analogy { background: #050A17; border: 1px solid #1A2A45; border-radius: 3px; padding: 13px 15px; display: flex; gap: 12px; align-items: flex-start; }
+  .cloud-analogy .ca-label { font-family: 'Inconsolata', monospace; font-size: 9px; letter-spacing: 2px; color: #5B8DB8; text-transform: uppercase; flex-shrink: 0; margin-top: 2px; }
+  .cloud-analogy .ca-text { font-family: 'Libre Baskerville', serif; font-size: 13px; color: #5A6A8A; line-height: 1.7; }
+
+  /* ── BOTTOM NAV ── */
+  #bottom-nav { margin-top: 52px; padding-top: 22px; border-top: 1px solid #1A2A45; display: flex; justify-content: space-between; align-items: center; }
+  .bottom-dots { display: flex; gap: 7px; align-items: center; }
+  .bottom-dot { width: 6px; height: 6px; border-radius: 50%; transition: all 0.3s; }
+  .nav-prev, .nav-next { padding: 10px 20px; border-radius: 3px; font-family: 'Inconsolata', monospace; font-size: 12px; font-weight: 700; cursor: pointer; letter-spacing: 1px; transition: all 0.2s; }
+  .nav-prev { background: transparent; border: 1px solid #1A2A45; color: #4A5A7A; }
+  .nav-next { border: none; color: #080E1F; }
+  .nav-placeholder { width: 100px; }
+
+  /* ── LEAD QUOTE ── */
+  .lead-quote { border-left: 3px solid; padding-left: 22px; margin-bottom: 42px; }
+  .lead-quote .lq-main { font-family: 'Libre Baskerville', serif; font-size: 16px; line-height: 1.8; color: #C8C0B4; margin-bottom: 13px; }
+  .lead-quote .lq-sub { font-family: 'Libre Baskerville', serif; font-style: italic; font-size: 14px; color: #4A5A7A; }
+
+  /* ── FADE ANIMATION ── */
+  .fade-in { animation: fadeIn 0.35s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="topbar">
+    <div class="topbar-label">FFIEC Regulatory Briefing</div>
+    <div class="topbar-divider"></div>
+    <div id="progress-dots"></div>
+    <div class="topbar-count" id="progress-count"></div>
+  </div>
+  <div id="layout">
+    <div id="sidebar">
+      <div id="sidebar-header"><p>Cloud & AI Examination Frameworks</p></div>
+      <div id="nav-list"></div>
+      <div id="sidebar-footer">Key Agencies<br/><span>FFIEC · FDIC · OCC · FRB</span></div>
+    </div>
+    <div id="main">
+      <div id="chapter-header">
+        <div class="top-stripe"></div>
+        <div class="ghost-icon"></div>
+        <div class="ch-eyebrow"></div>
+        <div class="ch-title"></div>
+        <div class="ch-subtitle"></div>
+      </div>
+      <div id="chapter-body"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ─────────────────────── DATA ─────────────────────── */
+const CHAPTERS = [
+  {
+    id: "overview", label: "Overview", icon: "◈", color: "#C9A84C",
+    title: "The Architecture of Supervision",
+    subtitle: "Cloud & AI Examination in Federal Banking",
+    content: {
+      type: "intro",
+      thesis: "While technology evolves, the core responsibilities of safety, soundness, and consumer protection remain constant. The federal examination framework for cloud computing now serves as the direct blueprint for AI oversight—and understanding one unlocks the other.",
+      keyTheme: "The same five-stage third-party risk lifecycle, the same shared-responsibility logic, and the same emphasis on continuous governance now govern both.",
+      lessons: [
+        { num: "01", headline: "Cloud examination is the template for AI examination.", detail: "Regulators are not inventing new frameworks from scratch. They are systematically translating proven cloud oversight principles—shared responsibility, architectural resilience, third-party due diligence—into AI-specific controls." },
+        { num: "02", headline: "Point-in-time audits are giving way to continuous governance.", detail: "Static validation cycles, adequate for stable infrastructure, are insufficient for AI systems that can drift, hallucinate, or behave unpredictably. Examiners now expect real-time monitoring, version pinning, and adversarial testing." },
+        { num: "03", headline: "Reputation risk is out. Measurable financial impact is in.", detail: "The FFIEC's February 2026 removal of 'reputation risk' from its handbook signals a decisive shift: examiners now focus on dollar-denominated losses, capital impact, and operational disruption—not public perception." }
+      ]
+    }
+  },
+  {
+    id: "ffiec", label: "FFIEC Handbook", icon: "⬡", color: "#5B8DB8",
+    title: "The Evolving Examination Handbook",
+    subtitle: "From Operations to Architecture",
+    content: {
+      type: "booklets",
+      intro: "The FFIEC IT Examination Handbook is not a fixed rulebook—it is a living framework substantially rewritten to reflect the shift from internal data centers to externally managed, AI-augmented environments. Four booklet revisions define the modern era.",
+      booklets: [
+        { name: "Architecture, Infrastructure & Operations (AIO)", replaced: "Operations Booklet (2004)", year: "2021", significance: "The defining revision of the modern era. AIO abandoned the view of IT as a siloed support function and recast it as an enterprise-wide structural component. Examiners now evaluate the logic of entire architectural designs—not just the physical security of server rooms. Virtualized environments, micro-services, and IoT are all in scope.", aiImplication: "The same architectural planning required for cloud resilience is now expected for AI integration. Unplanned model deployments can trigger cascading failures across interconnected systems." },
+        { name: "Development, Acquisition & Maintenance (DA&M)", replaced: "Development and Acquisition (2004)", year: "2024", significance: "Updated to address the reality that banks rarely build technology from scratch—they acquire it. The booklet introduced rigorous supply chain risk management and full System Development Life Cycle (SDLC) documentation requirements.", aiImplication: "The SDLC framework applies directly to AI model lifecycles, from initial design through retirement. The 'fourth-party risk' concept—where an AI vendor relies on a sub-provider like an LLM host—is now an active examination concern." },
+        { name: "Business Continuity Management (BCM)", replaced: "Business Continuity Planning (2015)", year: "2019", significance: "Shifted from reactive disaster recovery planning to proactive, enterprise-wide operational resilience. The change in terminology from 'planning' to 'management' reflects a philosophical evolution.", aiImplication: "Banks must now maintain tested fallback plans for AI-driven processes, not just cloud infrastructure outages." },
+        { name: "Supervision of Technology Service Providers", replaced: "Supervision of TSPs (2003)", year: "2012", significance: "Strengthened the oversight of third-party dependencies and formalized interagency cooperation protocols for examining shared service providers.", aiImplication: "AI vendors are technology service providers. The same oversight mechanisms—including interagency coordination—now apply to foundation model providers." }
+      ]
+    }
+  },
+  {
+    id: "tprm", label: "TPRM Lifecycle", icon: "⬟", color: "#7B6BAF",
+    title: "The Five-Stage Risk Lifecycle",
+    subtitle: "Third-Party Risk Management Applied to Cloud & AI",
+    content: {
+      type: "lifecycle",
+      intro: "The 2023 Interagency Guidance on Third-Party Relationships—issued jointly by the Federal Reserve, FDIC, and OCC—establishes a continuous five-stage lifecycle governing all material technology relationships. Every stage carries distinct examination expectations for both cloud and AI.",
+      dueDiligenceTable: [
+        { factor: "Information Security", cloud: "Encryption at rest and in transit; IAM controls and access logging.", ai: "Resilience against adversarial attacks; data privacy protections in model training." },
+        { factor: "Operational Resilience", cloud: "Multi-region redundancy, failover architecture, and tested recovery procedures.", ai: "Fallback models, graceful degradation paths, and kill-switches for autonomous decisions." },
+        { factor: "Compliance", cloud: "Audit trail availability, regulatory reporting capabilities, and certification status.", ai: "Explainability of outputs, adherence to fair lending laws, and bias testing records." },
+        { factor: "Financial Stability", cloud: "Provider viability—capacity to prevent sudden service termination or acquisition.", ai: "Sustainability of the AI research firm and its long-term model support commitments." }
+      ],
+      stages: [
+        { num: 1, name: "Planning", cloud: "Assess whether cloud migration aligns with the bank's strategic goals and risk appetite. For critical activities, board-level approval is required before procurement begins.", ai: "AI deployments affecting core financial functions require the same board-level authorization. Examiners look for a documented AI strategy, not ad hoc adoption.", examinerFocus: "Evidence of risk appetite alignment and board governance before any vendor engagement.", showDueDiligence: false },
+        { num: 2, name: "Due Diligence & Selection", cloud: "Deep evaluation of the provider's information security, operational resilience, compliance posture, and financial stability.", ai: "Due diligence expands to include training data quality, conceptual soundness of the algorithms, and the vendor's bias mitigation practices.", examinerFocus: "The quality of the bank's technical evaluation—not just the vendor's marketing materials.", showDueDiligence: true },
+        { num: 3, name: "Contract Negotiation", cloud: "Performance benchmarks, incident notification timelines, indemnification clauses, and Right to Audit language guaranteeing access to logs and monitoring data.", ai: "Contracts must address model ownership, fine-tuning data rights, provider liability for biased outputs, and output accuracy standards.", examinerFocus: "Examiners treat contracts as a primary risk mitigation tool—weak contract language is itself a supervisory finding.", showDueDiligence: false },
+        { num: 4, name: "Ongoing Monitoring", cloud: "Regular performance dashboard reviews and tested contingency plans. SOC 2 Type II reports are the primary assurance mechanism.", ai: "Monitoring must be more frequent than for cloud infrastructure due to 'model drift'—the gradual degradation of accuracy as underlying data patterns evolve.", examinerFocus: "Active surveillance dashboards, not passive annual reviews.", showDueDiligence: false },
+        { num: 5, name: "Termination & Exit Strategy", cloud: "'Data gravity' makes cloud exits difficult. Examiners look for tested transition plans and contractual data portability assurances.", ai: "'API lock-in' is the AI equivalent. Banks must demonstrate they can migrate away from a proprietary model without operational disruption.", examinerFocus: "A credible, tested exit plan is a supervisory requirement—not a theoretical exercise.", showDueDiligence: false }
+      ]
+    }
+  },
+  {
+    id: "mrm", label: "Model Risk", icon: "⬠", color: "#4D9E7A",
+    title: "Model Risk Management in the AI Era",
+    subtitle: "SR 11-7 Evolves for Machine Learning",
+    content: {
+      type: "mrm",
+      intro: "For AI that influences financial decisions, examiners apply the Model Risk Management framework—originally codified in the Federal Reserve's SR 11-7 and substantially updated in April 2026's SR 26-2. The revised guidance confronts the complexities of modern machine learning head-on.",
+      principles: [
+        { title: "Effective Challenge", description: "The cornerstone concept of SR 26-2. Banks must maintain genuinely independent experts who can critically interrogate a model's logic and performance. The people who build AI cannot be the same people who validate it—a structural separation of duties analogous to the cloud security requirement for independence between IT administrators and security auditors.", indicator: "Examiner red flag: AI development and validation teams reporting to the same manager." },
+        { title: "Conceptual Soundness", description: "Examiners evaluate whether the theoretical foundation of a model is appropriate for its intended use. A model optimized for fraud detection cannot be repurposed for credit underwriting without independent re-validation. The intended use defines the standard of rigor.", indicator: "Examiner red flag: Models deployed outside their validated use case without re-approval." },
+        { title: "Version Pinning", description: "Banks using external AI models must contractually prevent unannounced updates to model weights. An examiner-approved model that is silently updated by a vendor is, from a regulatory standpoint, a new, un-validated model—regardless of the provider's assurances of improvement.", indicator: "Examiner red flag: No contractual control over model version updates from third-party providers." },
+        { title: "Red Teaming & Adversarial Testing", description: "Just as cloud infrastructure requires disaster recovery drills, AI systems require structured adversarial testing. Red teaming—where internal teams attempt to elicit harmful, biased, or incorrect outputs—is becoming a standard examination expectation for high-stakes AI deployments.", indicator: "Examiner red flag: Absence of documented adversarial testing in the validation record." }
+      ],
+      comparison: [
+        { control: "Access Control", cloud: "Identity & Access Management (IAM)", ai: "Role-based access to model weights and training data" },
+        { control: "Versioning", cloud: "Infrastructure as Code (IaC) versioning", ai: "Version pinning to prevent unannounced model updates" },
+        { control: "Testing", cloud: "Disaster Recovery failover drills", ai: "Red teaming and adversarial prompt testing" },
+        { control: "Assurance Reporting", cloud: "SOC 2 Type II from the CSP", ai: "Model Cards or System Cards detailing bias and limitations" }
+      ]
+    }
+  },
+  {
+    id: "systemic", label: "Systemic Risk", icon: "⬡", color: "#C05C4A",
+    title: "Concentration Risk & Systemic Vulnerability",
+    subtitle: "When Five Banks Share One Model",
+    content: {
+      type: "systemic",
+      intro: "Perhaps the most consequential development in technology supervision is the emergence of portfolio-level concentration risk. As the financial sector clusters around a handful of dominant cloud and AI providers, regulators are confronting a scenario with no clean historical parallel: a single bug in a shared foundation model could trigger simultaneous failures across multiple systemically important institutions.",
+      scenarios: [
+        { title: "The Shared Infrastructure Problem", body: "Three hyperscalers—AWS, Azure, and Google Cloud—host the vast majority of U.S. financial institution workloads. Examiners now evaluate a bank's 'replaceability score': how quickly could operations migrate to an alternative provider? A 72-hour migration plan is now considered inadequate for critical activities." },
+        { title: "The Foundation Model Problem", body: "If five major banks use the same AI model hosted on the same cloud provider for credit decisioning, a single model failure or adversarial exploit could produce synchronized lending errors across institutions. This is a systemic liquidity risk scenario—not merely a vendor management failure." },
+        { title: "Fourth-Party Subcontracting Exposure", body: "Inspired by the EU's Digital Operational Resilience Act (DORA), U.S. examiners increasingly require banks to map their 'subcontracting exposure'—the full web of third and fourth parties underpinning each critical technology. An AI vendor's own dependency on a large language model host creates concentration risk the bank cannot see without active scrutiny." }
+      ],
+      keyShift: {
+        headline: "Reputation Risk Is Eliminated. Financial Impact Is Everything.",
+        body: "The FFIEC's February 2026 removal of all 'reputation risk' references from the IT Examination Handbook marks a clear supervisory philosophy: examiners now quantify harm in dollars. A biased AI model is not a PR problem—it is a measurable source of fair lending liability. A cloud outage is not embarrassing—it has a capital impact that can be calculated. This shift also calibrates examination intensity: a community bank's AI document summarizer warrants light-touch review, while a global systemically important bank's AI-driven underwriting platform warrants full-scope examination."
+      }
+    }
+  },
+  {
+    id: "quant", label: "Quantitative Tools", icon: "∑", color: "#8BB8A0",
+    title: "Measuring What Examiners Can't See",
+    subtitle: "Mathematical Tools for Algorithmic Drift",
+    content: {
+      type: "quant",
+      intro: "Supervisory language about 'model drift' and 'continuous governance' requires a quantitative foundation. Two mathematical instruments underpin how examiners—and the internal risk teams they evaluate—actually measure whether an AI system's behavior has changed materially since its last validation.",
+      tools: [
+        {
+          name: "Kullback-Leibler Divergence", tag: "D_KL",
+          purpose: "Measures how far the current distribution of model inputs has shifted from the distribution present at the time of validation.",
+          formula: "D_KL(P₀ ‖ P₁) = Σ P₀(x) · log( P₀(x) / P₁(x) )",
+          formulaNote: "P₀ is the input distribution at validation time t₀. P₁ is the current distribution at time t₁. A value near zero means the operating environment is statistically similar to training.",
+          interpretation: "As D_KL increases, the model is making decisions about data it was never validated against. A material spike signals to the examiner that re-validation is required—or that a fallback model should be activated. Banks are expected to set internal thresholds and treat a breach as an automatic escalation trigger.",
+          examinerAction: "Internal D_KL dashboards with documented threshold policies. Breaching the threshold must trigger re-validation or fallback activation—not a human judgment call.",
+          analogy: "The cloud equivalent is a sudden spike in infrastructure error rates: an automated alert that something structural has changed, requiring human review before operations continue."
+        },
+        {
+          name: "Softmax Temperature", tag: "τ",
+          purpose: "Controls the variance of an AI model's output predictions. Low temperature produces near-deterministic outputs; high temperature introduces randomness.",
+          formula: "P(yᵢ) = exp(zᵢ / τ) / Σⱼ exp(zⱼ / τ)",
+          formulaNote: "zᵢ are the raw model scores (logits). τ is the temperature parameter. As τ → 0, the model becomes fully deterministic; as τ increases, output variance grows.",
+          interpretation: "For high-stakes financial decisions—credit approvals, fraud flags, compliance determinations—examiners expect τ to be pinned near zero. A model with τ ≈ 0 will give the same answer to the same input every time, enabling audit trails and reproducible outcomes. Uncontrolled τ means identical loan applications could receive different decisions on different days.",
+          examinerAction: "Contracts with AI vendors must specify the production temperature setting. Uncontrolled temperature is a model governance deficiency—equivalent to running a core banking system in 'debug mode.'",
+          analogy: "The cloud equivalent is requiring that production infrastructure be deployed from versioned, immutable Infrastructure as Code—no ad hoc configuration changes that cannot be audited."
+        }
+      ],
+      synthesis: "Together, D_KL and τ give examiners a two-dimensional view of AI risk: D_KL answers whether the model is still operating in a familiar environment, while τ answers whether its decisions are sufficiently deterministic to be audited. A well-governed AI deployment will have monitoring dashboards tracking both in real time—with documented escalation procedures for when either metric breaches its threshold."
+    }
+  }
+];
+
+/* ─────────────────────── STATE ─────────────────────── */
+let activeId = "overview";
+let expandedBooklet = null;
+let expandedStage = 1;
+let expandedPrinciple = null;
+let expandedTool = 0;
+
+/* ─────────────────────── HELPERS ─────────────────────── */
+function idx() { return CHAPTERS.findIndex(c => c.id === activeId); }
+function chapter() { return CHAPTERS[idx()]; }
+function accent() { return chapter().color; }
+
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `${r},${g},${b}`;
+}
+
+function setExpandable(el, open) {
+  if (open) {
+    el.style.maxHeight = el.scrollHeight + 'px';
+    el.classList.add('open');
+  } else {
+    el.style.maxHeight = '0';
+    el.classList.remove('open');
+  }
+}
+
+/* ─────────────────────── RENDER TOPBAR ─────────────────────── */
+function renderTopbar() {
+  const dotsEl = document.getElementById('progress-dots');
+  dotsEl.innerHTML = '';
+  CHAPTERS.forEach((ch, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'dot';
+    btn.title = ch.label;
+    btn.style.width = (ch.id === activeId ? '26px' : '7px');
+    btn.style.background = ch.id === activeId ? ch.color : (i < idx() ? ch.color + '55' : '#1E2A45');
+    btn.addEventListener('click', () => navigate(ch.id));
+    dotsEl.appendChild(btn);
+  });
+  document.getElementById('progress-count').textContent = `${idx()+1} / ${CHAPTERS.length}`;
+}
+
+/* ─────────────────────── RENDER SIDEBAR ─────────────────────── */
+function renderSidebar() {
+  const nav = document.getElementById('nav-list');
+  nav.innerHTML = '';
+  CHAPTERS.forEach(ch => {
+    const isActive = ch.id === activeId;
+    const btn = document.createElement('button');
+    btn.className = 'nav-btn' + (isActive ? ' active' : '');
+    btn.style.background = isActive ? `${ch.color}12` : 'transparent';
+    btn.style.borderLeftColor = isActive ? ch.color : 'transparent';
+    btn.innerHTML = `
+      <span class="nav-icon" style="color:${isActive ? ch.color : '#2A3A55'}">${ch.icon}</span>
+      <span class="nav-label">${ch.label}</span>
+      <span class="nav-dot" style="background:${ch.color}"></span>
+    `;
+    btn.addEventListener('click', () => navigate(ch.id));
+    nav.appendChild(btn);
+  });
+}
+
+/* ─────────────────────── RENDER CHAPTER HEADER ─────────────────────── */
+function renderHeader() {
+  const ch = chapter(), a = accent();
+  const header = document.getElementById('chapter-header');
+  header.style.background = `linear-gradient(135deg, ${a}20 0%, ${a}07 55%, transparent 100%)`;
+  header.style.borderBottomColor = `${a}20`;
+  header.querySelector('.top-stripe').style.background = `linear-gradient(90deg, ${a} 0%, ${a}50 50%, transparent 100%)`;
+  header.querySelector('.ghost-icon').textContent = ch.icon;
+  header.querySelector('.ghost-icon').style.color = `${a}09`;
+  header.querySelector('.ch-eyebrow').textContent = `${ch.icon} ${ch.label}`;
+  header.querySelector('.ch-eyebrow').style.color = a;
+  header.querySelector('.ch-title').textContent = ch.title;
+  header.querySelector('.ch-subtitle').textContent = ch.subtitle;
+}
+
+/* ─────────────────────── RENDER CHAPTER BODY ─────────────────────── */
+function renderBody() {
+  const body = document.getElementById('chapter-body');
+  body.innerHTML = '';
+  body.className = 'fade-in';
+  void body.offsetWidth; // reflow to re-trigger animation
+
+  const ch = chapter(), a = accent(), c = ch.content;
+
+  if (c.type === 'intro') renderIntro(body, c, a);
+  else if (c.type === 'booklets') renderBooklets(body, c, a);
+  else if (c.type === 'lifecycle') renderLifecycle(body, c, a);
+  else if (c.type === 'mrm') renderMRM(body, c, a);
+  else if (c.type === 'systemic') renderSystemic(body, c, a);
+  else if (c.type === 'quant') renderQuant(body, c, a);
+
+  renderBottomNav(body, a);
+}
+
+/* ── OVERVIEW ── */
+function renderIntro(parent, c, a) {
+  const lq = el('div', 'lead-quote');
+  lq.style.borderLeftColor = a;
+  lq.innerHTML = `<p class="lq-main">${c.thesis}</p><p class="lq-sub">${c.keyTheme}</p>`;
+  parent.appendChild(lq);
+
+  parent.appendChild(sectionLabel('Three Defining Lessons'));
+  const wrap = el('div'); wrap.style.marginTop = '16px';
+  c.lessons.forEach(lesson => {
+    const card = el('div', 'lesson-card');
+    card.innerHTML = `
+      <div class="lesson-num">${lesson.num}</div>
+      <div>
+        <div class="lesson-headline">${lesson.headline}</div>
+        <div class="lesson-detail">${lesson.detail}</div>
+      </div>`;
+    wrap.appendChild(card);
+  });
+  parent.appendChild(wrap);
+}
+
+/* ── FFIEC BOOKLETS ── */
+function renderBooklets(parent, c, a) {
+  parent.appendChild(introText(c.intro));
+  c.booklets.forEach((b, i) => {
+    const card = el('div', 'card');
+    const isOpen = expandedBooklet === i;
+    if (isOpen) card.classList.add('open');
+    card.style.borderColor = isOpen ? a + '45' : '#1A2A45';
+
+    const hdr = el('div', 'card-header');
+    hdr.innerHTML = `
+      <span class="year-badge" style="color:${a};background:${a}18">${b.year}</span>
+      <div style="flex:1">
+        <div class="booklet-name">${b.name}</div>
+        <div class="booklet-replaced">Replaced: ${b.replaced}</div>
+      </div>
+      <span class="chevron${isOpen ? ' open' : ''}">›</span>`;
+    card.appendChild(hdr);
+
+    const bodyEl = el('div', 'card-body');
+    const inner = el('div', 'card-body-inner');
+    inner.innerHTML = `
+      <p class="micro-label" style="margin-bottom:8px">Supervisory Significance</p>
+      <p style="font-family:'Libre Baskerville',serif;font-size:14px;line-height:1.8;color:#8A9AAA;margin-bottom:16px">${b.significance}</p>
+      <div class="ai-box" style="background:${a}0D;border:1px solid ${a}28">
+        <p class="micro-label" style="color:${a};margin-bottom:6px">AI Implication</p>
+        <p style="font-family:'Libre Baskerville',serif;font-style:italic;font-size:13px;line-height:1.75;color:#8A9AAA">${b.aiImplication}</p>
+      </div>`;
+    bodyEl.appendChild(inner);
+    card.appendChild(bodyEl);
+
+    const expEl = el('div', 'expandable' + (isOpen ? ' open' : ''));
+    expEl.appendChild(bodyEl);
+    card.appendChild(expEl);
+    if (isOpen) setTimeout(() => expEl.style.maxHeight = expEl.scrollHeight + 'px', 10);
+
+    hdr.addEventListener('click', () => {
+      expandedBooklet = expandedBooklet === i ? null : i;
+      renderAll();
+    });
+    parent.appendChild(card);
+  });
+}
+
+/* ── TPRM LIFECYCLE ── */
+function renderLifecycle(parent, c, a) {
+  parent.appendChild(introText(c.intro));
+  c.stages.forEach(stage => {
+    const isOpen = expandedStage === stage.num;
+    const item = el('div', 'timeline-item');
+
+    // Spine
+    const spine = el('div', 'timeline-spine');
+    const circle = el('button', 'stage-circle' + (isOpen ? ' active' : ''));
+    circle.textContent = stage.num;
+    circle.style.background = isOpen ? a : '#0D1830';
+    circle.style.borderColor = isOpen ? a : '#1E2A45';
+    if (isOpen) circle.style.color = '#080E1F';
+    circle.addEventListener('click', () => { expandedStage = isOpen ? null : stage.num; renderAll(); });
+    spine.appendChild(circle);
+    if (stage.num < 5) spine.appendChild(el('div', 'timeline-line'));
+    item.appendChild(spine);
+
+    // Content
+    const content = el('div', 'timeline-content');
+    const stageCard = el('div', 'stage-card' + (isOpen ? ' open' : ''));
+    stageCard.style.borderColor = isOpen ? a + '35' : 'transparent';
+
+    const titleRow = el('div', 'stage-title');
+    titleRow.innerHTML = `<span>Stage ${stage.num}: ${stage.name}</span><span class="chevron${isOpen ? ' open' : ''}">›</span>`;
+    stageCard.appendChild(titleRow);
+
+    // Expandable inner
+    const expInner = el('div');
+    expInner.style.marginTop = '16px';
+
+    const twoCol = el('div', 'two-col');
+    twoCol.appendChild(cloudAICard('Cloud Focus', '#5B8DB8', stage.cloud));
+    twoCol.appendChild(cloudAICard('AI Focus', a, stage.ai));
+    expInner.appendChild(twoCol);
+
+    if (stage.showDueDiligence) {
+      const ddWrap = el('div', 'dd-table-wrap');
+      const ddLabel = el('div', 'micro-label'); ddLabel.textContent = 'Due Diligence Factor Comparison';
+      ddWrap.appendChild(ddLabel);
+      const ddTable = el('div', 'dd-table');
+      const thead = el('div', 'thead');
+      ['Factor','Cloud Focus','AI Focus'].forEach((h,hi) => {
+        const th = el('div','th' + (hi < 2 ? ' border-right' : '')); th.textContent = h; thead.appendChild(th);
+      });
+      ddTable.appendChild(thead);
+      c.dueDiligenceTable.forEach((row, ri) => {
+        const tr = el('div', 'tbody-row ' + (ri % 2 === 0 ? 'row-even' : 'row-odd'));
+        const d1 = el('div','td accent-col border-right'); d1.style.color = a; d1.textContent = row.factor;
+        const d2 = el('div','td border-right'); d2.textContent = row.cloud;
+        const d3 = el('div','td'); d3.textContent = row.ai;
+        tr.appendChild(d1); tr.appendChild(d2); tr.appendChild(d3);
+        ddTable.appendChild(tr);
+      });
+      ddWrap.appendChild(ddTable);
+      expInner.appendChild(ddWrap);
+    }
+
+    const callout = el('div', 'examiner-callout');
+    callout.style.background = `${a}0C`;
+    callout.style.borderLeftColor = a;
+    callout.innerHTML = `<span class="label" style="color:${a}">Examiner Focus:</span><span class="text">${stage.examinerFocus}</span>`;
+    expInner.appendChild(callout);
+
+    const expEl = el('div', 'expandable' + (isOpen ? ' open' : ''));
+    expEl.appendChild(expInner);
+    stageCard.appendChild(expEl);
+    if (isOpen) setTimeout(() => expEl.style.maxHeight = expEl.scrollHeight + 'px', 10);
+
+    stageCard.addEventListener('click', (e) => {
+      if (e.target !== circle) { expandedStage = isOpen ? null : stage.num; renderAll(); }
+    });
+
+    content.appendChild(stageCard);
+    item.appendChild(content);
+    parent.appendChild(item);
+  });
+}
+
+/* ── MODEL RISK ── */
+function renderMRM(parent, c, a) {
+  parent.appendChild(introText(c.intro));
+  parent.appendChild(sectionLabel('Four Core Principles of SR 26-2'));
+
+  const wrap = el('div'); wrap.style.marginTop = '16px'; wrap.style.marginBottom = '44px';
+  c.principles.forEach((p, i) => {
+    const isOpen = expandedPrinciple === i;
+    const card = el('div', 'card' + (isOpen ? ' open' : ''));
+    card.style.borderColor = isOpen ? a + '50' : '#1A2A45';
+
+    const hdr = el('div', 'card-header');
+    hdr.style.padding = '18px 22px';
+    hdr.innerHTML = `
+      <div style="flex:1;font-family:'Libre Baskerville',serif;font-size:15px;font-weight:700;color:#E8E2D9">${p.title}</div>
+      <span class="chevron${isOpen ? ' open' : ''}">›</span>`;
+    card.appendChild(hdr);
+
+    const inner = el('div');
+    inner.style.padding = '0 22px 22px';
+    inner.style.borderTop = '1px solid #1A2A45';
+    inner.innerHTML = `
+      <p style="font-family:'Libre Baskerville',serif;font-size:14px;line-height:1.8;color:#8A9AAA;margin-top:14px;margin-bottom:0">${p.description}</p>
+      <div class="red-flag">
+        <span class="flag-icon">⚑</span>
+        <span class="flag-text">${p.indicator}</span>
+      </div>`;
+
+    const expEl = el('div', 'expandable' + (isOpen ? ' open' : ''));
+    expEl.appendChild(inner);
+    card.appendChild(expEl);
+    if (isOpen) setTimeout(() => expEl.style.maxHeight = expEl.scrollHeight + 'px', 10);
+
+    hdr.addEventListener('click', () => { expandedPrinciple = expandedPrinciple === i ? null : i; renderAll(); });
+    wrap.appendChild(card);
+  });
+  parent.appendChild(wrap);
+
+  parent.appendChild(sectionLabel('Control Equivalencies: Cloud vs. AI'));
+  const table = el('div', 'data-table'); table.style.marginTop = '16px';
+  table.style.gridTemplateColumns = '1fr 1fr 1fr';
+  const thead = el('div', 'thead'); thead.style.gridTemplateColumns = '1fr 1fr 1fr';
+  ['Control Type','Cloud Application','AI Application'].forEach((h,hi) => {
+    const th = el('div','th' + (hi < 2 ? ' border-right' : '')); th.textContent = h; thead.appendChild(th);
+  });
+  table.appendChild(thead);
+  c.comparison.forEach((row, i) => {
+    const tr = el('div', 'tbody-row ' + (i % 2 === 0 ? 'row-even' : 'row-odd'));
+    tr.style.gridTemplateColumns = '1fr 1fr 1fr';
+    const d1 = el('div','td accent-col border-right'); d1.style.color = a; d1.textContent = row.control;
+    const d2 = el('div','td border-right'); d2.textContent = row.cloud;
+    const d3 = el('div','td'); d3.textContent = row.ai;
+    tr.appendChild(d1); tr.appendChild(d2); tr.appendChild(d3);
+    table.appendChild(tr);
+  });
+  parent.appendChild(table);
+}
+
+/* ── SYSTEMIC ── */
+function renderSystemic(parent, c, a) {
+  parent.appendChild(introText(c.intro));
+  parent.appendChild(sectionLabel('Three Concentration Risk Scenarios'));
+  const wrap = el('div'); wrap.style.marginTop = '16px';
+  c.scenarios.forEach(s => {
+    const card = el('div', 'scenario-card');
+    card.style.borderLeftColor = a;
+    card.innerHTML = `<div class="scenario-title">${s.title}</div><p class="scenario-body">${s.body}</p>`;
+    wrap.appendChild(card);
+  });
+  parent.appendChild(wrap);
+
+  const callout = el('div', 'callout');
+  callout.style.marginTop = '38px';
+  callout.style.background = `${a}0D`;
+  callout.style.border = `1px solid ${a}30`;
+  callout.innerHTML = `
+    <div class="callout-eyebrow" style="color:${a}">◈ Defining Policy Shift</div>
+    <div class="callout-headline">${c.keyShift.headline}</div>
+    <p class="callout-body">${c.keyShift.body}</p>`;
+  parent.appendChild(callout);
+}
+
+/* ── QUANT ── */
+function renderQuant(parent, c, a) {
+  parent.appendChild(introText(c.intro));
+  c.tools.forEach((tool, i) => {
+    const isOpen = expandedTool === i;
+    const card = el('div', 'card' + (isOpen ? ' open' : ''));
+    card.style.borderColor = isOpen ? a + '50' : '#1A2A45';
+
+    const hdr = el('div', 'card-header');
+    hdr.innerHTML = `
+      <div class="quant-tag-box" style="background:${a}18;border:1px solid ${a}30">
+        <span class="quant-tag-text" style="color:${a}">${tool.tag}</span>
+      </div>
+      <div style="flex:1">
+        <div style="font-family:'Libre Baskerville',serif;font-size:15px;font-weight:700;color:#E8E2D9;margin-bottom:3px">${tool.name}</div>
+        <div style="font-family:'Libre Baskerville',serif;font-style:italic;font-size:13px;color:#4A5A7A">${tool.purpose}</div>
+      </div>
+      <span class="chevron${isOpen ? ' open' : ''}">›</span>`;
+    card.appendChild(hdr);
+
+    const inner = el('div');
+    inner.style.padding = '0 24px 24px';
+    inner.style.borderTop = '1px solid #1A2A45';
+
+    const fbox = el('div', 'formula-box');
+    fbox.style.marginTop = '20px';
+    fbox.style.background = '#050A17';
+    fbox.style.border = `1px solid ${a}22`;
+    fbox.innerHTML = `
+      <p class="micro-label" style="color:${a}">Formula</p>
+      <div class="formula-text">${tool.formula}</div>
+      <p class="formula-note">${tool.formulaNote}</p>`;
+    inner.appendChild(fbox);
+
+    const siLabel = el('p', 'micro-label'); siLabel.textContent = 'Supervisory Interpretation'; siLabel.style.marginBottom = '8px';
+    inner.appendChild(siLabel);
+    const interp = el('p'); interp.style.cssText = "font-family:'Libre Baskerville',serif;font-size:14px;line-height:1.8;color:#8A9AAA;margin-bottom:16px";
+    interp.textContent = tool.interpretation; inner.appendChild(interp);
+
+    const ecallout = el('div', 'examiner-callout');
+    ecallout.style.background = `${a}0C`; ecallout.style.borderLeftColor = a; ecallout.style.marginBottom = '16px';
+    ecallout.innerHTML = `<span class="label" style="color:${a}">Examiner Action:</span><span class="text">${tool.examinerAction}</span>`;
+    inner.appendChild(ecallout);
+
+    const analogy = el('div', 'cloud-analogy');
+    analogy.innerHTML = `<span class="ca-label">Cloud Analogy</span><span class="ca-text">${tool.analogy}</span>`;
+    inner.appendChild(analogy);
+
+    const expEl = el('div', 'expandable' + (isOpen ? ' open' : ''));
+    expEl.appendChild(inner);
+    card.appendChild(expEl);
+    if (isOpen) setTimeout(() => expEl.style.maxHeight = expEl.scrollHeight + 'px', 10);
+
+    hdr.addEventListener('click', () => { expandedTool = expandedTool === i ? null : i; renderAll(); });
+    parent.appendChild(card);
+  });
+
+  const synth = el('div', 'callout');
+  synth.style.marginTop = '30px';
+  synth.style.background = `${a}0D`;
+  synth.style.border = `1px solid ${a}30`;
+  synth.innerHTML = `
+    <div class="callout-eyebrow" style="color:${a}">◈ Synthesis</div>
+    <p class="callout-body" style="font-size:15px;line-height:1.85">${c.synthesis}</p>`;
+  parent.appendChild(synth);
+}
+
+/* ── BOTTOM NAV ── */
+function renderBottomNav(parent, a) {
+  const nav = el('div'); nav.id = 'bottom-nav';
+  const i = idx();
+
+  if (i > 0) {
+    const prev = el('button', 'nav-prev');
+    prev.textContent = '← Previous';
+    prev.addEventListener('click', () => navigate(CHAPTERS[i-1].id));
+    nav.appendChild(prev);
+  } else {
+    nav.appendChild(el('div', 'nav-placeholder'));
+  }
+
+  const dots = el('div', 'bottom-dots');
+  CHAPTERS.forEach((ch, di) => {
+    const d = el('div', 'bottom-dot');
+    d.style.background = di === i ? a : (di < i ? a + '55' : '#1A2A45');
+    dots.appendChild(d);
+  });
+  nav.appendChild(dots);
+
+  if (i < CHAPTERS.length - 1) {
+    const next = el('button', 'nav-next');
+    next.textContent = 'Next →';
+    next.style.background = a;
+    next.addEventListener('click', () => navigate(CHAPTERS[i+1].id));
+    nav.appendChild(next);
+  } else {
+    nav.appendChild(el('div', 'nav-placeholder'));
+  }
+
+  parent.appendChild(nav);
+}
+
+/* ─────────────────────── SMALL HELPERS ─────────────────────── */
+function el(tag, className = '') {
+  const e = document.createElement(tag);
+  if (className) e.className = className;
+  return e;
+}
+function introText(text) {
+  const p = el('p', 'intro-text'); p.textContent = text; return p;
+}
+function sectionLabel(text) {
+  const d = el('div', 'section-label'); d.textContent = text; return d;
+}
+function cloudAICard(label, color, text) {
+  const card = el('div', 'cloud-ai-card');
+  card.innerHTML = `<p class="micro-label" style="color:${color}">${label}</p><p>${text}</p>`;
+  return card;
+}
+
+/* ─────────────────────── NAVIGATE ─────────────────────── */
+function navigate(id) {
+  activeId = id;
+  expandedBooklet = null;
+  expandedStage = 1;
+  expandedPrinciple = null;
+  expandedTool = 0;
+  renderAll();
+  document.getElementById('main').scrollTop = 0;
+}
+
+/* ─────────────────────── RENDER ALL ─────────────────────── */
+function renderAll() {
+  renderTopbar();
+  renderSidebar();
+  renderHeader();
+  renderBody();
+}
+
+renderAll();
+</script>
+</body>
+</html>

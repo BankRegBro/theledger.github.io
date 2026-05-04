@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>The Structural Evolution of American Banking · 1791–2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0D0F14;
+    --bg-card: #13161D;
+    --bg-card-hover: #161922;
+    --border: #1E2028;
+    --border-hover: #2E3040;
+    --gold: #C9A84C;
+    --text-primary: #F0E8D8;
+    --text-secondary: #B8AFA0;
+    --text-muted: #9A9080;
+    --text-dim: #6A6458;
+    --text-footer: #2A2820;
+    --spine: #2A2510;
+  }
+
+  body {
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: 'Libre Baskerville', serif;
+  }
+
+  /* ── HEADER ── */
+  .tl-header {
+    background: linear-gradient(180deg, #0A0C10 0%, var(--bg) 100%);
+    border-bottom: 1px solid #2A2510;
+    padding: 56px 40px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .tl-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201,168,76,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .tl-header-kicker {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+  }
+  .tl-header-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(26px, 5vw, 52px);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+    letter-spacing: -0.01em;
+  }
+  .tl-header-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+  .tl-header-sub {
+    font-size: 14px;
+    color: #8A8070;
+    max-width: 560px;
+    margin: 0 auto;
+    line-height: 1.65;
+  }
+  .tl-header-rule {
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 24px auto 0;
+  }
+
+  /* ── BODY / SPINE ── */
+  .tl-body {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 20px 80px;
+    position: relative;
+  }
+  .tl-spine {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(180deg, #2A2510 0%, rgba(201,168,76,0.2) 30%, rgba(201,168,76,0.27) 70%, #2A2510 100%);
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  /* ── EVENT ROW ── */
+  .tl-event {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    position: relative;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .tl-event.visible { opacity: 1; transform: translateY(0); }
+
+  .tl-event:nth-child(odd) {
+    flex-direction: row;
+    padding-right: calc(50% + 32px);
+    text-align: right;
+  }
+  .tl-event:nth-child(even) {
+    flex-direction: row-reverse;
+    padding-left: calc(50% + 32px);
+    text-align: left;
+  }
+
+  /* ── SPINE NODE ── */
+  .tl-node {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 18px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid var(--gold);
+    background: var(--bg);
+    z-index: 2;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+  .tl-event.active .tl-node {
+    width: 18px;
+    height: 18px;
+    top: 16px;
+    background: var(--gold);
+    box-shadow: 0 0 0 4px rgba(201,168,76,0.15), 0 0 20px rgba(201,168,76,0.3);
+  }
+
+  /* ── CARD ── */
+  .tl-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px 24px;
+    cursor: pointer;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.25s, border-color 0.25s, box-shadow 0.25s;
+  }
+  .tl-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--era-color, var(--gold));
+    opacity: 0.5;
+    transition: opacity 0.25s;
+  }
+  .tl-card:hover::before,
+  .tl-event.active .tl-card::before { opacity: 1; }
+  .tl-card:hover,
+  .tl-event.active .tl-card {
+    background: var(--bg-card-hover);
+    border-color: var(--border-hover);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  .tl-year {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--era-color, var(--gold));
+    margin-bottom: 4px;
+  }
+  .tl-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.25;
+    margin-bottom: 3px;
+  }
+  .tl-subtitle {
+    font-size: 11px;
+    font-style: italic;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+  }
+  .tl-summary {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+  .tl-chevron {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--era-color, var(--gold));
+    opacity: 0.7;
+    user-select: none;
+  }
+
+  /* ── EXPANDED SECTION ── */
+  .tl-expanded {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+  }
+  .tl-event.active .tl-expanded { max-height: 800px; }
+
+  .tl-detail {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    line-height: 1.75;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+  .tl-impact-label {
+    font-size: 9.5px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--era-color, var(--gold));
+    margin-top: 14px;
+    margin-bottom: 6px;
+  }
+  .tl-impact {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    font-style: italic;
+    color: #D8D0C0;
+    line-height: 1.55;
+    padding-left: 12px;
+    border-left: 2px solid var(--era-color, var(--gold));
+  }
+  .tl-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 14px;
+  }
+  .tl-event:nth-child(odd) .tl-tags { justify-content: flex-end; }
+  .tl-tag {
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #5A5448;
+    background: var(--bg);
+    border: 1px solid #2A2820;
+    border-radius: 2px;
+    padding: 3px 8px;
+  }
+
+  /* ── FOOTER ── */
+  .tl-footer {
+    text-align: center;
+    padding: 24px;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-footer);
+    border-top: 1px solid #161820;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .tl-spine { left: 20px; }
+    .tl-node  { left: 20px; }
+    .tl-event:nth-child(odd),
+    .tl-event:nth-child(even) {
+      flex-direction: row;
+      padding-left: 50px;
+      padding-right: 0;
+      text-align: left;
+    }
+    .tl-event:nth-child(odd) .tl-tags { justify-content: flex-start; }
+    .tl-header { padding: 40px 20px 32px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="tl-header">
+  <div class="tl-header-kicker">American Financial Architecture · 1791 – 2026</div>
+  <h1 class="tl-header-title">The Structural Evolution of<br><em>American Banking</em></h1>
+  <p class="tl-header-sub">From Hamilton's vision of a national bank to Riegle-Neal's opening of state lines — two centuries of geographic restriction, circumvention, and reform.</p>
+  <div class="tl-header-rule"></div>
+</header>
+
+<!-- TIMELINE -->
+<main class="tl-body">
+  <div class="tl-spine"></div>
+
+  <!-- Each .tl-event has style="--era-color: #HEX" -->
+
+  <div class="tl-event" style="--era-color:#C9A84C">
+    <div class="tl-node"></div>
+    <div class="tl-card">
+      <div class="tl-year">1791 · National Banks with Branches</div>
+      <div class="tl-title">First Bank of the United States</div>
+      <div class="tl-subtitle">Hamilton's Vision of National Finance</div>
+      <div class="tl-summary">Alexander Hamilton established the First Bank of the United States, the nation's first experiment with interstate branching. Operating offices across state lines, it demonstrated the utility of a centralized financial infrastructure.</div>
+      <div class="tl-chevron">▼ expand</div>
+      <div class="tl-expanded">
+        <div class="tl-detail">Hamilton envisioned a robust, centralized financial system modeled after the Bank of England. The First Bank operated branches across states to facilitate government fiscal operations and provide a uniform currency — a direct precursor to modern interstate banking. Thomas Jefferson and agrarian interests fiercely opposed it, viewing such institutions as "fountains of corruption."</div>
+        <div class="tl-impact-label">Lasting Impact</div>
+        <div class="tl-impact">Established the foundational tension between centralized financial efficiency and Jeffersonian localism that would define American banking for the next 200 years.</div>
+        <div class="tl-tags">
+          <span class="tl-tag">Federal Charter</span>
+          <span class="tl-tag">Branching</span>
+          <span class="tl-tag">Hamilton</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tl-event" style="--era-color:#9B4F4F">
+    <div class="tl-node"></div>
+    <div class="tl-card">
+      <div class="tl-year">1832 · Jacksonian Decentralization</div>
+      <div class="tl-title">Jackson's Veto &amp; the End of National Banking</div>
+      <div class="tl-subtitle">The 'Money Trust' Destroyed</div>
+      <div class="tl-summary">President Andrew Jackson vetoed the recharter of the Second Bank of the United States, portraying it as a "money trust" benefiting the wealthy elite. This ended nationwide branching for over 150 years.</div>
+      <div class="tl-chevron">▼ expand</div>
+      <div class="tl-expanded">
+        <div class="tl-detail">The subsequent Free Banking Era (1837–1863) saw states take primary control over chartering. Unit banking became the norm, particularly in the Northeast. The instability of state-issued bank notes and localized economic shocks reinforced the public's desire for small, independent institutions — setting the stage for the Great Depression's banking catastrophe.</div>
+        <div class="tl-impact-label">Lasting Impact</div>
+        <div class="tl-impact">Dismantled interstate branching and entrenched unit banking as the American standard, a structural weakness that would contribute to thousands of bank failures a century later.</div>
+        <div class="tl-tags">
+          <span class="tl-tag">Unit Banking</span>
+          <span class="tl-tag">States' Rights</span>
+          <span class="tl-tag">Free Banking Era</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tl-event" style="--era-color:#4F7A9B">
+    <div class="tl-node"></div>
+    <div class="tl-card">
+      <div class="tl-year">1864 · Dual Banking System</div>
+      <div class="tl-title">National Bank Act</div>
+      <div class="tl-subtitle">The Birth of the Dual Banking System</div>
+      <div class="tl-summary">The Civil War necessitated federal oversight to fund the war effort. The National Bank Act created federally chartered "national banks," but the OCC interpreted the Act's silence on branching as an implicit prohibition.</div>
+      <div class="tl-chevron">▼ expand</div>
+      <div class="tl-expanded">
+        <div class="tl-detail">National banks were restricted to a single office, while state-chartered banks proliferated under more permissive state rules. This created the "dual banking system" — an enduring feature of American finance where national and state banks coexist under different regulatory regimes, often competing for charters and customers.</div>
+        <div class="tl-impact-label">Lasting Impact</div>
+        <div class="tl-impact">Cemented the dual banking system and implicitly restricted national banks to unit operations, while state banks gradually adopted branching where permitted.</div>
+        <div class="tl-tags">
+          <span class="tl-tag">OCC</span>
+          <span class="tl-tag">National Charter</span>
+          <span class="tl-tag">Dual Banking</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tl-event" style="--era-color:#7B5EA7">
+    <div class="tl-node"></div>
+    <div class="tl-card">
+      <div class="tl-year">1927 · Restricted Branching Era</div>
+      <div class="tl-title">The McFadden Act</div>
+      <div class="tl-subtitle">Geographic Restrictions Codified in Law</div>
+      <div class="tl-summary">After a five-year legislative battle, the McFadden Act was signed into law, explicitly prohibiting interstate branching and locking the banking system into a state-by-state structure for nearly 70 years.</div>
+      <div class="tl-chevron">▼ expand</div>
+      <div class="tl-expanded">
+        <div class="tl-detail">The Act allowed national banks to branch within their home city if state banks had the same privilege, but its paramount legacy was the explicit ban on crossing state lines. Comptroller Henry Dawes warned that branch banking would "destroy the Federal Reserve." While intended to protect small banks and keep local deposits in local communities, McFadden prevented risk diversification across geographic regions — a fatal structural flaw.</div>
+        <div class="tl-impact-label">Lasting Impact</div>
+        <div class="tl-impact">Explicitly prohibited interstate branching via federal statute. Created the rigid unit banking structure that would catastrophically amplify the Great Depression's bank failures.</div>
+        <div class="tl-tags">
+          <span class="tl-tag">McFadden</span>
+          <span class="tl-tag">Interstate Prohibition</span>
+          <span class="tl-tag">Unit Banking</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tl-event" style="--era-color:#9B4F4F">
+    <div class="tl-node"></div>
+    <div class="tl-card">
+      <div class="tl-year">1933 · Post-Depression Reform</div>
+      <div class="tl-title">Banking Act of 1933 (Glass-Steagall)</div>
+      <div class="tl-subtitle">9,400 Failures and the Lessons of Localism</div>
+      <div class="tl-summary">Between 1929 and 1933, approximately 9,400 banks failed — nearly all small unit banks. The Banking Act created the FDIC and amended McFadden to allow statewide branching where state law permitted, but the interstate prohibition survived.</div>
+      <div class="tl-chevron">▼ expand</div>
+      <div class="tl-expanded">
+        <div class="tl-detail">The contrast with Canada was stark: Canada experienced zero bank failures during the Depression because its nationwide branch networks could use profits from one region to offset losses in another. Glass-Steagall also separated commercial from investment banking. The interstate prohibition, however, survived — an ideological holdover from Jacksonian localism despite clear evidence of its structural danger.</div>
+        <div class="tl-impact-label">Lasting Impact</div>
+        <div class="tl-impact">Created federal deposit insurance (FDIC), permitted statewide branching for national banks, but left the federal ban on interstate branching intact for another 60 years.</div>
+        <div class="tl-tags">
+          <span class="tl-tag">Glass-Steagall</span>
+          <span class="tl-tag">FDIC</span>
+          <span class="tl-tag">Great Depression</span>
+          <span class="tl-tag">Statewide Branching</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tl-event" style="--era-color:#4F7A9B">
+    <div class="tl-node"></div>
+    <div class="tl-card">
+      <div class="tl-year">1956 · Bank Holding Company Era</div>
+      <div class="tl-title">Bank Holding Company Act &amp; Douglas Amendment</div>
+      <div class="tl-subtitle">A 'Straitjacket' for Interstate Ambition</div>
+      <div class="tl-summary">Congress passed the Bank Holding Company Act, giving the Federal Reserve oversight of BHCs. The critical Douglas Amendment prohibited a BHC from acquiring an out-of-state bank unless the target state expressly authorized it.</div>
+      <div class="tl-chevron">▼ expand</div>
+      <div class="tl-expanded">
+        <div class="tl-detail">Banks had been using holding company structures as a workaround — a BHC could own separate banks across states without technically "branching." The Douglas Amendment shut this down unless states opted in. For two decades, no states passed enabling legislation, creating what industry observers called a "straitjacket." "Non-bank banks" — institutions that either took deposits or made commercial loans but not both — emerged as the next loophole.</div>
+        <div class="tl-impact-label">Lasting Impact</div>
+        <div class="tl-impact">Formalized the interstate barrier at the holding company level and established the state-opt-in framework that would later enable the regional compact movement of the 1980s.</div>
+        <div class="tl-tags">
+          <span class="tl-tag">BHC Act</span>
+          <span class="tl-tag">Douglas Amendment</span>
+          <span class="tl-tag">Federal Reserve</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tl-event" style="--era-color:#5A8A5A">
+    <div class="tl-node"></div>
+    <div class="tl-card">
+      <div class="tl-year">1978–1985 · State-Led Deregulation</div>
+      <div class="tl-title">Regional Compacts &amp; Reciprocal Entry</div>
+      <div class="tl-subtitle">States Break the Interstate Wall</div>
+      <div class="tl-summary">Maine pioneered reciprocal interstate banking in 1978. A wave of regional compacts followed — New England, Southeast, Midwest, and West — allowing groups of states to authorize bank acquisitions within their regions.</div>
+      <div class="tl-chevron">▼ expand</div>
+      <div class="tl-expanded">
+        <div class="tl-detail">The Southeastern Compact was particularly transformative: ten states including North Carolina, Virginia, and Georgia created a closed regional market that allowed NCNB (later Bank of America) and Wachovia to achieve continental-scale ambitions before full deregulation. In 1985, the Supreme Court in <em>Northeast Bancorp v. Board of Governors</em> upheld these regional arrangements, ruling the Douglas Amendment gave states flexibility to open their borders selectively.</div>
+        <div class="tl-impact-label">Lasting Impact</div>
+        <div class="tl-impact">Created the regional banking giants that would drive consolidation after Riegle-Neal. Validated state authority to engineer selective interstate banking through compacts.</div>
+        <div class="tl-tags">
+          <span class="tl-tag">Regional Compacts</span>
+          <span class="tl-tag">SCOTUS</span>
+          <span class="tl-tag">Southeast Banking</span>
+          <span class="tl-tag">NCNB</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tl-event" style="--era-color:#2E7D5A">
+    <div class="tl-node"></div>
+    <div class="tl-card">
+      <div class="tl-year">1994 · Nationwide Interstate Branching</div>
+      <div class="tl-title">Riegle-Neal Interstate Banking and Branching Efficiency Act</div>
+      <div class="tl-subtitle">The McFadden Prohibition Finally Falls</div>
+      <div class="tl-summary">Riegle-Neal was the landmark legislation that dismantled McFadden's 67-year interstate prohibition, creating a uniform federal framework for nationwide banking operations.</div>
+      <div class="tl-chevron">▼ expand</div>
+      <div class="tl-expanded">
+        <div class="tl-detail">The Act worked in two phases: beginning in 1995, BHCs could acquire banks in any state regardless of state law; by 1997, banks could merge their multi-state subsidiaries into single interstate branch networks. Strict concentration limits prevented any one bank from controlling more than 10% of national deposits or 30% of any single state's deposits. Section 109's Two-Step Test guarded against "deposit production" offices that gathered local savings to lend elsewhere.</div>
+        <div class="tl-impact-label">Lasting Impact</div>
+        <div class="tl-impact">The single most transformative event in the structural evolution of American banking. Enabled the mega-mergers that reshaped the industry and reduced the number of independent banks from ~18,000 to under 5,000.</div>
+        <div class="tl-tags">
+          <span class="tl-tag">Riegle-Neal</span>
+          <span class="tl-tag">Interstate Branching</span>
+          <span class="tl-tag">Concentration Limits</span>
+          <span class="tl-tag">Section 109</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tl-event" style="--era-color:#2E7D5A">
+    <div class="tl-node"></div>
+    <div class="tl-card">
+      <div class="tl-year">2010 · Nationwide Interstate Branching</div>
+      <div class="tl-title">Dodd-Frank Act — Section 613</div>
+      <div class="tl-subtitle">De Novo Branching: The Final Barrier Falls</div>
+      <div class="tl-summary">Section 613 of Dodd-Frank removed the last major hurdle: the requirement for states to "opt in" to de novo interstate branching. Any bank could now open a brand-new branch in any state on equal terms.</div>
+      <div class="tl-chevron">▼ expand</div>
+      <div class="tl-expanded">
+        <div class="tl-detail">Before Dodd-Frank, banks entering a new state often had to pay a premium to acquire a "shell" charter or small existing bank. Section 613 allowed any state or national bank to open a new branch in another state if the target state would permit a locally chartered bank to do so — the same treatment that thrifts had enjoyed since 1992. This rendered many restrictive state statutes moot and completed Hamilton's 219-year-old vision of a national financial infrastructure.</div>
+        <div class="tl-impact-label">Lasting Impact</div>
+        <div class="tl-impact">Completed the full deregulation of geographic banking restrictions. Removed the acquisition premium for new-state entry and leveled the competitive field between banks and thrifts.</div>
+        <div class="tl-tags">
+          <span class="tl-tag">Dodd-Frank</span>
+          <span class="tl-tag">De Novo Branching</span>
+          <span class="tl-tag">Section 613</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tl-event" style="--era-color:#8A6E2F">
+    <div class="tl-node"></div>
+    <div class="tl-card">
+      <div class="tl-year">2025–2026 · Digital Contraction &amp; Consolidation</div>
+      <div class="tl-title">The Great Consolidation &amp; Regulatory Streamlining</div>
+      <div class="tl-subtitle">From Geographic Expansion to Digital Optimization</div>
+      <div class="tl-summary">M&amp;A activity surged as regional banks sought scale to compete with global giants' technology budgets. Capital One acquired Discover for $51.8B. The FDIC streamlined branching rules, cutting intrastate relocation approval from 21 days to 3.</div>
+      <div class="tl-chevron">▼ expand</div>
+      <div class="tl-expanded">
+        <div class="tl-detail">Total bank branches declined 19% from 2014 to 2024. The FDIC's 2025 final rule modernized branching administration: newspaper public notice requirements were eliminated, timelines dramatically shortened, and the term "de novo branch" was replaced with "de novo interstate branch" to reflect modern reality. Banking deserts emerged as a new equity concern — particularly in LMI neighborhoods where physical access to credit remains essential. The frontier has shifted from the legality of crossing state lines to the equity of services within them.</div>
+        <div class="tl-impact-label">Lasting Impact</div>
+        <div class="tl-impact">The era of geographic expansion has given way to digital contraction. Fewer than 5,000 independent banks remain. The structural evolution is complete; the social implications of the Great Consolidation are the next frontier.</div>
+        <div class="tl-tags">
+          <span class="tl-tag">M&amp;A</span>
+          <span class="tl-tag">Capital One</span>
+          <span class="tl-tag">Banking Deserts</span>
+          <span class="tl-tag">FDIC Rule 2025</span>
+          <span class="tl-tag">Digital Banking</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="tl-footer">
+  Interactive Timeline · The Structural Evolution of American Banking · 1791–2026
+</footer>
+
+<script>
+  // Staggered entrance animation
+  const events = document.querySelectorAll('.tl-event');
+  events.forEach((el, i) => {
+    setTimeout(() => el.classList.add('visible'), 80 * i);
+  });
+
+  // Toggle expand/collapse on card or node click
+  function toggleEvent(el) {
+    const isActive = el.classList.contains('active');
+    // Collapse all
+    events.forEach(e => {
+      e.classList.remove('active');
+      const ch = e.querySelector('.tl-chevron');
+      if (ch) ch.textContent = '▼ expand';
+    });
+    // If it wasn't active, open it
+    if (!isActive) {
+      el.classList.add('active');
+      const ch = el.querySelector('.tl-chevron');
+      if (ch) ch.textContent = '▲ collapse';
+    }
+  }
+
+  events.forEach(el => {
+    el.querySelector('.tl-card').addEventListener('click', () => toggleEvent(el));
+    el.querySelector('.tl-node').addEventListener('click', () => toggleEvent(el));
+  });
+</script>
+</body>
+</html>
