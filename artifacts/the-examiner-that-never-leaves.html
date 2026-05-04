@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Examiner Who Never Leaves — The Ledger</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: #F5EFE1; }
+    ::selection { background: #C8A44D; color: #0F2A44; }
+    input[type="range"] { -webkit-appearance: none; appearance: none; background: transparent; width: 100%; }
+    input[type="range"]::-webkit-slider-runnable-track { height: 2px; background: #D9CFB8; }
+    input[type="range"]::-moz-range-track { height: 2px; background: #D9CFB8; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #A88534; margin-top: -8px; border: 2px solid #F5EFE1; box-shadow: 0 2px 6px rgba(15,42,68,0.3); cursor: pointer; }
+    input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: #A88534; border: 2px solid #F5EFE1; cursor: pointer; }
+    @keyframes growBar { from { width: 0; } }
+    @keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+    @keyframes growR { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+    @keyframes growL { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+    @keyframes pop { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: scale(1); } }
+    @keyframes slideR { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes pulseIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+    @keyframes fadeUpA { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    const NAVY = "#0F2A44", NAVY_DEEP = "#081A2D", NAVY_SOFT = "#1F3D5C";
+    const GOLD = "#C8A44D", GOLD_DEEP = "#A88534", GOLD_SOFT = "#E5C87A";
+    const CREAM = "#F5EFE1", CREAM_DEEP = "#EBE2CE";
+    const INK = "#1A1814", RULE = "#D9CFB8", MUTED = "#6B6354";
+    const CRIMSON = "#9A2A2A", GREEN = "#4A7C59";
+
+    function useReveal() {
+      const ref = useRef(null);
+      const [visible, setVisible] = useState(false);
+      useEffect(() => {
+        if (!ref.current) return;
+        const obs = new IntersectionObserver(([e]) => {
+          if (e.isIntersecting) { setVisible(true); obs.disconnect(); }
+        }, { threshold: 0.12 });
+        obs.observe(ref.current);
+        return () => obs.disconnect();
+      }, []);
+      return [ref, visible];
+    }
+
+    function Reveal({ children, delay = 0 }) {
+      const [ref, visible] = useReveal();
+      return (
+        <div ref={ref} style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(20px)", transition: `opacity 900ms cubic-bezier(.2,.8,.2,1) ${delay}ms, transform 900ms cubic-bezier(.2,.8,.2,1) ${delay}ms` }}>
+          {children}
+        </div>
+      );
+    }
+
+    function CountUp({ value, prefix = "", suffix = "", decimals = 0, duration = 1600 }) {
+      const [ref, visible] = useReveal();
+      const [n, setN] = useState(0);
+      useEffect(() => {
+        if (!visible) return;
+        const start = performance.now();
+        let raf;
+        const tick = t => {
+          const p = Math.min(1, (t - start) / duration);
+          setN(value * (1 - Math.pow(1 - p, 3)));
+          if (p < 1) raf = requestAnimationFrame(tick);
+        };
+        raf = requestAnimationFrame(tick);
+        return () => cancelAnimationFrame(raf);
+      }, [visible, value, duration]);
+      return <span ref={ref}>{prefix}{n.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}{suffix}</span>;
+    }
+
+    function Masthead() {
+      return (
+        <header style={{ background: NAVY, color: CREAM, borderBottom: `3px solid ${GOLD}`, position: "relative", overflow: "hidden" }}>
+          <div style={{ position: "absolute", inset: 0, backgroundImage: `repeating-linear-gradient(90deg, transparent, transparent 80px, rgba(200,164,77,0.04) 80px, rgba(200,164,77,0.04) 81px)`, pointerEvents: "none" }} />
+          <div style={{ maxWidth: 1180, margin: "0 auto", padding: "18px 28px 14px", position: "relative", display: "flex", alignItems: "baseline", gap: 14 }}>
+            <div style={{ fontFamily: "'Playfair Display',serif", fontWeight: 900, fontSize: 38, letterSpacing: "-0.02em", lineHeight: 1, color: CREAM }}>The Ledger</div>
+            <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, letterSpacing: "0.3em", textTransform: "uppercase", color: GOLD, borderLeft: `1px solid ${GOLD}`, paddingLeft: 14, paddingBottom: 4 }}>Est. 2026 · Interactive Edition</div>
+          </div>
+        </header>
+      );
+    }
+
+    function SectionStrip() {
+      return (
+        <div style={{ background: NAVY_DEEP, color: CREAM, padding: "9px 0", fontFamily: "'DM Sans',sans-serif", fontSize: 11, letterSpacing: "0.25em", textTransform: "uppercase" }}>
+          <div style={{ maxWidth: 1180, margin: "0 auto", padding: "0 28px", display: "flex", justifyContent: "space-between" }}>
+            <span style={{ color: GOLD_SOFT }}>Banking Regulation</span>
+            <span style={{ opacity: 0.6 }}>Vol. VI · № 05 · May 2031</span>
+          </div>
+        </div>
+      );
+    }
+
+    function FigureFrame({ eyebrow, title, subtitle, source, dark, children }) {
+      return (
+        <Reveal>
+          <figure style={{ margin: "48px 0", padding: "28px 28px 22px", background: dark ? NAVY : "white", color: dark ? CREAM : INK, border: `1px solid ${dark ? NAVY_DEEP : RULE}`, position: "relative", boxShadow: dark ? "0 20px 40px -20px rgba(15,42,68,0.5)" : "0 10px 30px -18px rgba(15,42,68,0.18)" }}>
+            <div style={{ position: "absolute", top: 0, left: 0, width: 60, height: 5, background: GOLD }} />
+            <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, letterSpacing: "0.25em", textTransform: "uppercase", color: GOLD, fontWeight: 700, marginTop: 6, marginBottom: 10 }}>{eyebrow}</div>
+            <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: 24, lineHeight: 1.2, margin: "0 0 6px", color: dark ? CREAM : NAVY, fontWeight: 700 }}>{title}</h3>
+            {subtitle && <div style={{ fontFamily: "Georgia,serif", fontSize: 14, color: dark ? "rgba(245,239,225,0.7)" : MUTED, marginBottom: 20, fontStyle: "italic" }}>{subtitle}</div>}
+            <div style={{ marginTop: 8 }}>{children}</div>
+            {source && <div style={{ marginTop: 16, paddingTop: 12, borderTop: `1px solid ${dark ? "rgba(245,239,225,0.15)" : RULE}`, fontFamily: "'DM Sans',sans-serif", fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: dark ? "rgba(245,239,225,0.55)" : MUTED }}>Source: {source}</div>}
+          </figure>
+        </Reveal>
+      );
+    }
+
+    // ── Figure 1: Response Time ──────────────────────────────────
+    function ResponseTimeCollapse() {
+      const [metric, setMetric] = useState("general");
+      const metrics = {
+        general: { old: 187, new: 11, label: "All supervisory concerns" },
+        liquidity: { old: 94, new: 4, label: "Liquidity metrics" },
+      };
+      const m = metrics[metric];
+      const ratio = m.new / m.old;
+      return (
+        <FigureFrame eyebrow="Figure 1 · The headline number" title="From 187 days to 11" subtitle="Median time between a deteriorating metric first appearing in the data and a formal supervisory response." source="The Ledger, from Federal Reserve 2031 Financial Stability Report" dark>
+          <div style={{ display: "flex", gap: 8, marginBottom: 22 }}>
+            {[["general", "All concerns"], ["liquidity", "Liquidity (worst case)"]].map(([k, label]) => (
+              <button key={k} onClick={() => setMetric(k)} style={{ padding: "9px 14px", background: metric === k ? GOLD : "transparent", color: metric === k ? NAVY : GOLD, border: `1px solid ${GOLD}`, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 700, transition: "all 180ms" }}>{label}</button>
+            ))}
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+            <div style={{ padding: "22px 20px", background: "rgba(154,42,42,0.12)", border: "1px solid rgba(154,42,42,0.3)" }}>
+              <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "#FF8A8A", marginBottom: 7 }}>Periodic examination</div>
+              <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 68, fontWeight: 900, color: "#FFBDBD", letterSpacing: "-0.04em", lineHeight: 1 }}>{m.old}</div>
+              <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 12, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(245,239,225,0.7)", marginTop: 4 }}>days (median)</div>
+              <div style={{ marginTop: 20, height: 7, background: "rgba(245,239,225,0.07)" }}><div style={{ height: 7, background: `linear-gradient(90deg, ${CRIMSON}, #FF8A8A)`, width: "100%" }} /></div>
+            </div>
+            <div style={{ padding: "22px 20px", background: "rgba(200,164,77,0.12)", border: `1px solid ${GOLD}` }}>
+              <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: GOLD, marginBottom: 7 }}>Continuous supervision</div>
+              <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 68, fontWeight: 900, color: GOLD_SOFT, letterSpacing: "-0.04em", lineHeight: 1 }}><CountUp value={m.new} /></div>
+              <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 12, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(245,239,225,0.7)", marginTop: 4 }}>days (median)</div>
+              <div style={{ marginTop: 20, height: 7, background: "rgba(245,239,225,0.07)" }}><div style={{ height: 7, background: `linear-gradient(90deg, ${GOLD_DEEP}, ${GOLD})`, width: `${ratio * 100}%`, animation: "growBar 1200ms cubic-bezier(.2,.8,.2,1)" }} /></div>
+            </div>
+          </div>
+          <div style={{ marginTop: 18, padding: "13px 16px", background: "rgba(200,164,77,0.08)", borderLeft: `3px solid ${GOLD}`, fontFamily: "Georgia,serif", fontSize: 14, fontStyle: "italic", color: "rgba(245,239,225,0.88)", lineHeight: 1.55 }}>
+            A <strong style={{ color: CREAM, fontStyle: "normal" }}>{Math.round((1 - ratio) * 100)}%</strong> compression in detection-to-response time. For liquidity metrics, the median is now <strong style={{ color: GOLD, fontStyle: "normal" }}>four days</strong>.
+          </div>
+        </FigureFrame>
+      );
+    }
+
+    // ── Figure 2: Dashboard ──────────────────────────────────────
+    function SupervisoryPipeline() {
+      const [tick, setTick] = useState(0);
+      useEffect(() => {
+        const id = setInterval(() => setTick(t => t + 1), 1600);
+        return () => clearInterval(id);
+      }, []);
+      const banks = [
+        { name: "Regional Bank A", state: "OH", ratio: 0.88, status: "nominal" },
+        { name: "Community Bank B", state: "KS", ratio: 0.94, status: "nominal" },
+        { name: "Mid-Cap Bank C", state: "NC", ratio: 0.72, status: "watch" },
+        { name: "Regional Bank D", state: "TX", ratio: 0.91, status: "nominal" },
+        { name: "Community Bank E", state: "OR", ratio: 0.61, status: "alert" },
+        { name: "National Bank F", state: "NY", ratio: 0.86, status: "nominal" },
+        { name: "Regional Bank G", state: "GA", ratio: 0.83, status: "nominal" },
+        { name: "Mid-Cap Bank H", state: "IL", ratio: 0.79, status: "watch" },
+      ];
+      const sc = s => s === "alert" ? CRIMSON : s === "watch" ? GOLD : GREEN;
+      const sl = s => s === "alert" ? "ALERT" : s === "watch" ? "WATCH" : "NOMINAL";
+      return (
+        <FigureFrame eyebrow="Figure 2 · The dashboard" title="What an examiner sees now" subtitle="A stylised Supervisory Intelligence Platform view. The data streams in. The examiner reads the anomalies." source="The Ledger, illustrative, based on FFIEC SDEP specification">
+          <div style={{ background: NAVY_DEEP, color: CREAM, padding: "18px 20px", border: `1px solid ${NAVY}`, fontFamily: "'DM Sans',sans-serif" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: 12, borderBottom: "1px solid rgba(245,239,225,0.14)", marginBottom: 14 }}>
+              <div style={{ display: "flex", gap: 18 }}>
+                <div style={{ fontSize: 10, letterSpacing: "0.25em", textTransform: "uppercase", color: GOLD, fontWeight: 700 }}>● SDEP FEED · LIVE</div>
+                <div style={{ fontSize: 10, color: "rgba(245,239,225,0.5)" }}>Ingest: 4,217 institutions</div>
+              </div>
+              <div style={{ fontSize: 10, color: "rgba(245,239,225,0.5)" }}>Tick: {String(tick).padStart(4, "0")} · UTC</div>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 9, marginBottom: 14 }}>
+              {banks.map((b, i) => {
+                const flicker = (i + tick) % 7 === 0;
+                return (
+                  <div key={b.name} style={{ padding: "11px 11px", background: flicker ? `${sc(b.status)}22` : "rgba(245,239,225,0.04)", border: `1px solid ${b.status === "nominal" ? "rgba(245,239,225,0.1)" : sc(b.status)}`, transition: "background 300ms" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
+                      <span style={{ fontSize: 10, color: "rgba(245,239,225,0.9)", fontWeight: 600 }}>{b.name}</span>
+                      <span style={{ fontSize: 9, color: "rgba(245,239,225,0.45)" }}>{b.state}</span>
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+                      <span style={{ fontFamily: "'Playfair Display',serif", fontSize: 22, color: sc(b.status), fontWeight: 800, letterSpacing: "-0.02em" }}>{b.ratio.toFixed(2)}</span>
+                      <span style={{ fontSize: 8, color: sc(b.status), letterSpacing: "0.2em", fontWeight: 700 }}>● {sl(b.status)}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{ padding: "11px 13px", background: "rgba(154,42,42,0.12)", borderLeft: `3px solid ${CRIMSON}`, fontSize: 12, color: "rgba(245,239,225,0.88)", lineHeight: 1.6 }}>
+              <div style={{ fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: "#FF8A8A", fontWeight: 700, marginBottom: 5 }}>○ 1 ACTIVE ALERT</div>
+              <span style={{ color: "#FFBDBD", fontWeight: 700 }}>[E]</span> Liquidity coverage ratio trending toward threshold for 21 consecutive business days. Targeted supervisory inquiry auto-escalated to examiner queue.
+            </div>
+          </div>
+          <div style={{ marginTop: 16, display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, fontFamily: "Georgia,serif", fontSize: 12, fontStyle: "italic", color: MUTED }}>
+            <div><strong style={{ color: GREEN, fontStyle: "normal" }}>●</strong> Nominal — metrics within band.</div>
+            <div><strong style={{ color: GOLD_DEEP, fontStyle: "normal" }}>●</strong> Watch — trending toward threshold.</div>
+            <div><strong style={{ color: CRIMSON, fontStyle: "normal" }}>●</strong> Alert — breach auto-escalated.</div>
+          </div>
+        </FigureFrame>
+      );
+    }
+
+    // ── Figure 3: Intervention Funnel ────────────────────────────
+    function InterventionFunnel() {
+      const panels = [
+        { label: "Periodic examination model", informal: 34, formal: 66, dark: false },
+        { label: "Continuous supervision", informal: 71, formal: 29, dark: true },
+      ];
+      return (
+        <FigureFrame eyebrow="Figure 3 · Intervention mix" title="Catching it earlier" subtitle="Share of supervisory concerns resolved informally vs. requiring formal enforcement action." source="The Ledger, from federal banking agency annual reports">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 22 }}>
+            {panels.map((p, idx) => (
+              <div key={idx} style={{ padding: "22px 20px", background: p.dark ? NAVY : CREAM_DEEP, color: p.dark ? CREAM : INK, border: `1px solid ${p.dark ? NAVY_DEEP : RULE}` }}>
+                <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 10, letterSpacing: "0.25em", textTransform: "uppercase", color: p.dark ? GOLD : MUTED, marginBottom: 10 }}>{p.label}</div>
+                <div style={{ height: 48, display: "flex", border: `1px solid ${p.dark ? "rgba(245,239,225,0.15)" : RULE}`, marginBottom: 12 }}>
+                  <div style={{ width: `${p.informal}%`, background: GOLD, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Playfair Display',serif", fontSize: 20, fontWeight: 800, color: NAVY, animation: `grow 900ms ${idx * 200}ms both cubic-bezier(.2,.8,.2,1)`, transformOrigin: "left" }}>{p.informal}%</div>
+                  <div style={{ width: `${p.formal}%`, background: p.dark ? "rgba(154,42,42,0.6)" : "rgba(154,42,42,0.22)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Playfair Display',serif", fontSize: 20, fontWeight: 800, color: p.dark ? CREAM : CRIMSON, animation: `grow 900ms ${idx * 200 + 200}ms both cubic-bezier(.2,.8,.2,1)`, transformOrigin: "left" }}>{p.formal}%</div>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "'DM Sans',sans-serif", fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: p.dark ? "rgba(245,239,225,0.6)" : MUTED }}>
+                  <span style={{ display: "flex", alignItems: "center", gap: 5 }}><span style={{ width: 9, height: 9, background: GOLD, display: "inline-block" }} />Informal</span>
+                  <span style={{ display: "flex", alignItems: "center", gap: 5 }}><span style={{ width: 9, height: 9, background: p.dark ? "rgba(154,42,42,0.6)" : "rgba(154,42,42,0.22)", display: "inline-block" }} />Formal (MRA/MRIA)</span>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{ marginTop: 18, padding: "16px 20px", background: NAVY, color: CREAM, display: "grid", gridTemplateColumns: "auto 1fr", gap: 22, alignItems: "center" }}>
+            <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 48, fontWeight: 900, color: GOLD, letterSpacing: "-0.03em", lineHeight: 1 }}>−<CountUp value={28} />%</div>
+            <div style={{ fontFamily: "Georgia,serif", fontSize: 14, lineHeight: 1.55, color: "rgba(245,239,225,0.88)" }}>
+              <strong style={{ color: CREAM }}>Fall in formal supervisory citations</strong> since full implementation — problems are caught and resolved before they reach the severity that historically triggered formal action.
+            </div>
+          </div>
+        </FigureFrame>
+      );
+    }
+
+    // ── Figure 4: Burden Relief ──────────────────────────────────
+    function PersonIcon({ color, delay }) {
+      return (
+        <svg viewBox="0 0 24 36" style={{ width: "100%", height: "auto", animation: `pop 500ms ${delay}ms both cubic-bezier(.2,.8,.4,1.3)` }}>
+          <circle cx="12" cy="7" r="5" fill={color} />
+          <path d="M 2 36 Q 2 18 12 18 Q 22 18 22 36 Z" fill={color} />
+        </svg>
+      );
+    }
+
+    function BurdenRelief() {
+      return (
+        <FigureFrame eyebrow="Figure 4 · Burden relief" title="Seven people became two" subtitle="A mid-sized regional bank's examination management team, before and after SDEP implementation." source="The Ledger, from case interview with a $22bn regional bank in Ohio">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+            <div style={{ padding: "24px 20px", background: CREAM_DEEP, border: `1px solid ${RULE}` }}>
+              <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: MUTED, marginBottom: 11 }}>Before CSF</div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 5, marginBottom: 14 }}>
+                {Array.from({ length: 7 }).map((_, i) => <PersonIcon key={i} color={NAVY} delay={i * 80} />)}
+              </div>
+              <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 38, fontWeight: 900, color: NAVY, letterSpacing: "-0.03em", lineHeight: 1 }}>7 FTEs</div>
+              <div style={{ fontFamily: "Georgia,serif", fontSize: 13, color: MUTED, fontStyle: "italic", marginTop: 7, lineHeight: 1.55 }}>dedicated to examination management: scheduling, document production, examiner liaison.</div>
+            </div>
+            <div style={{ padding: "24px 20px", background: NAVY, color: CREAM, border: `1px solid ${NAVY_DEEP}` }}>
+              <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: GOLD, marginBottom: 11 }}>After 18 months</div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 5, marginBottom: 14 }}>
+                {Array.from({ length: 7 }).map((_, i) => <PersonIcon key={i} color={i < 2 ? GOLD : "rgba(245,239,225,0.14)"} delay={i * 80 + 500} />)}
+              </div>
+              <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 38, fontWeight: 900, color: GOLD, letterSpacing: "-0.03em", lineHeight: 1 }}>2 FTEs</div>
+              <div style={{ fontFamily: "Georgia,serif", fontSize: 13, color: "rgba(245,239,225,0.7)", fontStyle: "italic", marginTop: 7, lineHeight: 1.55 }}>Five people returned to actual compliance work. The automated feed replaced the choreography.</div>
+            </div>
+          </div>
+        </FigureFrame>
+      );
+    }
+
+    // ── Figure 5: Examiner Role Shift ────────────────────────────
+    function ExaminerRoleShift() {
+      const activities = [
+        { task: "Loan file sampling", old: 24, new: 6 },
+        { task: "Policy compliance testing", old: 18, new: 5 },
+        { task: "Call Report verification", old: 16, new: 4 },
+        { task: "Board minute analysis", old: 8, new: 3 },
+        { task: "Anomaly interpretation", old: 6, new: 28 },
+        { task: "Targeted issue review", old: 12, new: 24 },
+        { task: "Dashboard monitoring", old: 0, new: 18 },
+        { task: "Culture & governance review", old: 16, new: 12 },
+      ];
+      return (
+        <FigureFrame eyebrow="Figure 5 · The examiner's week" title="Document reviewer, then. Data interpreter, now." subtitle="Illustrative share of a junior examiner's weekly time, by activity." source="The Ledger, from federal banking agency workforce assessments">
+          <div style={{ display: "grid", gap: 11 }}>
+            {activities.map((a, i) => (
+              <div key={a.task} style={{ display: "grid", gridTemplateColumns: "200px 1fr 1fr", gap: 10, alignItems: "center" }}>
+                <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 13, fontWeight: 600, color: NAVY }}>{a.task}</div>
+                <div style={{ position: "relative", height: 20, display: "flex", justifyContent: "flex-end" }}>
+                  <div style={{ height: "100%", width: `${(a.old / 30) * 100}%`, background: NAVY_SOFT, animation: `growR 750ms ${i * 75}ms both cubic-bezier(.2,.8,.2,1)`, transformOrigin: "right" }} />
+                  <span style={{ position: "absolute", right: `${(a.old / 30) * 100 + 1}%`, top: 2, fontFamily: "'DM Sans',sans-serif", fontSize: 10, color: MUTED, paddingRight: 5 }}>{a.old}%</span>
+                </div>
+                <div style={{ position: "relative", height: 20 }}>
+                  <div style={{ height: "100%", width: `${(a.new / 30) * 100}%`, background: `linear-gradient(90deg, ${GOLD_DEEP}, ${GOLD})`, animation: `growL 750ms ${i * 75 + 280}ms both cubic-bezier(.2,.8,.2,1)`, transformOrigin: "left" }} />
+                  <span style={{ position: "absolute", left: `${(a.new / 30) * 100 + 1}%`, top: 2, fontFamily: "'DM Sans',sans-serif", fontSize: 10, color: GOLD_DEEP, fontWeight: 700, paddingLeft: 5 }}>{a.new}%</span>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "200px 1fr 1fr", gap: 10, marginTop: 12, paddingTop: 12, borderTop: `1px solid ${RULE}`, fontFamily: "'DM Sans',sans-serif", fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: MUTED }}>
+            <span />
+            <span style={{ textAlign: "right" }}>2025 examiner</span>
+            <span style={{ color: GOLD_DEEP, fontWeight: 700 }}>2031 examiner</span>
+          </div>
+        </FigureFrame>
+      );
+    }
+
+    // ── Figure 6: What Machines Miss ─────────────────────────────
+    function WhatMachinesMiss() {
+      const captured = ["Daily capital ratios", "Intraday liquidity positions", "Loan portfolio quality metrics", "Interest rate risk exposures", "Large-exposure concentrations", "Anomalous transaction patterns"];
+      const missed = ["Management culture", "Board governance quality", "Risk appetite of individual loan officers", "Informal decision-making norms", "How policy and practice diverge", "Context from years of institutional knowledge"];
+      return (
+        <FigureFrame eyebrow="Figure 6 · Signal and silence" title="What the feed captures — and what it can't" subtitle="The SDEP protocol is comprehensive on quantitative risk. The qualitative dimensions most predictive of slow-building failure are elsewhere." source="The Ledger, from FFIEC SDEP specification and supervisory research">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+            <div style={{ padding: "20px 20px", background: CREAM_DEEP, border: `1px solid ${RULE}` }}>
+              <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 9, letterSpacing: "0.25em", textTransform: "uppercase", color: GOLD_DEEP, fontWeight: 700, marginBottom: 4 }}>● Captured by SDEP</div>
+              <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 18, fontWeight: 700, color: NAVY, marginBottom: 16 }}>The quantitative surface</div>
+              <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
+                {captured.map((c, i) => (
+                  <li key={c} style={{ padding: "8px 0", borderBottom: i < captured.length - 1 ? `1px solid ${RULE}` : "none", fontFamily: "Georgia,serif", fontSize: 13, color: INK, display: "flex", gap: 9, alignItems: "baseline", animation: `slideR 450ms ${i * 70}ms both` }}>
+                    <span style={{ color: GOLD_DEEP, fontWeight: 700 }}>✓</span>{c}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div style={{ padding: "20px 20px", background: NAVY, color: CREAM, border: `1px solid ${NAVY_DEEP}` }}>
+              <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 9, letterSpacing: "0.25em", textTransform: "uppercase", color: "#FF8A8A", fontWeight: 700, marginBottom: 4 }}>○ Invisible to the feed</div>
+              <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 18, fontWeight: 700, color: CREAM, marginBottom: 16 }}>The qualitative interior</div>
+              <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
+                {missed.map((m, i) => (
+                  <li key={m} style={{ padding: "8px 0", borderBottom: i < missed.length - 1 ? "1px solid rgba(245,239,225,0.12)" : "none", fontFamily: "Georgia,serif", fontSize: 13, color: "rgba(245,239,225,0.88)", display: "flex", gap: 9, alignItems: "baseline", animation: `slideR 450ms ${i * 70 + 180}ms both` }}>
+                    <span style={{ color: "#FF8A8A", fontWeight: 700 }}>—</span>{m}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          <div style={{ marginTop: 18, padding: "13px 16px", background: "white", border: `1px solid ${RULE}`, borderLeft: `3px solid ${GOLD}`, fontFamily: "Georgia,serif", fontSize: 13, fontStyle: "italic", color: INK, lineHeight: 1.55 }}>
+            <strong style={{ fontFamily: "'Playfair Display',serif", fontStyle: "normal", color: NAVY }}>The paradox:</strong> the factors historically most predictive of slow-building institutional problems are precisely the factors the continuous data feed cannot see.
+          </div>
+        </FigureFrame>
+      );
+    }
+
+    // ── Text helpers ─────────────────────────────────────────────
+    function Para({ children, dropCap }) {
+      return (
+        <p style={{ fontFamily: "Georgia,serif", fontSize: 18, lineHeight: 1.65, color: INK, margin: "0 0 22px", textAlign: "justify", hyphens: "auto" }}>
+          {dropCap ? (
+            <>
+              <span style={{ fontFamily: "'Playfair Display',serif", fontSize: 74, lineHeight: 0.9, fontWeight: 900, float: "left", marginRight: 11, marginTop: 6, marginBottom: -8, color: NAVY }}>{typeof children === "string" ? children.charAt(0) : ""}</span>
+              {typeof children === "string" ? children.slice(1) : children}
+            </>
+          ) : children}
+        </p>
+      );
+    }
+
+    function SmallCaps({ children }) {
+      return <strong style={{ fontFamily: "'Playfair Display',serif", fontVariant: "small-caps", letterSpacing: "0.06em", fontWeight: 700, color: NAVY }}>{children}</strong>;
+    }
+
+    function SHead({ children, kicker }) {
+      return (
+        <Reveal>
+          <div style={{ margin: "52px 0 24px" }}>
+            {kicker && <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, letterSpacing: "0.28em", textTransform: "uppercase", color: GOLD_DEEP, fontWeight: 700, marginBottom: 10, display: "flex", alignItems: "center", gap: 12 }}><span style={{ display: "inline-block", width: 28, height: 1, background: GOLD_DEEP }} />{kicker}</div>}
+            <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: 30, lineHeight: 1.15, margin: 0, color: NAVY, fontWeight: 800, borderBottom: `2px solid ${NAVY}`, paddingBottom: 11 }}>{children}</h2>
+          </div>
+        </Reveal>
+      );
+    }
+
+    function PQ({ children, attribution }) {
+      return (
+        <Reveal>
+          <figure style={{ margin: "50px 0", padding: "32px 0 26px", borderTop: `2px solid ${NAVY}`, borderBottom: `1px solid ${RULE}`, position: "relative" }}>
+            <div style={{ position: "absolute", top: -21, left: 0, background: CREAM, paddingRight: 13, fontFamily: "'Playfair Display',serif", fontSize: 58, lineHeight: 1, color: GOLD, fontWeight: 900 }}>"</div>
+            <blockquote style={{ margin: 0, fontFamily: "'Playfair Display',serif", fontSize: 27, lineHeight: 1.35, color: NAVY, fontStyle: "italic", fontWeight: 500 }}>{children}</blockquote>
+            {attribution && <figcaption style={{ marginTop: 17, fontFamily: "'DM Sans',sans-serif", fontSize: 12, letterSpacing: "0.18em", textTransform: "uppercase", color: MUTED }}>— {attribution}</figcaption>}
+          </figure>
+        </Reveal>
+      );
+    }
+
+    // ── Main App ─────────────────────────────────────────────────
+    function App() {
+      return (
+        <div style={{ background: CREAM, color: INK, minHeight: "100vh", paddingBottom: 80, fontFamily: "Georgia,serif" }}>
+          <Masthead />
+          <SectionStrip />
+
+          {/* Hero */}
+          <div style={{ background: `linear-gradient(180deg, ${CREAM} 0%, ${CREAM_DEEP} 100%)`, borderBottom: `1px solid ${RULE}`, paddingTop: 48, paddingBottom: 56 }}>
+            <div style={{ maxWidth: 1180, margin: "0 auto", padding: "0 28px" }}>
+              <Reveal>
+                <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: 19, fontFamily: "'DM Sans',sans-serif", fontSize: 11, letterSpacing: "0.25em", textTransform: "uppercase", color: MUTED }}>
+                  <span style={{ background: NAVY, color: GOLD, padding: "4px 10px", fontWeight: 700 }}>Briefing</span>
+                  <span>Supervision</span>
+                  <span style={{ color: GOLD_DEEP, fontWeight: 700 }}>· Interactive</span>
+                </div>
+              </Reveal>
+              <Reveal delay={120}>
+                <h1 style={{ fontFamily: "'Playfair Display',serif", fontSize: "clamp(46px,7.5vw,106px)", lineHeight: 0.92, margin: "0 0 24px", fontWeight: 900, letterSpacing: "-0.035em", color: NAVY, maxWidth: 1000 }}>
+                  The examiner<br />who <span style={{ color: GOLD }}>never leaves</span>
+                </h1>
+              </Reveal>
+              <Reveal delay={240}>
+                <div style={{ fontFamily: "'Playfair Display',serif", fontSize: "clamp(18px,1.9vw,23px)", lineHeight: 1.4, color: MUTED, fontStyle: "italic", maxWidth: 800, marginBottom: 28 }}>
+                  Real-time API supervision has transformed bank regulation. Safety and soundness have improved dramatically. Examiners now intervene only when the data says something is wrong. The profession is still adjusting to what that means.
+                </div>
+              </Reveal>
+              <Reveal delay={360}>
+                <div style={{ display: "flex", gap: 28, flexWrap: "wrap", paddingTop: 18, borderTop: `1px solid ${RULE}`, fontFamily: "'DM Sans',sans-serif", fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: MUTED }}>
+                  <span><span style={{ color: NAVY, fontWeight: 700 }}>Washington, D.C.</span> · Kansas City · Columbus</span>
+                  <span>16-min read</span>
+                  <span>6 interactive figures</span>
+                </div>
+              </Reveal>
+            </div>
+          </div>
+
+          {/* Article */}
+          <article style={{ maxWidth: 780, margin: "0 auto", padding: "56px 28px 0", position: "relative", zIndex: 2 }}>
+            <Reveal><Para dropCap>{`For most of its 160-year history, the bank examination has operated on a rhythm that would be recognisable to a regulator from the nineteenth century. A team of examiners arrives at a financial institution, requests loan files and board minutes, spends weeks reviewing documents, issues a report, and leaves. They return, typically, in twelve to eighteen months. In between, the bank is largely on its own.`}</Para></Reveal>
+            <Reveal><Para>This is no longer how bank supervision works in the United States.</Para></Reveal>
+            <Reveal><Para>Since the phased rollout of the Federal Financial Institutions Examination Council's Continuous Supervision Framework, which began in 2028 and reached full implementation for institutions above $10bn in assets in 2030, the periodic examination has been replaced — for most routine supervisory purposes — by a permanent, automated, API-based data feed from every regulated institution to its primary supervisor. The regulator is no longer a visitor who arrives periodically. It is a presence that never leaves, reading the institution's vital signs in real time, around the clock, every day of the year.</Para></Reveal>
+            <SHead kicker="Part I">What the old system actually cost</SHead>
+            <Reveal><Para>The periodic examination was expensive in ways that were poorly understood outside the industry. A full-scope safety and soundness examination of a mid-sized regional bank typically consumed between 8,000 and 14,000 management hours across compliance, finance, risk, legal, and executive functions. The shadow it cast was equally costly: policy reviews, stress-testing schedules, and board reporting cycles were structured as much to produce documentation examiners would want to see as to actually manage the risks the documentation described.</Para></Reveal>
+            <PQ attribution="Chief compliance officer, $22bn regional bank">We had a team of seven people whose primary function was examination management. Not compliance. Not risk management. Examination management. Getting ready for the next exam and recovering from the last one.</PQ>
+          </article>
+
+          <div style={{ maxWidth: 1060, margin: "0 auto", padding: "0 28px" }}><BurdenRelief /></div>
+
+          <article style={{ maxWidth: 780, margin: "0 auto", padding: "0 28px" }}>
+            <Reveal><Para>The 2023 failures of Silicon Valley Bank and Signature Bank were the proximate political catalyst for supervisory reform. The post-mortem analyses were consistent: the supervisory framework had detected the problems, but by the time examination findings were written, reviewed, transmitted, and acted upon — a process measured in months — conditions had evolved into a catastrophic liquidity crisis that developed over forty-eight hours. The examination cycle was not built for forty-eight hours.</Para></Reveal>
+            <SHead kicker="Part II">The architecture of always-on</SHead>
+            <Reveal><Para>The Continuous Supervision Framework is, at its technical core, a standardised API specification — the Supervisory Data Exchange Protocol, or SDEP — that institutions implement in their core banking systems. The protocol defines data fields, formats, update frequencies, and authentication requirements for a continuous feed covering daily capital ratios, intraday liquidity positions, loan portfolio quality metrics, interest rate risk exposures, large exposure concentrations, and anomalous transaction patterns flagged by the institution's own AML systems.</Para></Reveal>
+          </article>
+
+          <div style={{ maxWidth: 1060, margin: "0 auto", padding: "0 28px" }}><SupervisoryPipeline /></div>
+
+          <article style={{ maxWidth: 780, margin: "0 auto", padding: "0 28px" }}>
+            <Reveal><Para>On the regulatory side, this feed is ingested by the Supervisory Intelligence Platform — an AI-driven system that monitors each institution's data stream against a dynamic threshold framework, generates alerts when metrics breach defined parameters, and escalates those alerts to human examiners for assessment. A bank performing well across all monitored dimensions may go eighteen months without a formal examiner visit. A bank whose liquidity position has been trending toward a threshold for three consecutive weeks will receive a targeted supervisory inquiry within days.</Para></Reveal>
+            <PQ attribution="Michael Torres, senior examiner, OCC">The old model was like giving a patient an ECG once a year and treating whatever the ECG showed. The new model is a continuous heart monitor. You still need cardiologists — more than ever, actually.</PQ>
+            <SHead kicker="Part III">What the data actually shows</SHead>
+            <Reveal><Para>The Federal Reserve's 2031 Financial Stability Report contains the most comprehensive assessment to date of the framework's impact. The average time between a deteriorating metric first appearing in supervisory data and a formal supervisory response has fallen from a median of 187 days to 11 days. For liquidity metrics, the median is now 4 days. Early intervention rates — supervisory concerns resolved informally before requiring formal enforcement action — have risen from 34% to 71%.</Para></Reveal>
+          </article>
+
+          <div style={{ maxWidth: 1060, margin: "0 auto", padding: "0 28px" }}><ResponseTimeCollapse /></div>
+          <div style={{ maxWidth: 1060, margin: "0 auto", padding: "0 28px" }}><InterventionFunnel /></div>
+
+          <article style={{ maxWidth: 780, margin: "0 auto", padding: "0 28px" }}>
+            <SHead kicker="Part IV">The examiner's new job</SHead>
+            <Reveal><Para>The examination workforce has not been dramatically reduced in headcount — the number of commissioned bank examiners fell by approximately 12% between 2028 and 2031, achieved primarily through attrition. The deeper change has been in what examiners do. The junior examiner of 2025 spent the majority of their time on document review: loan file sampling, policy compliance testing, Call Report verification, board minute analysis. The junior examiner of 2031 spends the majority of their time interpreting anomalies in the supervisory data feed and conducting targeted reviews generated by platform alerts.</Para></Reveal>
+          </article>
+
+          <div style={{ maxWidth: 1060, margin: "0 auto", padding: "0 28px" }}><ExaminerRoleShift /></div>
+
+          <article style={{ maxWidth: 780, margin: "0 auto", padding: "0 28px" }}>
+            <PQ attribution="Michael Torres, OCC">The junior examiner of 2025 reviewed documents. The junior examiner of 2031 interprets data streams. The knowledge base is different. The judgment required is different. The training pipeline is completely different.</PQ>
+            <SHead kicker="Part V">What the machines miss</SHead>
+            <Reveal><Para>The Supervisory Intelligence Platform is performing well by the metrics available — detecting problems earlier, triggering interventions faster, across a vastly larger number of institutions than human examiners could cover at comparable depth. It is not infallible. The platform is trained on historical supervisory data: patterns of metric behaviour that preceded past instances of bank stress. It is less well equipped to identify institutions whose risk profile is genuinely novel. The next banking crisis will almost certainly have features the current generation of supervisory AI has not been trained to recognise.</Para></Reveal>
+            <Reveal><Para>There is also the question of what the continuous data feed does not contain. The SDEP protocol captures financial metrics with considerable granularity. It does not capture management culture, board governance quality, the judgment and risk appetite of individual loan officers, or the informal norms that govern how an institution actually makes decisions when the written policy and the operational reality diverge.</Para></Reveal>
+          </article>
+
+          <div style={{ maxWidth: 1060, margin: "0 auto", padding: "0 28px" }}><WhatMachinesMiss /></div>
+
+          <article style={{ maxWidth: 780, margin: "0 auto", padding: "0 28px" }}>
+            <PQ attribution="Dr. Patricia Huang, Georgetown Law">The danger is not that the machines are wrong. The danger is that we stop asking the questions the machines can't answer.</PQ>
+            <Reveal><Para>The concern most often voiced by bankers and academic economists is not that continuous supervision is wrong in any individual case. It is that the same message, delivered simultaneously by the same platform to every institution in the country, produces a convergence of risk management behaviour that may itself become a systemic vulnerability. When every bank manages its portfolio to the same metric thresholds, the diversity of approach that historically provided resilience to the system disappears.</Para></Reveal>
+            <Reveal><Para>Whether this comes at an acceptable systemic cost is a question the framework's designers acknowledge they cannot yet answer with confidence. The data required — a sufficiently long track record across a full credit cycle — does not yet exist. The next recession will be the test. In the meantime, the examiner who never leaves is watching. And the question of whether constant observation changes the behaviour being observed is one that keeps the thoughtful regulators up at night, in the quiet hours between the alerts.</Para></Reveal>
+            <Reveal><div style={{ textAlign: "center", margin: "30px 0 18px", fontFamily: "'Playfair Display',serif", fontSize: 20, color: GOLD, fontWeight: 900, letterSpacing: "0.4em" }}>§ § §</div></Reveal>
+            <Reveal>
+              <div style={{ marginTop: 38, padding: "20px 22px", background: CREAM_DEEP, borderLeft: `3px solid ${NAVY_SOFT}`, fontFamily: "Georgia,serif", fontSize: 13, color: MUTED, fontStyle: "italic", lineHeight: 1.6 }}>
+                This is a work of narrative fiction set in 2031, extrapolated from real regulatory trends, supervisory frameworks, and financial stability research. The Continuous Supervision Framework, the Supervisory Data Exchange Protocol, and the Supervisory Intelligence Platform are fictional constructs. All named individuals are fictional.
+              </div>
+            </Reveal>
+            <Reveal>
+              <div style={{ marginTop: 40, paddingTop: 22, borderTop: `2px solid ${NAVY}`, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 14, fontFamily: "'DM Sans',sans-serif", fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: MUTED }}>
+                <span><span style={{ color: NAVY, fontWeight: 700 }}>The Ledger</span> <span style={{ color: GOLD_DEEP }}>· Interactive</span></span>
+                <span>Filed from D.C., Kansas City &amp; Columbus</span>
+              </div>
+            </Reveal>
+          </article>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
