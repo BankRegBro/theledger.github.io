@@ -9,167 +9,176 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet" />
 
   <style>
-    /* ─── TOKENS ──────────────────────────────────────────────── */
+    /* ─── TOKENS ─────────────────────────────────────────── */
     :root {
       --navy:        #0b1f3a;
       --navy-mid:    #112848;
       --navy-light:  #1a3660;
+      --navy-card:   #0f2244;
       --gold:        #c9a84c;
       --gold-bright: #e2c06a;
       --gold-dim:    #8a6d2f;
       --cream:       #f5f0e8;
-      --parchment:   #ede7d9;
-      --ink:         #1c1c1c;
       --mist:        #d4cfc7;
-      --rule:        rgba(201,168,76,0.35);
+      --mist-dim:    #8a9aaa;
+      --rule:        rgba(201,168,76,0.25);
+
+      /* Category palette */
+      --cat-interactive: #4a90d9;
+      --cat-policy:      #c9a84c;
+      --cat-fiction:     #9060c0;
+      --cat-history:     #4a9870;
+      --cat-supervision: #c97040;
+      --cat-digital:     #40b0c0;
+      --cat-explainer:   #a060a0;
+      --cat-compliance:  #d06060;
+      --cat-tracker:     #7090d0;
     }
 
-    /* ─── RESET & BASE ────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     html { scroll-behavior: smooth; }
 
     body {
       background-color: var(--navy);
       color: var(--cream);
       font-family: 'Crimson Pro', Georgia, serif;
-      font-size: 18px;
+      font-size: 17px;
       line-height: 1.6;
       min-height: 100vh;
       overflow-x: hidden;
     }
 
-    /* ─── BACKGROUND TEXTURE ──────────────────────────────────── */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
-      background-image:
-        repeating-linear-gradient(
-          0deg,
-          transparent,
-          transparent 59px,
-          rgba(201,168,76,0.04) 59px,
-          rgba(201,168,76,0.04) 60px
-        );
+      background-image: repeating-linear-gradient(
+        0deg, transparent, transparent 59px,
+        rgba(201,168,76,0.03) 59px, rgba(201,168,76,0.03) 60px
+      );
       pointer-events: none;
       z-index: 0;
     }
 
-    /* ─── MASTHEAD ────────────────────────────────────────────── */
+    /* ─── MASTHEAD ───────────────────────────────────────── */
     .masthead {
-      position: relative;
-      z-index: 10;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--navy);
       border-bottom: 1px solid var(--gold);
       padding: 0 4vw;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
     }
 
     .masthead-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 1rem 0 0.75rem;
+      padding: 0.5rem 0;
       border-bottom: 1px solid var(--rule);
+      flex-wrap: wrap;
+      gap: 0.5rem;
     }
 
     .issue-info {
       font-family: 'Cinzel', serif;
-      font-size: 0.65rem;
+      font-size: 0.58rem;
       letter-spacing: 0.15em;
       color: var(--gold-dim);
       text-transform: uppercase;
     }
 
-    .masthead-center {
-      text-align: center;
-      padding: 2.5rem 0 1.5rem;
-    }
-
-    .masthead-rule-top {
+    .masthead-main {
       display: flex;
       align-items: center;
-      gap: 1rem;
-      margin-bottom: 1.2rem;
+      justify-content: space-between;
+      padding: 0.9rem 0;
+      gap: 2rem;
+      flex-wrap: wrap;
     }
-    .masthead-rule-top::before,
-    .masthead-rule-top::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--gold);
-    }
-    .masthead-rule-top span {
-      font-family: 'Cinzel', serif;
-      font-size: 0.6rem;
-      letter-spacing: 0.3em;
-      color: var(--gold);
-      text-transform: uppercase;
-    }
+
+    .masthead-identity { flex-shrink: 0; }
 
     .site-title {
       font-family: 'Cinzel', serif;
-      font-size: clamp(3.5rem, 9vw, 7rem);
+      font-size: clamp(1.8rem, 4vw, 3rem);
       font-weight: 700;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.08em;
       color: var(--gold);
       line-height: 1;
-      text-shadow: 0 0 60px rgba(201,168,76,0.2);
-      animation: fadeDown 0.9s ease both;
+      text-shadow: 0 0 40px rgba(201,168,76,0.15);
     }
 
     .site-tagline {
       font-family: 'Cormorant Garamond', serif;
       font-style: italic;
-      font-size: clamp(1rem, 2.5vw, 1.35rem);
-      color: var(--mist);
+      font-size: 0.85rem;
+      color: var(--mist-dim);
       letter-spacing: 0.04em;
-      margin-top: 0.6rem;
-      animation: fadeDown 0.9s 0.15s ease both;
+      margin-top: 0.2rem;
     }
 
-    .masthead-rule-bottom {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-top: 1.4rem;
-    }
-    .masthead-rule-bottom::before,
-    .masthead-rule-bottom::after {
-      content: '';
+    /* ─── SEARCH BAR ─────────────────────────────────────── */
+    .search-wrap {
       flex: 1;
-      height: 1px;
-      background: var(--gold);
+      max-width: 340px;
+      position: relative;
     }
-    .ornament {
-      color: var(--gold);
-      font-size: 1.1rem;
+
+    .search-input {
+      width: 100%;
+      background: var(--navy-mid);
+      border: 1px solid rgba(201,168,76,0.2);
+      color: var(--cream);
+      font-family: 'Crimson Pro', serif;
+      font-size: 0.85rem;
+      padding: 0.55rem 1rem 0.55rem 2.4rem;
+      outline: none;
+      transition: border-color 0.2s;
+      letter-spacing: 0.02em;
+    }
+
+    .search-input::placeholder { color: var(--mist-dim); }
+    .search-input:focus { border-color: var(--gold); }
+
+    .search-icon {
+      position: absolute;
+      left: 0.8rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gold-dim);
+      font-size: 0.75rem;
+      pointer-events: none;
     }
 
     .masthead-nav {
       display: flex;
-      justify-content: center;
-      gap: 2.5rem;
-      padding: 0.75rem 0;
+      justify-content: flex-start;
+      gap: 2rem;
+      padding: 0.55rem 0;
+      flex-wrap: wrap;
+      border-top: 1px solid var(--rule);
     }
 
     .masthead-nav a {
       font-family: 'Cinzel', serif;
-      font-size: 0.62rem;
+      font-size: 0.56rem;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: var(--mist);
+      color: var(--mist-dim);
       text-decoration: none;
       transition: color 0.2s;
     }
     .masthead-nav a:hover { color: var(--gold-bright); }
 
-    /* ─── HERO BANNER ─────────────────────────────────────────── */
+    /* ─── HERO BANNER ────────────────────────────────────── */
     .hero-banner {
       position: relative;
       z-index: 5;
       background: linear-gradient(135deg, var(--navy-light) 0%, var(--navy-mid) 60%, var(--navy) 100%);
       border-bottom: 1px solid var(--rule);
-      padding: 3.5rem 4vw;
+      padding: 2.5rem 4vw 2rem;
       text-align: center;
       overflow: hidden;
     }
@@ -177,340 +186,458 @@
     .hero-banner::after {
       content: '';
       position: absolute;
-      bottom: -1px;
-      left: 0;
-      right: 0;
-      height: 3px;
+      bottom: -1px; left: 0; right: 0;
+      height: 2px;
       background: linear-gradient(90deg, transparent, var(--gold), transparent);
     }
 
     .hero-eyebrow {
       font-family: 'Cinzel', serif;
-      font-size: 0.6rem;
+      font-size: 0.55rem;
       letter-spacing: 0.3em;
       text-transform: uppercase;
       color: var(--gold);
-      margin-bottom: 1rem;
+      margin-bottom: 0.75rem;
     }
 
     .hero-headline {
       font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(1.6rem, 4vw, 2.8rem);
+      font-size: clamp(1.4rem, 3.5vw, 2.4rem);
       font-weight: 300;
-      line-height: 1.25;
+      line-height: 1.3;
       color: var(--cream);
-      max-width: 700px;
-      margin: 0 auto 1rem;
-      letter-spacing: 0.01em;
+      max-width: 660px;
+      margin: 0 auto 0.75rem;
     }
 
-    .hero-headline em {
-      color: var(--gold-bright);
-      font-style: italic;
-    }
+    .hero-headline em { color: var(--gold-bright); font-style: italic; }
 
     .hero-sub {
-      font-size: 1rem;
-      color: var(--mist);
-      max-width: 560px;
+      font-size: 0.95rem;
+      color: var(--mist-dim);
+      max-width: 520px;
       margin: 0 auto;
       font-weight: 300;
     }
 
-    /* ─── MAIN LAYOUT ─────────────────────────────────────────── */
-    main {
+    /* ─── FILTER BAR ─────────────────────────────────────── */
+    .filter-bar {
       position: relative;
       z-index: 5;
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 3rem 4vw 5rem;
-    }
-
-    /* ─── SECTION HEADERS ─────────────────────────────────────── */
-    .section-header {
+      background: var(--navy-mid);
+      border-bottom: 1px solid var(--rule);
+      padding: 0.75rem 4vw;
       display: flex;
       align-items: center;
-      gap: 1.2rem;
-      margin-bottom: 2rem;
+      gap: 0.5rem;
+      flex-wrap: wrap;
     }
 
-    .section-label {
+    .filter-label {
       font-family: 'Cinzel', serif;
-      font-size: 0.6rem;
-      letter-spacing: 0.3em;
+      font-size: 0.5rem;
+      letter-spacing: 0.2em;
+      color: var(--gold-dim);
       text-transform: uppercase;
-      color: var(--gold);
+      margin-right: 0.25rem;
       white-space: nowrap;
     }
 
-    .section-rule {
-      flex: 1;
-      height: 1px;
-      background: linear-gradient(90deg, var(--gold-dim), transparent);
+    .filter-btn {
+      font-family: 'Cinzel', serif;
+      font-size: 0.48rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.75rem;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--mist-dim);
+      cursor: pointer;
+      transition: all 0.18s ease;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
     }
 
-    /* ─── ARTIFACT GRID ───────────────────────────────────────── */
+    .filter-btn:hover {
+      color: var(--cream);
+      border-color: rgba(201,168,76,0.25);
+    }
+
+    .filter-btn.active {
+      background: var(--gold);
+      color: var(--navy);
+      border-color: var(--gold);
+    }
+
+    .filter-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .results-count {
+      margin-left: auto;
+      font-family: 'Cinzel', serif;
+      font-size: 0.5rem;
+      letter-spacing: 0.1em;
+      color: var(--gold-dim);
+      white-space: nowrap;
+    }
+
+    /* ─── MAIN ───────────────────────────────────────────── */
+    main {
+      position: relative;
+      z-index: 5;
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 2.5rem 4vw 5rem;
+    }
+
+    /* ─── NO RESULTS ─────────────────────────────────────── */
+    .no-results {
+      display: none;
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--mist-dim);
+    }
+
+    .no-results.visible { display: block; }
+
+    .no-results p {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.3rem;
+    }
+
+    /* ─── ARTIFACT GRID ──────────────────────────────────── */
     .artifact-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 1.5px;
       background: var(--rule);
       border: 1px solid var(--rule);
-      margin-bottom: 4rem;
     }
 
-    /* ─── ARTIFACT CARD ───────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .artifact-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 580px) {
+      .artifact-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ─── CARD ───────────────────────────────────────────── */
     .card {
-      background: var(--navy-mid);
-      padding: 2rem 1.8rem;
+      background: var(--navy-card);
+      padding: 1.6rem 1.5rem 1.4rem;
       text-decoration: none;
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
+      gap: 0.6rem;
       position: relative;
-      transition: background 0.25s;
       overflow: hidden;
+      transition: background 0.22s ease, transform 0.18s ease, box-shadow 0.22s ease;
+      border-top: 3px solid transparent;
       cursor: pointer;
-    }
-
-    .card::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 3px;
-      background: var(--gold);
-      transform: scaleY(0);
-      transform-origin: bottom;
-      transition: transform 0.3s ease;
     }
 
     .card:hover {
       background: var(--navy-light);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+      z-index: 2;
     }
 
-    .card:hover::before {
-      transform: scaleY(1);
+    /* Category top borders */
+    .card[data-cat="interactive"]  { border-top-color: var(--cat-interactive); }
+    .card[data-cat="policy"]       { border-top-color: var(--cat-policy); }
+    .card[data-cat="fiction"]      { border-top-color: var(--cat-fiction); }
+    .card[data-cat="history"]      { border-top-color: var(--cat-history); }
+    .card[data-cat="supervision"]  { border-top-color: var(--cat-supervision); }
+    .card[data-cat="digital"]      { border-top-color: var(--cat-digital); }
+    .card[data-cat="explainer"]    { border-top-color: var(--cat-explainer); }
+    .card[data-cat="compliance"]   { border-top-color: var(--cat-compliance); }
+    .card[data-cat="tracker"]      { border-top-color: var(--cat-tracker); }
+
+    /* Hidden state for filtering */
+    .card.hidden {
+      display: none;
+    }
+
+    /* ─── CARD HEADER ROW ────────────────────────────────── */
+    .card-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
     }
 
     .card-tag {
       font-family: 'Cinzel', serif;
-      font-size: 0.55rem;
-      letter-spacing: 0.25em;
+      font-size: 0.46rem;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: var(--gold);
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.4rem;
     }
 
-    .card-tag::after {
-      content: '';
-      display: inline-block;
-      width: 1.5rem;
-      height: 1px;
-      background: var(--gold-dim);
+    .cat-pip {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      flex-shrink: 0;
     }
 
+    .card-format {
+      font-family: 'Cinzel', serif;
+      font-size: 0.42rem;
+      letter-spacing: 0.1em;
+      color: var(--navy);
+      padding: 0.15rem 0.45rem;
+      border-radius: 2px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* ─── CARD TITLE ─────────────────────────────────────── */
     .card-title {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1.35rem;
+      font-size: 1.2rem;
       font-weight: 600;
       color: var(--cream);
-      line-height: 1.3;
+      line-height: 1.25;
       transition: color 0.2s;
     }
 
-    .card:hover .card-title {
-      color: var(--gold-bright);
-    }
+    .card:hover .card-title { color: var(--gold-bright); }
 
+    /* ─── CARD DESC ──────────────────────────────────────── */
     .card-desc {
-      font-size: 0.9rem;
-      color: var(--mist);
+      font-size: 0.85rem;
+      color: var(--mist-dim);
       line-height: 1.55;
       font-weight: 300;
       flex: 1;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
+    /* ─── CARD META ──────────────────────────────────────── */
     .card-meta {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding-top: 0.75rem;
-      border-top: 1px solid var(--rule);
+      padding-top: 0.65rem;
+      border-top: 1px solid rgba(201,168,76,0.12);
       margin-top: auto;
     }
 
     .card-date {
       font-family: 'Cinzel', serif;
-      font-size: 0.55rem;
+      font-size: 0.48rem;
       letter-spacing: 0.12em;
       color: var(--gold-dim);
     }
 
+    .card-time {
+      font-family: 'Cinzel', serif;
+      font-size: 0.44rem;
+      letter-spacing: 0.08em;
+      color: var(--mist-dim);
+    }
+
     .card-arrow {
-      width: 28px;
-      height: 28px;
-      border: 1px solid var(--rule);
+      width: 26px;
+      height: 26px;
+      border: 1px solid rgba(201,168,76,0.2);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       color: var(--gold-dim);
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       transition: all 0.2s;
+      flex-shrink: 0;
     }
 
     .card:hover .card-arrow {
       border-color: var(--gold);
       color: var(--gold);
-      background: rgba(201,168,76,0.1);
+      background: rgba(201,168,76,0.08);
     }
 
-    /* ─── FEATURED CARD (SPAN 2) ──────────────────────────────── */
+    /* ─── FEATURED CARD ──────────────────────────────────── */
     .card.featured {
       grid-column: span 2;
       flex-direction: row;
-      gap: 2rem;
+      gap: 1.8rem;
       align-items: flex-start;
-      background: linear-gradient(135deg, var(--navy-light), var(--navy-mid));
+      background: linear-gradient(135deg, var(--navy-light) 0%, var(--navy-card) 100%);
+      padding: 2rem;
     }
 
-    @media (max-width: 760px) {
-      .card.featured {
-        grid-column: span 1;
-        flex-direction: column;
-      }
+    @media (max-width: 900px) {
+      .card.featured { grid-column: span 2; }
     }
 
-    .card.featured .card-title {
-      font-size: 1.7rem;
+    @media (max-width: 580px) {
+      .card.featured { grid-column: span 1; flex-direction: column; }
     }
 
-    .card.featured .card-featured-badge {
-      font-family: 'Cinzel', serif;
-      font-size: 0.5rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--navy);
-      background: var(--gold);
-      padding: 0.25rem 0.6rem;
-      display: inline-block;
-      margin-bottom: 0.5rem;
+    .card.featured .card-title { font-size: 1.5rem; }
+
+    .card.featured .card-desc {
+      -webkit-line-clamp: 4;
     }
 
-    .card.featured .card-body {
-      flex: 1;
-    }
-
-    .card.featured .card-accent {
-      width: 80px;
+    .featured-accent {
+      width: 60px;
       border-right: 1px solid var(--rule);
       display: flex;
-      align-items: flex-start;
-      justify-content: center;
+      flex-direction: column;
+      align-items: center;
       padding-top: 0.25rem;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 580px) {
+      .featured-accent { display: none; }
     }
 
     .roman-numeral {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 3rem;
+      font-size: 2.8rem;
       font-weight: 300;
-      color: var(--rule);
+      color: rgba(201,168,76,0.18);
       line-height: 1;
     }
 
-    /* ─── ADD ARTIFACT BUTTON ─────────────────────────────────── */
+    .featured-badge {
+      font-family: 'Cinzel', serif;
+      font-size: 0.42rem;
+      letter-spacing: 0.2em;
+      color: var(--navy);
+      background: var(--gold);
+      padding: 0.2rem 0.5rem;
+      display: inline-block;
+      margin-bottom: 0.3rem;
+    }
+
+    .featured-body { flex: 1; display: flex; flex-direction: column; gap: 0.6rem; }
+
+    /* ─── ADD STRIP ──────────────────────────────────────── */
     .add-strip {
-      background: transparent;
-      border: 1px dashed var(--rule);
-      padding: 2rem;
+      border: 1px dashed rgba(201,168,76,0.15);
+      padding: 1.5rem;
       text-align: center;
-      margin-bottom: 4rem;
+      margin-top: 2.5rem;
       transition: border-color 0.2s;
     }
     .add-strip:hover { border-color: var(--gold-dim); }
-
     .add-strip p {
       font-family: 'Cinzel', serif;
-      font-size: 0.6rem;
-      letter-spacing: 0.25em;
+      font-size: 0.52rem;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
       color: var(--gold-dim);
     }
-
     .add-strip code {
       font-family: 'Courier New', monospace;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: var(--gold-dim);
       background: rgba(201,168,76,0.06);
-      padding: 0.15rem 0.4rem;
-      border-radius: 2px;
+      padding: 0.1rem 0.35rem;
     }
 
-    /* ─── FOOTER ──────────────────────────────────────────────── */
+    /* ─── FOOTER ─────────────────────────────────────────── */
     footer {
       position: relative;
       z-index: 5;
       border-top: 1px solid var(--gold);
-      padding: 2rem 4vw;
+      padding: 1.5rem 4vw;
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 1rem;
+      gap: 0.75rem;
     }
 
     .footer-brand {
       font-family: 'Cinzel', serif;
-      font-size: 1.1rem;
+      font-size: 1rem;
       letter-spacing: 0.1em;
       color: var(--gold);
     }
 
     .footer-copy {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: var(--gold-dim);
       letter-spacing: 0.05em;
     }
 
-    /* ─── ANIMATIONS ──────────────────────────────────────────── */
-    @keyframes fadeDown {
-      from { opacity: 0; transform: translateY(-12px); }
-      to   { opacity: 1; transform: translateY(0); }
+    /* ─── LEGEND ─────────────────────────────────────────── */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding: 1rem 4vw;
+      background: var(--navy-mid);
+      border-bottom: 1px solid var(--rule);
+      position: relative;
+      z-index: 5;
     }
 
-    .card {
-      animation: cardIn 0.5s ease both;
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: 'Cinzel', serif;
+      font-size: 0.45rem;
+      letter-spacing: 0.1em;
+      color: var(--mist-dim);
+      text-transform: uppercase;
     }
-    .card:nth-child(1)  { animation-delay: 0.05s; }
-    .card:nth-child(2)  { animation-delay: 0.10s; }
-    .card:nth-child(3)  { animation-delay: 0.15s; }
-    .card:nth-child(4)  { animation-delay: 0.20s; }
-    .card:nth-child(5)  { animation-delay: 0.25s; }
-    .card:nth-child(6)  { animation-delay: 0.30s; }
-    .card:nth-child(7)  { animation-delay: 0.35s; }
-    .card:nth-child(8)  { animation-delay: 0.40s; }
 
+    .legend-pip {
+      width: 8px;
+      height: 3px;
+      border-radius: 1px;
+    }
+
+    /* ─── ANIMATIONS ─────────────────────────────────────── */
     @keyframes cardIn {
-      from { opacity: 0; transform: translateY(16px); }
+      from { opacity: 0; transform: translateY(12px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* ─── RESPONSIVE ──────────────────────────────────────────── */
-    @media (max-width: 600px) {
-      .artifact-grid { grid-template-columns: 1fr; }
-      .masthead-nav { gap: 1.2rem; flex-wrap: wrap; }
-      footer { flex-direction: column; text-align: center; }
-    }
+    .card { animation: cardIn 0.4s ease both; }
+    .card:nth-child(1)  { animation-delay: 0.04s; }
+    .card:nth-child(2)  { animation-delay: 0.08s; }
+    .card:nth-child(3)  { animation-delay: 0.12s; }
+    .card:nth-child(4)  { animation-delay: 0.16s; }
+    .card:nth-child(5)  { animation-delay: 0.20s; }
+    .card:nth-child(6)  { animation-delay: 0.24s; }
+    .card:nth-child(7)  { animation-delay: 0.28s; }
+    .card:nth-child(8)  { animation-delay: 0.32s; }
+    .card:nth-child(9)  { animation-delay: 0.36s; }
+    .card:nth-child(10) { animation-delay: 0.40s; }
+    .card:nth-child(11) { animation-delay: 0.44s; }
+    .card:nth-child(12) { animation-delay: 0.48s; }
+    .card:nth-child(13) { animation-delay: 0.52s; }
+    .card:nth-child(14) { animation-delay: 0.56s; }
+    .card:nth-child(15) { animation-delay: 0.60s; }
   </style>
 </head>
-
 <body>
 
-  <!-- ═══ MASTHEAD ════════════════════════════════════════════ -->
+  <!-- ═══ MASTHEAD ══════════════════════════════════════════ -->
   <header class="masthead">
     <div class="masthead-top">
       <span class="issue-info">Financial Policy &amp; Innovation</span>
@@ -518,16 +645,21 @@
       <span class="issue-info">Vol. I</span>
     </div>
 
-    <div class="masthead-center">
-      <div class="masthead-rule-top">
-        <span>Est. 2025</span>
+    <div class="masthead-main">
+      <div class="masthead-identity">
+        <div class="site-title">The Ledger</div>
+        <div class="site-tagline">Ideas at the Frontier of Financial Services</div>
       </div>
 
-      <div class="site-title">The Ledger</div>
-      <div class="site-tagline">Ideas at the Frontier of Financial Services</div>
-
-      <div class="masthead-rule-bottom">
-        <span class="ornament">❧</span>
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input
+          class="search-input"
+          type="text"
+          id="searchInput"
+          placeholder="Search artifacts..."
+          autocomplete="off"
+        />
       </div>
     </div>
 
@@ -540,7 +672,7 @@
     </nav>
   </header>
 
-  <!-- ═══ HERO ═════════════════════════════════════════════════ -->
+  <!-- ═══ HERO ══════════════════════════════════════════════ -->
   <section class="hero-banner">
     <div class="hero-eyebrow">Curated Analysis &amp; Research</div>
     <h1 class="hero-headline">
@@ -551,230 +683,441 @@
     </p>
   </section>
 
-  <!-- ═══ MAIN ══════════════════════════════════════════════════ -->
+  <!-- ═══ FILTER BAR ════════════════════════════════════════ -->
+  <div class="filter-bar" id="filterBar">
+    <span class="filter-label">Filter:</span>
+    <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">All</button>
+    <button class="filter-btn" data-filter="interactive" onclick="setFilter('interactive')">
+      <span class="filter-dot" style="background:var(--cat-interactive)"></span>Interactive
+    </button>
+    <button class="filter-btn" data-filter="policy" onclick="setFilter('policy')">
+      <span class="filter-dot" style="background:var(--cat-policy)"></span>Policy Analysis
+    </button>
+    <button class="filter-btn" data-filter="supervision" onclick="setFilter('supervision')">
+      <span class="filter-dot" style="background:var(--cat-supervision)"></span>Supervision
+    </button>
+    <button class="filter-btn" data-filter="digital" onclick="setFilter('digital')">
+      <span class="filter-dot" style="background:var(--cat-digital)"></span>Digital Assets
+    </button>
+    <button class="filter-btn" data-filter="compliance" onclick="setFilter('compliance')">
+      <span class="filter-dot" style="background:var(--cat-compliance)"></span>Compliance
+    </button>
+    <button class="filter-btn" data-filter="fiction" onclick="setFilter('fiction')">
+      <span class="filter-dot" style="background:var(--cat-fiction)"></span>Fiction
+    </button>
+    <button class="filter-btn" data-filter="history" onclick="setFilter('history')">
+      <span class="filter-dot" style="background:var(--cat-history)"></span>History
+    </button>
+    <button class="filter-btn" data-filter="tracker" onclick="setFilter('tracker')">
+      <span class="filter-dot" style="background:var(--cat-tracker)"></span>Tracker
+    </button>
+    <span class="results-count" id="resultsCount">15 artifacts</span>
+  </div>
+
+  <!-- ═══ LEGEND ════════════════════════════════════════════ -->
+  <div class="legend">
+    <div class="legend-item"><span class="legend-pip" style="background:var(--cat-interactive)"></span>Interactive</div>
+    <div class="legend-item"><span class="legend-pip" style="background:var(--cat-policy)"></span>Policy Analysis</div>
+    <div class="legend-item"><span class="legend-pip" style="background:var(--cat-supervision)"></span>Supervision</div>
+    <div class="legend-item"><span class="legend-pip" style="background:var(--cat-digital)"></span>Digital Assets</div>
+    <div class="legend-item"><span class="legend-pip" style="background:var(--cat-compliance)"></span>Compliance</div>
+    <div class="legend-item"><span class="legend-pip" style="background:var(--cat-fiction)"></span>Fiction</div>
+    <div class="legend-item"><span class="legend-pip" style="background:var(--cat-history)"></span>History</div>
+    <div class="legend-item"><span class="legend-pip" style="background:var(--cat-tracker)"></span>Tracker</div>
+  </div>
+
+  <!-- ═══ MAIN ══════════════════════════════════════════════ -->
   <main>
+    <div class="artifact-grid" id="artifactGrid">
 
-    <!-- ── SECTION: ALL ARTIFACTS ─────────────────────────────── -->
-    <div class="section-header" id="supervision">
-      <span class="section-label">All Artifacts</span>
-      <div class="section-rule"></div>
-    </div>
-
-    <div class="artifact-grid">
-
-      <!-- CARD 1 — TPRM (Featured) -->
-      <a class="card featured" href="artifacts/third-party-risk-management.html" target="_blank" rel="noopener">
-        <div class="card-accent">
+      <!-- ── CARD 1: TPRM FEATURED ──────────────────────── -->
+      <a class="card featured"
+         href="artifacts/third-party-risk-management.html"
+         target="_blank" rel="noopener"
+         data-cat="interactive"
+         data-title="third party risk management lifecycle tprm"
+         id="supervision">
+        <div class="featured-accent">
           <span class="roman-numeral">I</span>
         </div>
-        <div class="card-body">
-          <div class="card-featured-badge">Interactive</div>
-          <span class="card-tag">Supervision · Third-Party Risk</span>
+        <div class="featured-body">
+          <div>
+            <span class="featured-badge">Featured</span>
+          </div>
+          <div class="card-header-row">
+            <span class="card-tag">
+              <span class="cat-pip" style="background:var(--cat-interactive)"></span>
+              Interactive · Supervision
+            </span>
+            <span class="card-format" style="background:var(--cat-interactive)">Interactive Tool</span>
+          </div>
           <div class="card-title">Third-Party Risk Management Lifecycle</div>
           <div class="card-desc">
-            A practical, interactive guide to the five-stage TPRM lifecycle under the 2023 interagency guidance — with four realistic scenarios covering BaaS, core processors, AI vendors, and data aggregators. Walk through planning, due diligence, contract negotiation, ongoing monitoring, and exit, stage by stage.
+            A practical, interactive guide to the five-stage TPRM lifecycle under the 2023 interagency guidance — with four realistic scenarios covering BaaS, core processors, AI vendors, and data aggregators. Walk through planning, due diligence, contract negotiation, ongoing monitoring, and exit stage by stage.
           </div>
           <div class="card-meta">
             <span class="card-date">2026</span>
+            <span class="card-time">Interactive · 5 Scenarios</span>
             <span class="card-arrow">→</span>
           </div>
         </div>
       </a>
 
-      <!-- CARD 2 — Payments System -->
-      <a class="card" href="artifacts/press-start-to-pay.html" target="_blank" rel="noopener" id="payments">
-        <span class="card-tag">Interactive · Payments</span>
+      <!-- ── CARD 2: PAYMENTS SYSTEM ─────────────────────── -->
+      <a class="card"
+         href="artifacts/press-start-to-pay.html"
+         target="_blank" rel="noopener"
+         data-cat="interactive"
+         data-title="payments system evolves history us payments"
+         id="payments">
+        <div class="card-header-row">
+          <span class="card-tag">
+            <span class="cat-pip" style="background:var(--cat-interactive)"></span>
+            Interactive · Payments
+          </span>
+          <span class="card-format" style="background:var(--cat-interactive)">Interactive Tool</span>
+        </div>
         <div class="card-title">The Payments System Evolves</div>
         <div class="card-desc">
           The evolution of the U.S. payments system — from cash and checks through ACH, wires, real-time rails, and stablecoins. Seven eras of infrastructure, each with mechanics, key risks, and the regulatory framework that governs it.
         </div>
         <div class="card-meta">
           <span class="card-date">2026</span>
+          <span class="card-time">7 Eras · Interactive</span>
           <span class="card-arrow">→</span>
         </div>
       </a>
 
-      <!-- CARD 3 — The Day the Keys Fell -->
-      <a class="card" href="artifacts/the-day-the-keys-fell.html" target="_blank" rel="noopener" id="fiction">
-        <span class="card-tag">Fiction · Cyber Risk</span>
+      <!-- ── CARD 3: THE DAY THE KEYS FELL ───────────────── -->
+      <a class="card"
+         href="artifacts/the-day-the-keys-fell.html"
+         target="_blank" rel="noopener"
+         data-cat="fiction"
+         data-title="day keys fell cyber risk community bank ransomware fiction"
+         id="fiction">
+        <div class="card-header-row">
+          <span class="card-tag">
+            <span class="cat-pip" style="background:var(--cat-fiction)"></span>
+            Fiction · Cyber Risk
+          </span>
+          <span class="card-format" style="background:var(--cat-fiction)">Short Story</span>
+        </div>
         <div class="card-title">The Day the Keys Fell</div>
         <div class="card-desc">
           A fictional story about cyber risk at a community bank — the morning a ransomware attack encrypts the core, the decisions that follow, and what happens when a small institution discovers how thin the line is between operational and existential risk.
         </div>
         <div class="card-meta">
           <span class="card-date">2026</span>
+          <span class="card-time">~12 min read</span>
           <span class="card-arrow">→</span>
         </div>
       </a>
 
-      <!-- CARD 4 — Model Risk Management -->
-      <a class="card" href="artifacts/model-risk-management-2026.html" target="_blank" rel="noopener" id="risk">
-        <span class="card-tag">Policy Analysis · Model Risk</span>
+      <!-- ── CARD 4: MODEL RISK MANAGEMENT ───────────────── -->
+      <a class="card"
+         href="artifacts/model-risk-management-2026.html"
+         target="_blank" rel="noopener"
+         data-cat="policy"
+         data-title="model risk management guidance 2026 SR 11-7 AI machine learning"
+         id="risk">
+        <div class="card-header-row">
+          <span class="card-tag">
+            <span class="cat-pip" style="background:var(--cat-policy)"></span>
+            Policy Analysis · Model Risk
+          </span>
+          <span class="card-format" style="background:var(--cat-policy)">Policy Analysis</span>
+        </div>
         <div class="card-title">Model Risk Management Guidance Updates</div>
         <div class="card-desc">
           What changed in the newly released 2026 Model Risk Management Guidance — a structured before-and-after breakdown of every material revision from SR 11-7, covering AI/ML model inclusion, tiering, vendor validation, fairness testing, and governance expectations.
         </div>
         <div class="card-meta">
           <span class="card-date">2026</span>
+          <span class="card-time">~10 min read</span>
           <span class="card-arrow">→</span>
         </div>
       </a>
 
-      <!-- CARD 5 — Press Play to Pay -->
-      <a class="card" href="artifacts/press-play-to-pay.html" target="_blank" rel="noopener" id="digital">
-        <span class="card-tag">Fiction · Digital Assets</span>
+      <!-- ── CARD 5: PRESS PLAY TO PAY ───────────────────── -->
+      <a class="card"
+         href="artifacts/press-play-to-pay.html"
+         target="_blank" rel="noopener"
+         data-cat="fiction"
+         data-title="press play pay sony stablecoin fiction digital assets gaming"
+         id="digital">
+        <div class="card-header-row">
+          <span class="card-tag">
+            <span class="cat-pip" style="background:var(--cat-fiction)"></span>
+            Fiction · Digital Assets
+          </span>
+          <span class="card-format" style="background:var(--cat-fiction)">Short Story</span>
+        </div>
         <div class="card-title">Press Play to Pay</div>
         <div class="card-desc">
-          A fictional story set in the near future — Sony launches a stablecoin for its gaming ecosystem, and regulators, banks, and consumers must reckon with what happens when a global entertainment company becomes a payment network. What does the GENIUS Act say? Who supervises PlayStation Finance?
+          A fictional story set in the near future — Sony launches a stablecoin for its gaming ecosystem, and regulators, banks, and consumers must reckon with what happens when a global entertainment company becomes a payment network.
         </div>
         <div class="card-meta">
           <span class="card-date">2026</span>
+          <span class="card-time">~10 min read</span>
           <span class="card-arrow">→</span>
         </div>
       </a>
 
-      <!-- CARD 6 — The Examiner That Never Leaves -->
-      <a class="card" href="artifacts/the-examiner-that-never-leaves.html" target="_blank" rel="noopener">
-        <span class="card-tag">Commentary · Supervision</span>
+      <!-- ── CARD 6: THE EXAMINER THAT NEVER LEAVES ──────── -->
+      <a class="card"
+         href="artifacts/the-examiner-that-never-leaves.html"
+         target="_blank" rel="noopener"
+         data-cat="supervision"
+         data-title="examiner never leaves continuous supervision api real time monitoring">
+        <div class="card-header-row">
+          <span class="card-tag">
+            <span class="cat-pip" style="background:var(--cat-supervision)"></span>
+            Commentary · Supervision
+          </span>
+          <span class="card-format" style="background:var(--cat-supervision)">Commentary</span>
+        </div>
         <div class="card-title">The Examiner That Never Leaves</div>
         <div class="card-desc">
-          A future where APIs enable 24/7 supervisory review — continuous examination, real-time data feeds, and algorithmic monitoring replace the annual exam cycle. What does it mean for banks, examiners, and the nature of the supervisory relationship?
+          A future where APIs enable 24/7 supervisory review — continuous examination, real-time data feeds, and algorithmic monitoring replace the annual exam cycle. What does it mean for banks, examiners, and the supervisory relationship?
         </div>
         <div class="card-meta">
           <span class="card-date">2026</span>
+          <span class="card-time">~8 min read</span>
           <span class="card-arrow">→</span>
         </div>
       </a>
 
-      <!-- CARD 7 — Special Charters Map -->
-      <a class="card" href="artifacts/special-charters-map.html" target="_blank" rel="noopener">
-        <span class="card-tag">Interactive · Chartering</span>
+      <!-- ── CARD 7: SPECIAL STATE CHARTERS ──────────────── -->
+      <a class="card"
+         href="artifacts/special-charters-map.html"
+         target="_blank" rel="noopener"
+         data-cat="interactive"
+         data-title="special state charters chartering innovation fintech">
+        <div class="card-header-row">
+          <span class="card-tag">
+            <span class="cat-pip" style="background:var(--cat-interactive)"></span>
+            Interactive · Chartering
+          </span>
+          <span class="card-format" style="background:var(--cat-interactive)">Interactive Map</span>
+        </div>
         <div class="card-title">Special State Charters</div>
         <div class="card-desc">
           Serving as a bedrock for innovation — an interactive look at special purpose state charter frameworks across the country, how they differ from traditional bank charters, and what they signal about the future of financial services licensing.
         </div>
         <div class="card-meta">
           <span class="card-date">2026</span>
+          <span class="card-time">Interactive Map</span>
           <span class="card-arrow">→</span>
         </div>
       </a>
 
-      <!-- CARD 8 — History of Banking -->
-      <a class="card" href="artifacts/history-of-banking.html" target="_blank" rel="noopener">
-        <span class="card-tag">History · Banking</span>
+      <!-- ── CARD 8: HISTORY OF BANKING ──────────────────── -->
+      <a class="card"
+         href="artifacts/history-of-banking.html"
+         target="_blank" rel="noopener"
+         data-cat="history"
+         data-title="history interstate banking united states mcfadden riegle neal dual banking">
+        <div class="card-header-row">
+          <span class="card-tag">
+            <span class="cat-pip" style="background:var(--cat-history)"></span>
+            History · Banking
+          </span>
+          <span class="card-format" style="background:var(--cat-history)">History</span>
+        </div>
         <div class="card-title">A History of Interstate Banking in the United States</div>
         <div class="card-desc">
           A quick look at the history of interstate banking in the United States — from unit banking restrictions and the McFadden Act to Riegle-Neal, the consolidation era, and the dual banking system as it stands today.
         </div>
         <div class="card-meta">
           <span class="card-date">2026</span>
+          <span class="card-time">~8 min read</span>
           <span class="card-arrow">→</span>
         </div>
       </a>
 
-      <!-- CARD 9 — Examining for AI -->
-      <a class="card" href="artifacts/examining-for-AI.html" target="_blank" rel="noopener">
-        <span class="card-tag">Supervision · AI</span>
+      <!-- ── CARD 9: EXAMINING FOR AI ────────────────────── -->
+      <a class="card"
+         href="artifacts/examining-for-AI.html"
+         target="_blank" rel="noopener"
+         data-cat="supervision"
+         data-title="examining AI bank examination model governance supervision theoretical">
+        <div class="card-header-row">
+          <span class="card-tag">
+            <span class="cat-pip" style="background:var(--cat-supervision)"></span>
+            Supervision · AI
+          </span>
+          <span class="card-format" style="background:var(--cat-supervision)">Analysis</span>
+        </div>
         <div class="card-title">Examining for AI</div>
         <div class="card-desc">
           A theoretical review of how examiners might approach AI in a bank examination — what to look for, how to assess model governance, and what a future AI-focused examination module could look like under existing supervisory frameworks.
         </div>
         <div class="card-meta">
           <span class="card-date">2026</span>
+          <span class="card-time">~10 min read</span>
           <span class="card-arrow">→</span>
         </div>
       </a>
 
-      <!-- CARD 10 — Mythos Explainer -->
-      <a class="card" href="artifacts/mythos-explainer.html" target="_blank" rel="noopener">
-        <span class="card-tag">Explainer · AI Risk</span>
+      <!-- ── CARD 10: CLAUDE MYTHOS ───────────────────────── -->
+      <a class="card"
+         href="artifacts/mythos-explainer.html"
+         target="_blank" rel="noopener"
+         data-cat="supervision"
+         data-title="claude mythos AI risk supervisors financial services explainer">
+        <div class="card-header-row">
+          <span class="card-tag">
+            <span class="cat-pip" style="background:var(--cat-supervision)"></span>
+            Explainer · AI Risk
+          </span>
+          <span class="card-format" style="background:var(--cat-supervision)">Explainer</span>
+        </div>
         <div class="card-title">Why Supervisors Are Watching Claude Mythos</div>
         <div class="card-desc">
-          An overview of why financial services supervisors are concerned about Claude Mythos — what it is, how it differs from prior AI deployments in banking, and the regulatory, operational, and systemic risk questions it raises for examiners and institutions alike.
+          An overview of why financial services supervisors are concerned about Claude Mythos — what it is, how it differs from prior AI deployments in banking, and the regulatory, operational, and systemic risk questions it raises.
         </div>
         <div class="card-meta">
           <span class="card-date">2026</span>
+          <span class="card-time">~7 min read</span>
           <span class="card-arrow">→</span>
         </div>
       </a>
 
-      <!-- CARD 11 — Fed Supervisory Principles -->
-      <a class="card" href="artifacts/fed-supervisory-comp.html" target="_blank" rel="noopener">
-        <span class="card-tag">Policy Analysis · Federal Reserve</span>
+      <!-- ── CARD 11: FED SUPERVISORY PRINCIPLES ─────────── -->
+      <a class="card"
+         href="artifacts/fed-supervisory-comp.html"
+         target="_blank" rel="noopener"
+         data-cat="supervision"
+         data-title="federal reserve supervisory operating principles updated fed posture">
+        <div class="card-header-row">
+          <span class="card-tag">
+            <span class="cat-pip" style="background:var(--cat-supervision)"></span>
+            Policy Analysis · Federal Reserve
+          </span>
+          <span class="card-format" style="background:var(--cat-supervision)">Comparative</span>
+        </div>
         <div class="card-title">How the Fed Updated Its Supervisory Operating Principles</div>
         <div class="card-desc">
           A comparative look at how the Federal Reserve updated its Supervisory Operating Principles — what changed, what it signals about the Fed's evolving supervisory posture, and what the revisions mean for large bank holding companies and state member banks.
         </div>
         <div class="card-meta">
           <span class="card-date">2026</span>
+          <span class="card-time">~9 min read</span>
           <span class="card-arrow">→</span>
         </div>
       </a>
 
-      <!-- CARD 12 — Bank Merger Reform Scorecard -->
-      <a class="card" href="artifacts/bank-merger-reform-scorecard.html" target="_blank" rel="noopener">
-        <span class="card-tag">Policy Analysis · M&amp;A</span>
+      <!-- ── CARD 12: BANK MERGER REFORM ─────────────────── -->
+      <a class="card"
+         href="artifacts/bank-merger-reform-scorecard.html"
+         target="_blank" rel="noopener"
+         data-cat="policy"
+         data-title="bank merger reform scorecard M&A OCC FDIC Federal Reserve">
+        <div class="card-header-row">
+          <span class="card-tag">
+            <span class="cat-pip" style="background:var(--cat-policy)"></span>
+            Policy Analysis · M&amp;A
+          </span>
+          <span class="card-format" style="background:var(--cat-policy)">Scorecard</span>
+        </div>
         <div class="card-title">Bank Merger Reform Scorecard</div>
         <div class="card-desc">
-          An overview of merger and acquisition policy changes across the federal banking agencies — tracking where the OCC, FDIC, and Federal Reserve have moved, what the new frameworks require, and what the scorecard looks like for deals in the current environment.
+          An overview of merger and acquisition policy changes across the federal banking agencies — tracking where the OCC, FDIC, and Federal Reserve have moved and what the new frameworks require for deals in the current environment.
         </div>
         <div class="card-meta">
           <span class="card-date">2026</span>
+          <span class="card-time">Interactive · Scorecard</span>
           <span class="card-arrow">→</span>
         </div>
       </a>
 
-      <!-- CARD 13 — GENIUS Act Dashboard -->
-      <a class="card" href="artifacts/genius-act-dashboard.html" target="_blank" rel="noopener">
-        <span class="card-tag">Digital Assets · Legislation</span>
+      <!-- ── CARD 13: GENIUS ACT DASHBOARD ───────────────── -->
+      <a class="card"
+         href="artifacts/genius-act-dashboard.html"
+         target="_blank" rel="noopener"
+         data-cat="digital"
+         data-title="genius act stablecoin implementation dashboard digital assets legislation">
+        <div class="card-header-row">
+          <span class="card-tag">
+            <span class="cat-pip" style="background:var(--cat-digital)"></span>
+            Digital Assets · Legislation
+          </span>
+          <span class="card-format" style="background:var(--cat-digital)">Dashboard</span>
+        </div>
         <div class="card-title">GENIUS Act Implementation Dashboard</div>
         <div class="card-desc">
-          An implementation update for the groundbreaking GENIUS Act — tracking regulatory milestones, agency rulemaking timelines, stablecoin issuer compliance obligations, and the state-federal charter pathway debate as the framework moves from statute to supervision.
+          An implementation update for the groundbreaking GENIUS Act — tracking regulatory milestones, agency rulemaking timelines, stablecoin issuer obligations, and the state-federal charter pathway debate as the framework moves from statute to supervision.
         </div>
         <div class="card-meta">
           <span class="card-date">2026</span>
+          <span class="card-time">Interactive · Dashboard</span>
           <span class="card-arrow">→</span>
         </div>
       </a>
 
-      <!-- CARD 14 — AML/CFT Program Rule Navigator -->
-      <a class="card" href="artifacts/aml-cft-program-rule-navigator.html" target="_blank" rel="noopener">
-        <span class="card-tag">Compliance · AML/CFT</span>
+      <!-- ── CARD 14: AML/CFT PROGRAM RULE ───────────────── -->
+      <a class="card"
+         href="artifacts/aml-cft-program-rule-navigator.html"
+         target="_blank" rel="noopener"
+         data-cat="compliance"
+         data-title="AML CFT program rule navigator FinCEN AML Act BSA rulemaking">
+        <div class="card-header-row">
+          <span class="card-tag">
+            <span class="cat-pip" style="background:var(--cat-compliance)"></span>
+            Compliance · AML/CFT
+          </span>
+          <span class="card-format" style="background:var(--cat-compliance)">Navigator</span>
+        </div>
         <div class="card-title">AML/CFT Program Rule Navigator</div>
         <div class="card-desc">
-          Key changes in the landmark AML Act rulemaking — a structured guide to FinCEN's revised program rule requirements, the risk assessment mandate, beneficial ownership updates, and what banks need to do to align their compliance programs with the new standard.
+          Key changes in the landmark AML Act rulemaking — a structured guide to FinCEN's revised program rule requirements, the risk assessment mandate, beneficial ownership updates, and what banks need to do to align their compliance programs.
         </div>
         <div class="card-meta">
           <span class="card-date">2026</span>
+          <span class="card-time">Interactive · Navigator</span>
           <span class="card-arrow">→</span>
         </div>
       </a>
 
-      <!-- CARD 15 — Gould OCC Policy Tracker -->
-      <a class="card" href="artifacts/gould-occ-policy-tracker.html" target="_blank" rel="noopener">
-        <span class="card-tag">Policy Tracker · OCC</span>
+      <!-- ── CARD 15: GOULD OCC POLICY TRACKER ───────────── -->
+      <a class="card"
+         href="artifacts/gould-occ-policy-tracker.html"
+         target="_blank" rel="noopener"
+         data-cat="tracker"
+         data-title="gould OCC comptroller policy tracker national banks federal thrifts">
+        <div class="card-header-row">
+          <span class="card-tag">
+            <span class="cat-pip" style="background:var(--cat-tracker)"></span>
+            Policy Tracker · OCC
+          </span>
+          <span class="card-format" style="background:var(--cat-tracker)">Live Tracker</span>
+        </div>
         <div class="card-title">The Gould OCC: Policy Tracker</div>
         <div class="card-desc">
-          A running account of the aggressive policy actions from Comptroller Gould's OCC — chartering decisions, supervisory guidance rescissions, digital asset interpretive letters, merger policy shifts, and what the new OCC posture means for national banks and federal thrifts.
+          A running account of the aggressive policy actions from Comptroller Gould's OCC — chartering decisions, supervisory guidance rescissions, digital asset interpretive letters, merger policy shifts, and what the new OCC posture means for national banks.
         </div>
         <div class="card-meta">
           <span class="card-date">2026</span>
+          <span class="card-time">Tracker</span>
           <span class="card-arrow">→</span>
         </div>
       </a>
 
     </div><!-- /artifact-grid -->
 
-    <!-- ── HOW TO ADD ─────────────────────────────────────────── -->
+    <div class="no-results" id="noResults">
+      <p>No artifacts match your search.</p>
+    </div>
+
     <div class="add-strip">
       <p>
-        To add an artifact → copy a <code>&lt;a class="card"&gt;</code> block · set <code>href</code> to your file path · update the tag, title, and description
+        To add an artifact → copy a <code>&lt;a class="card"&gt;</code> block · set <code>href</code> · update tag, title, and description
       </p>
     </div>
 
   </main>
 
-  <!-- ═══ FOOTER ════════════════════════════════════════════════ -->
+  <!-- ═══ FOOTER ════════════════════════════════════════════ -->
   <footer>
     <span class="footer-brand">The Ledger</span>
     <span class="footer-copy">Ideas at the Frontier of Financial Services</span>
@@ -782,12 +1125,53 @@
   </footer>
 
   <script>
-    // Set current date in masthead
+    // ── Date ──
     const now = new Date();
     document.getElementById('currentDate').textContent =
       now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-    document.getElementById('footerYear').textContent =
-      '© ' + now.getFullYear();
+    document.getElementById('footerYear').textContent = '© ' + now.getFullYear();
+
+    // ── Filter ──
+    let activeFilter = 'all';
+    let searchTerm   = '';
+
+    function setFilter(cat) {
+      activeFilter = cat;
+      document.querySelectorAll('.filter-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.filter === cat);
+      });
+      applyFilters();
+    }
+
+    document.getElementById('searchInput').addEventListener('input', function() {
+      searchTerm = this.value.toLowerCase().trim();
+      applyFilters();
+    });
+
+    function applyFilters() {
+      const cards = document.querySelectorAll('.card');
+      let visible = 0;
+
+      cards.forEach(card => {
+        const catMatch  = activeFilter === 'all' || card.dataset.cat === activeFilter;
+        const titleText = (card.dataset.title || '') + ' ' + (card.querySelector('.card-title')?.textContent || '');
+        const descText  = card.querySelector('.card-desc')?.textContent || '';
+        const searchMatch = !searchTerm ||
+          titleText.toLowerCase().includes(searchTerm) ||
+          descText.toLowerCase().includes(searchTerm);
+
+        if (catMatch && searchMatch) {
+          card.classList.remove('hidden');
+          visible++;
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+
+      document.getElementById('resultsCount').textContent =
+        visible === 15 ? '15 artifacts' : `${visible} of 15`;
+      document.getElementById('noResults').classList.toggle('visible', visible === 0);
+    }
   </script>
 
 </body>
