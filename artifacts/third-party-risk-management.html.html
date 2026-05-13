@@ -1402,7 +1402,7 @@ function TPRMv5() {
             span({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9}}),
             span({style:{fontSize:12,color:active?tc:C.text3}}), s.icon+' ',
             span({style:{fontFamily:"'EB Garamond',Georgia,serif",fontSize:12,color:active?C.text0:C.text2}}), s.label, ' ',
-            div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:8,color:tc,background:tc+'15',borderRadius:2,padding:'0 4px'}}), typeLabel(s.type)
+            div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:8,color:tc,background:tc+'15',borderRadius:2,padding:'0 4px'}}, typeLabel(s.type))
           );
         })
       ),
@@ -1461,7 +1461,7 @@ function TPRMv5() {
           div({style:{padding:'9px 13px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:9}},
             div({style:{display:'flex',alignItems:'center',gap:7,flex:1,minWidth:0}},
               div({style:{width:5,height:5,borderRadius:'50%',background:C.gold,flexShrink:0}}),
-              span({style:{fontSize:13,color:open?C.text0:C.text1,fontWeight:open?600:400,lineHeight:1.4}}), a.label
+              span({style:{fontSize:13,color:open?C.text0:C.text1,fontWeight:open?600:400,lineHeight:1.4}}, a.label)
             ),
             div({style:{display:'flex',alignItems:'center',gap:5,flexShrink:0}},
               cfes?div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:cfes.color,background:cfes.color+'12',border:`1px solid ${cfes.color}25`,borderRadius:2,padding:'2px 5px',whiteSpace:'nowrap'}}, cfes.label):null,
@@ -1469,7 +1469,7 @@ function TPRMv5() {
             )
           ),
           open?div({style:{padding:'0 13px 11px 26px',borderTop:`1px solid ${C.borderSoft}`}},
-            p({style:{fontSize:13,color:C.text2,lineHeight:1.8,paddingTop:9,margin:0}}), a.detail
+            p({style:{fontSize:13,color:C.text2,lineHeight:1.8,paddingTop:9,margin:0}}, a.detail)
           ):null
         );
       })
@@ -1486,7 +1486,7 @@ function TPRMv5() {
           background:C.bg2,border:`1px solid ${cfg.c}20`,borderLeft:`3px solid ${cfg.c}`,borderRadius:7,padding:'10px 13px'
         }},
           div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:cfg.c,background:cfg.c+'15',border:`1px solid ${cfg.c}35`,borderRadius:3,padding:'2px 5px',flexShrink:0,marginTop:1}}), cfg.l,
-          p({style:{fontSize:13,color:C.text1,lineHeight:1.72,margin:0}}), r.text
+          p({style:{fontSize:13,color:C.text1,lineHeight:1.72,margin:0}}, r.text)
         );
       }),
       // Enforcement analytics panel
@@ -1517,20 +1517,20 @@ function TPRMv5() {
                   ),
                   div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:f.color,marginTop:2}}), f.pct+'%'
                 ),
-                p({style:{fontSize:12,color:C.text2,lineHeight:1.65,margin:0}}), f.detail
+                p({style:{fontSize:12,color:C.text2,lineHeight:1.65,margin:0}}, f.detail)
               )
             )
           ):null,
           enfView==='fdic'?div({},
             div({style:{display:'flex',gap:6,alignItems:'center',marginBottom:8}},
               div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:C.gold}}), ENFORCEMENT.fdic_proposed_rule.title,
-              div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:'#d4905a',background:'#d4905a12',border:'1px solid #d4905a30',borderRadius:2,padding:'1px 5px'}}), ENFORCEMENT.fdic_proposed_rule.status
+              div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:'#d4905a',background:'#d4905a12',border:'1px solid #d4905a30',borderRadius:2,padding:'1px 5px'}}, ENFORCEMENT.fdic_proposed_rule.status)
             ),
             div({style:{display:'flex',flexDirection:'column',gap:6}},
               ...ENFORCEMENT.fdic_proposed_rule.key_provisions.map((prov,i)=>
                 div({key:i,style:{display:'flex',gap:7,alignItems:'flex-start'}},
                   span({style:{color:C.gold,flexShrink:0,fontSize:9,marginTop:2}},'→'),
-                  p({style:{fontSize:12,color:C.text2,lineHeight:1.65,margin:0}}), prov
+                  p({style:{fontSize:12,color:C.text2,lineHeight:1.65,margin:0}}, prov)
                 )
               )
             )
@@ -1541,7 +1541,7 @@ function TPRMv5() {
               ...ENFORCEMENT.consumer_confusion.requirements.map((req,i)=>
                 div({key:i,style:{display:'flex',gap:7,alignItems:'flex-start'}},
                   span({style:{color:'#7ab07a',flexShrink:0,fontSize:9,marginTop:2}},'→'),
-                  p({style:{fontSize:12,color:C.text2,lineHeight:1.65,margin:0}}), req
+                  p({style:{fontSize:12,color:C.text2,lineHeight:1.65,margin:0}}, req)
                 )
               )
             )
@@ -1581,7 +1581,7 @@ function TPRMv5() {
           open?div({style:{borderTop:`1px solid ${C.borderSoft}`,background:C.dangerDim,padding:'8px 13px'}},
             div({style:{display:'flex',gap:7,alignItems:'flex-start'}},
               span({style:{color:C.danger,flexShrink:0,fontSize:9,marginTop:2}},'◆'),
-              p({style:{fontSize:12,color:'#d4a0a0',lineHeight:1.7,fontStyle:'italic',margin:0}}), q.flag
+              p({style:{fontSize:12,color:'#d4a0a0',lineHeight:1.7,fontStyle:'italic',margin:0}}, q.flag)
             )
           ):null
         );
@@ -1625,10 +1625,10 @@ function TPRMv5() {
             div({key:item.id,style:{background:C.bg2,border:`1px solid ${C.teal}25`,borderLeft:`3px solid ${C.teal}`,borderRadius:7,padding:'10px 12px'}},
               div({style:{display:'flex',alignItems:'center',gap:5,marginBottom:5}},
                 span({style:{fontFamily:"'EB Garamond',Georgia,serif",fontSize:12,fontWeight:600,color:C.text0}}), item.label,
-                div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:C.teal,background:C.teal+'15',borderRadius:2,padding:'1px 4px',marginLeft:'auto'}}), item.tier
+                div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:C.teal,background:C.teal+'15',borderRadius:2,padding:'1px 4px',marginLeft:'auto'}}, item.tier)
               ),
               div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:C.text3,marginBottom:3}},'Nth-party chain'),
-              p({style:{fontSize:12,color:'#c4a0b0',lineHeight:1.5,margin:0}}), item.relationship
+              p({style:{fontSize:12,color:'#c4a0b0',lineHeight:1.5,margin:0}}, item.relationship)
             )
           )
         ),
@@ -1638,10 +1638,10 @@ function TPRMv5() {
             div({key:item.id,style:{background:C.bg2,border:`1px solid ${C.gold}25`,borderLeft:`3px solid ${C.gold}`,borderRadius:7,padding:'10px 12px'}},
               div({style:{display:'flex',alignItems:'center',gap:5,marginBottom:5}},
                 span({style:{fontFamily:"'EB Garamond',Georgia,serif",fontSize:12,fontWeight:600,color:C.text0}}), item.label,
-                div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:C.gold,background:C.gold+'15',borderRadius:2,padding:'1px 4px',marginLeft:'auto'}}), item.tier
+                div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:C.gold,background:C.gold+'15',borderRadius:2,padding:'1px 4px',marginLeft:'auto'}}, item.tier)
               ),
               div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:C.text3,marginBottom:3}},'Nth-party chain'),
-              p({style:{fontSize:12,color:'#c4a0b0',lineHeight:1.5,margin:0}}), item.relationship
+              p({style:{fontSize:12,color:'#c4a0b0',lineHeight:1.5,margin:0}}, item.relationship)
             )
           )
         )
@@ -1651,15 +1651,15 @@ function TPRMv5() {
         ...TAXONOMY.differences.map((d,i)=>
           div({key:i,style:{display:'grid',gridTemplateColumns:'130px 1fr 1fr',background:C.bg2,border:`1px solid ${C.border}`,borderRadius:7,overflow:'hidden'}},
             div({style:{padding:'9px 11px',borderRight:`1px solid ${C.border}`,display:'flex',alignItems:'center'}},
-              div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:C.gold,fontWeight:500,lineHeight:1.4}}), d.dimension
+              div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:C.gold,fontWeight:500,lineHeight:1.4}}, d.dimension)
             ),
             div({style:{padding:'9px 11px',borderRight:`1px solid ${C.borderSoft}`,background:C.teal+'08'}},
               div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:C.teal,marginBottom:3}},'Traditional'),
-              p({style:{fontSize:12,color:C.text1,lineHeight:1.6,margin:0}}), d.traditional
+              p({style:{fontSize:12,color:C.text1,lineHeight:1.6,margin:0}}, d.traditional)
             ),
             div({style:{padding:'9px 11px',background:C.gold+'08'}},
               div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:C.gold,marginBottom:3}},'BaaS'),
-              p({style:{fontSize:12,color:C.text1,lineHeight:1.6,margin:0}}), d.baas
+              p({style:{fontSize:12,color:C.text1,lineHeight:1.6,margin:0}}, d.baas)
             )
           )
         )
@@ -1682,12 +1682,12 @@ function TPRMv5() {
           ...NTH_PARTY.tiers.map((tier,i)=>
             div({key:i,style:{background:C.bg2,border:`1px solid ${tier.color}25`,borderLeft:`3px solid ${tier.color}`,borderRadius:7,padding:'11px 13px'}},
               div({style:{display:'flex',gap:8,alignItems:'center',marginBottom:6}},
-                span({style:{fontFamily:"'EB Garamond',Georgia,serif",fontSize:13,fontWeight:600,color:tier.color}}), tier.tier
+                span({style:{fontFamily:"'EB Garamond',Georgia,serif",fontSize:13,fontWeight:600,color:tier.color}}, tier.tier)
               ),
               div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:C.text3,marginBottom:3,letterSpacing:'1px',textTransform:'uppercase'}},'Oversight Mechanism'),
               p({style:{fontSize:12,color:C.text1,lineHeight:1.65,marginBottom:6,margin:0}}), tier.oversight,
               div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:tier.color,marginBottom:3,letterSpacing:'1px',textTransform:'uppercase',marginTop:6}},'Examples'),
-              p({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:C.text3,lineHeight:1.5,margin:0}}), tier.example
+              p({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:C.text3,lineHeight:1.5,margin:0}}, tier.example)
             )
           )
         ):null,
@@ -1724,7 +1724,7 @@ function TPRMv5() {
                 div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:cfg.c,background:cfg.c+'15',border:`1px solid ${cfg.c}35`,borderRadius:3,padding:'1px 5px'}}), r.severity==='high'?'High':'Moderate',
                 span({style:{fontFamily:"'EB Garamond',Georgia,serif",fontSize:13,fontWeight:600,color:C.text0}}), ' '+r.risk
               ),
-              p({style:{fontSize:12,color:C.text2,lineHeight:1.7,margin:0}}), r.detail
+              p({style:{fontSize:12,color:C.text2,lineHeight:1.7,margin:0}}, r.detail)
             );
           })
         ):null
@@ -1759,15 +1759,15 @@ function TPRMv5() {
           ...DORA.comparison.map((d,i)=>
             div({key:i,style:{display:'grid',gridTemplateColumns:'90px 1fr 1fr',background:C.bg3,borderRadius:5,overflow:'hidden'}},
               div({style:{padding:'6px 9px',borderRight:`1px solid ${C.border}`,display:'flex',alignItems:'center'}},
-                div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:'#5a80d4',lineHeight:1.3}}), d.dimension
+                div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:'#5a80d4',lineHeight:1.3}}, d.dimension)
               ),
               div({style:{padding:'6px 9px',borderRight:`1px solid ${C.borderSoft}`}},
                 div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:C.text3,marginBottom:2}},'U.S.'),
-                p({style:{fontSize:11,color:C.text2,lineHeight:1.5,margin:0}}), d.us
+                p({style:{fontSize:11,color:C.text2,lineHeight:1.5,margin:0}}, d.us)
               ),
               div({style:{padding:'6px 9px',background:'#5a80d408'}},
                 div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:'#7aa0f4',marginBottom:2}},'EU (DORA)'),
-                p({style:{fontSize:11,color:C.text1,lineHeight:1.5,margin:0}}), d.eu
+                p({style:{fontSize:11,color:C.text1,lineHeight:1.5,margin:0}}, d.eu)
               )
             )
           )
@@ -1822,7 +1822,7 @@ function TPRMv5() {
                   span({style:{fontSize:16,color:C.gold,flexShrink:0}}), item.icon,
                   div({},
                     div({style:{fontFamily:"'EB Garamond',Georgia,serif",fontSize:12,fontWeight:600,color:C.text0,marginBottom:3}}), item.label,
-                    p({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:C.text3,lineHeight:1.6,margin:0}}), item.desc
+                    p({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:C.text3,lineHeight:1.6,margin:0}}, item.desc)
                   )
                 )
               )
@@ -1835,7 +1835,7 @@ function TPRMv5() {
               ...ABOUT.tabs.map((item,i)=>
                 div({key:i,style:{display:'flex',gap:9,alignItems:'flex-start',background:C.bg2,border:`1px solid ${item.color}20`,borderLeft:`3px solid ${item.color}`,borderRadius:6,padding:'9px 12px'}},
                   div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:item.color,background:item.color+'15',borderRadius:3,padding:'2px 6px',flexShrink:0,marginTop:1,whiteSpace:'nowrap'}}), item.tab,
-                  p({style:{fontSize:12,color:C.text2,lineHeight:1.7,margin:0}}), item.desc
+                  p({style:{fontSize:12,color:C.text2,lineHeight:1.7,margin:0}}, item.desc)
                 )
               )
             )
@@ -1847,7 +1847,7 @@ function TPRMv5() {
               ...ABOUT.glossary.map((item,i)=>
                 div({key:i,style:{background:C.bg2,border:`1px solid ${item.color}20`,borderLeft:`3px solid ${item.color}`,borderRadius:7,padding:'11px 13px'}},
                   div({style:{fontFamily:"'EB Garamond',Georgia,serif",fontSize:13,fontWeight:600,color:item.color,marginBottom:5,lineHeight:1.3}}), item.term,
-                  p({style:{fontSize:12,color:C.text2,lineHeight:1.8,margin:0}}), item.def
+                  p({style:{fontSize:12,color:C.text2,lineHeight:1.8,margin:0}}, item.def)
                 )
               )
             )
@@ -1859,7 +1859,7 @@ function TPRMv5() {
               ...ABOUT.sources.map((item,i)=>
                 div({key:i,style:{display:'flex',gap:7,alignItems:'flex-start',background:C.bg2,borderRadius:5,padding:'7px 10px'}},
                   div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:item.color,background:item.color+'12',borderRadius:2,padding:'1px 5px',flexShrink:0,marginTop:1,whiteSpace:'nowrap'}}), item.src,
-                  p({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:C.text3,lineHeight:1.5,margin:0}}), item.full
+                  p({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:C.text3,lineHeight:1.5,margin:0}}, item.full)
                 )
               )
             )
@@ -1936,7 +1936,7 @@ function TPRMv5() {
                 s.number,
                 active ? span({style:{width:5,height:5,borderRadius:'50%',background:C.gold,boxShadow:`0 0 6px ${C.gold}`,display:'inline-block'}}) : null
               ),
-              div({style:{fontFamily:"'EB Garamond',Georgia,serif",fontSize:13,fontWeight:active?600:400,color:C.text0,lineHeight:1.2,whiteSpace:'nowrap'}}), s.title
+              div({style:{fontFamily:"'EB Garamond',Georgia,serif",fontSize:13,fontWeight:active?600:400,color:C.text0,lineHeight:1.2,whiteSpace:'nowrap'}}, s.title)
             )
           );
         })
@@ -1989,11 +1989,11 @@ function TPRMv5() {
               transition:'all .15s ease',borderRadius:'0 4px 4px 0',marginBottom:1,cursor:'pointer',
             }},
               div({style:{display:'flex',alignItems:'center',gap:5}},
-                span({style:{fontSize:11,color:C.teal}}), s.icon,
-                span({style:{fontFamily:"'EB Garamond',Georgia,serif",fontSize:11,fontWeight:active?600:400,color:C.text0,lineHeight:1.2}}), s.label,
+                span({style:{fontSize:11,color:C.teal}}, s.icon),
+                span({style:{fontFamily:"'EB Garamond',Georgia,serif",fontSize:11,fontWeight:active?600:400,color:C.text0,lineHeight:1.2}}, s.label),
                 div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:8,color:C.teal,background:C.teal+'15',borderRadius:2,padding:'0 3px',marginLeft:'auto',flexShrink:0}}), s.tier==='Critical'?'Crit':'Sig'
               ),
-              p({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:8,color:C.text2,lineHeight:1.4,paddingLeft:16,margin:0}}), s.desc
+              p({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:8,color:C.text2,lineHeight:1.4,paddingLeft:16,margin:0}}, s.desc)
             );
           })
         ),
@@ -2009,11 +2009,11 @@ function TPRMv5() {
               transition:'all .15s ease',borderRadius:'0 4px 4px 0',marginBottom:1,cursor:'pointer',
             }},
               div({style:{display:'flex',alignItems:'center',gap:5}},
-                span({style:{fontSize:11,color:C.gold}}), s.icon,
-                span({style:{fontFamily:"'EB Garamond',Georgia,serif",fontSize:11,fontWeight:active?600:400,color:C.text0,lineHeight:1.2}}), s.label,
+                span({style:{fontSize:11,color:C.gold}}, s.icon),
+                span({style:{fontFamily:"'EB Garamond',Georgia,serif",fontSize:11,fontWeight:active?600:400,color:C.text0,lineHeight:1.2}}, s.label),
                 div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:8,color:C.gold,background:C.gold+'15',borderRadius:2,padding:'0 3px',marginLeft:'auto',flexShrink:0}}), 'Crit'
               ),
-              p({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:8,color:C.text2,lineHeight:1.4,paddingLeft:16,margin:0}}), s.desc
+              p({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:8,color:C.text2,lineHeight:1.4,paddingLeft:16,margin:0}}, s.desc)
             );
           })
         ),
@@ -2023,7 +2023,7 @@ function TPRMv5() {
           ...[['L1','Optimized',C.gold],['L2','Strategic',C.goldMid],['L3','Integrated','#7ab07a'],['L4','Documented','#d47a5a'],['L5','Rudimentary',C.danger]].map(([l,label,c])=>
             div({key:l,style:{display:'flex',gap:5,alignItems:'center',marginBottom:2}},
               div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:c,width:16}}), l,
-              div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:C.text2}}), label
+              div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:C.text2}}, label)
             )
           )
         )
@@ -2043,12 +2043,12 @@ function TPRMv5() {
               span({style:{color:C.borderSoft}},'·'),
               div({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:C.text3}}), stage.cites.join(' · ')
             ),
-            h2({style:{fontFamily:"'EB Garamond',Georgia,serif",fontSize:19,fontWeight:600,color:C.text0,lineHeight:1.1,margin:0}}), stage.title
+            h2({style:{fontFamily:"'EB Garamond',Georgia,serif",fontSize:19,fontWeight:600,color:C.text0,lineHeight:1.1,margin:0}}, stage.title)
           ),
           // Scenario badge
           div({style:{display:'flex',alignItems:'center',gap:5,background:typeColor(scenario.type)+'15',border:`1px solid ${typeColor(scenario.type)}40`,borderRadius:4,padding:'4px 9px',flexShrink:0}},
             span({style:{fontSize:12,color:typeColor(scenario.type)}}), scenario.icon, ' ',
-            span({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:typeColor(scenario.type)}}), scenario.abbr
+            span({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:9,color:typeColor(scenario.type)}}, scenario.abbr)
           ),
           // Prev/next
           div({style:{display:'flex',gap:3,flexShrink:0}},
@@ -2091,7 +2091,7 @@ function TPRMv5() {
               boxShadow:active?`0 0 10px ${C.gold}40`:'none',
               transition:'all .2s ease',
             }},
-              span({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:7,color:active?C.bg0:past?C.gold:C.text3,fontWeight:500}}), s.number
+              span({style:{fontFamily:"'IBM Plex Mono',monospace",fontSize:7,color:active?C.bg0:past?C.gold:C.text3,fontWeight:500}}, s.number)
             ),
             i<STAGES.length-1?div({style:{width:2,height:12,background:i<stageIdx?C.gold+'50':C.borderSoft,borderRadius:1,transition:'background .3s ease'}}):null
           );
